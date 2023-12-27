@@ -22,7 +22,7 @@ plugins {
 }
 
 group = "com.blr19c.falowp"
-version = "1.0.1"
+version = "1.0.0"
 
 application {
     mainClass.set("com.blr19c.ApplicationKt")
@@ -101,23 +101,56 @@ configurations.all {
     }
 }
 
+tasks.register<Jar>("javadocJar") {
+    archiveClassifier.set("javadoc")
+    from(tasks.getByName("javadoc"))
+}
+
+tasks.register<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
+}
+
+artifacts {
+    add("archives", tasks.named<Jar>("javadocJar"))
+    add("archives", tasks.named<Jar>("sourcesJar"))
+}
+
 
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            from(components["kotlin"])
+            from(components["java"])
             groupId = project.group.toString()
+            artifactId = "falowp-bot-system"
             version = project.version.toString()
+
+            artifact(tasks.getByName<Jar>("javadocJar")) {
+                classifier = "javadoc"
+            }
+            artifact(tasks.getByName<Jar>("sourcesJar")) {
+                classifier = "sources"
+            }
+
             pom {
                 name.set("${project.group}:falowp-bot-system")
                 description.set("FalowpBot system infrastructure")
+                packaging = "jar"
                 url.set("https://github.com/bingliran/falowp-bot-system.git")
+
+                scm {
+                    url.set("https://github.com/bingliran/falowp-bot-system")
+                    connection.set("https://github.com/bingliran/falowp-bot-system.git")
+                    developerConnection.set("scm:git:ssh://github.com:bingliran/falowp-bot-system.git")
+                }
+
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
                         url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
+
                 developers {
                     developer {
                         id.set("blr")
@@ -137,21 +170,18 @@ publishing {
 
     repositories {
         maven {
-            name = "sonatype"
-            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
             credentials {
-                username = project.findProperty("ossrhUsername") as String?
-                password = project.findProperty("ossrhPassword") as String?
+                username = project.findProperty("ossrhUsername").toString()
+                password = project.findProperty("ossrhPassword").toString()
             }
         }
-        mavenLocal()
     }
 }
 
 signing {
-    useInMemoryPgpKeys(
-        project.findProperty("signing.keyId") as String?,
-        project.findProperty("signing.password") as String?,
-    )
+    useGpgCmd()
+    setRequired({ true })
+    sign(publishing.publications)
 }
 
