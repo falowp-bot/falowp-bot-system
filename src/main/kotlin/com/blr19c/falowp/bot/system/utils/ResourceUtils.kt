@@ -107,7 +107,7 @@ object ResourceUtils {
         return if (resourceLocation.startsWith(CLASSPATH_URL_PREFIX)) {
             true
         } else try {
-            URL(resourceLocation)
+            URI.create(resourceLocation)
             true
         } catch (ex: MalformedURLException) {
             false
@@ -142,7 +142,7 @@ object ResourceUtils {
         }
         return try {
             // try URL
-            URL(resourceLocation)
+            URI.create(resourceLocation).toURL()
         } catch (ex: MalformedURLException) {
             // no URL -> treat as file path
             try {
@@ -184,7 +184,7 @@ object ResourceUtils {
         }
         return try {
             // try URL
-            getFile(URL(resourceLocation))
+            getFile(URI.create(resourceLocation))
         } catch (ex: MalformedURLException) {
             // no URL -> treat as file path
             File(resourceLocation)
@@ -322,14 +322,14 @@ object ResourceUtils {
         return if (separatorIndex != -1) {
             var jarFile = urlFile.substring(0, separatorIndex)
             try {
-                URL(jarFile)
+                URI.create(jarFile).toURL()
             } catch (ex: MalformedURLException) {
                 // Probably no protocol in original jar URL, like "jar:C:/mypath/myjar.jar".
                 // This usually indicates that the jar file resides in the file system.
                 if (!jarFile.startsWith("/")) {
                     jarFile = "/$jarFile"
                 }
-                URL(FILE_URL_PREFIX + jarFile)
+                URI.create(FILE_URL_PREFIX + jarFile).toURL()
             }
         } else {
             jarUrl
@@ -357,11 +357,11 @@ object ResourceUtils {
             // Tomcat's "war:file:...mywar.war*/WEB-INF/lib/myjar.jar!/myentry.txt"
             val warFile = urlFile.substring(0, endIndex)
             if (URL_PROTOCOL_WAR == jarUrl.protocol) {
-                return URL(warFile)
+                return URI.create(warFile).toURL()
             }
             val startIndex = warFile.indexOf(WAR_URL_PREFIX)
             if (startIndex != -1) {
-                return URL(warFile.substring(startIndex + WAR_URL_PREFIX.length))
+                return URI.create(warFile.substring(startIndex + WAR_URL_PREFIX.length)).toURL()
             }
         }
 
@@ -392,8 +392,8 @@ object ResourceUtils {
      * @throws URISyntaxException if the location wasn't a valid URI
      */
     @Throws(URISyntaxException::class)
-    fun toURI(location: String?): URI {
-        return URI(StringUtils.replace(location!!, " ", "%20"))
+    fun toURI(location: String): URI {
+        return URI(location.replace(" ", "%20"))
     }
 
     /**

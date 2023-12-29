@@ -1,6 +1,5 @@
 package com.blr19c.falowp.bot.system.scheduling.cron
 
-import com.blr19c.falowp.bot.system.utils.StringUtils
 import java.time.DateTimeException
 import java.time.temporal.Temporal
 import java.time.temporal.ValueRange
@@ -192,7 +191,7 @@ internal class BitsCronField private constructor(type: Type) : CronField(type) {
         private fun parseField(value: String, type: Type): BitsCronField {
             return try {
                 val result = BitsCronField(type)
-                val fields: Array<String> = StringUtils.delimitedListToStringArray(value, ",")
+                val fields: Array<String> = value.split(",").toTypedArray()
                 for (field in fields) {
                     val slashPos = field.indexOf('/')
                     if (slashPos == -1) {

@@ -1,6 +1,5 @@
 package com.blr19c.falowp.bot.system.scheduling.cron
 
-import com.blr19c.falowp.bot.system.utils.StringUtils
 import java.time.temporal.ChronoUnit
 import java.time.temporal.Temporal
 
@@ -199,7 +198,7 @@ class CronExpression private constructor(
         fun parse(exp: String): CronExpression {
             var expression = exp
             expression = resolveMacros(expression)
-            val fields: Array<String> = StringUtils.tokenizeToStringArray(expression, " ")
+            val fields: Array<String> = expression.split(" ").toTypedArray()
             require(fields.size == 6) {
                 String.format(
                     "Cron expression must consist of 6 fields (found %d in \"%s\")", fields.size, expression

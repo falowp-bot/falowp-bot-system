@@ -2,7 +2,6 @@ package com.blr19c.falowp.bot.system.scheduling.cron
 
 import com.blr19c.falowp.bot.system.scheduling.cron.QuartzCronField.Companion.isQuartzDaysOfMonthField
 import com.blr19c.falowp.bot.system.scheduling.cron.QuartzCronField.Companion.isQuartzDaysOfWeekField
-import com.blr19c.falowp.bot.system.utils.StringUtils
 import java.time.DateTimeException
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
@@ -279,7 +278,7 @@ internal abstract class CronField protected constructor(private val type: Type) 
             type: Type,
             parseFieldFunction: BiFunction<String, Type, CronField>
         ): CronField {
-            val fields: Array<String> = StringUtils.delimitedListToStringArray(value, ",")
+            val fields: Array<String> = value.split(",").toTypedArray()
             val cronFields = arrayOfNulls<CronField>(fields.size)
             for (i in fields.indices) {
                 cronFields[i] = parseFieldFunction.apply(fields[i], type)
@@ -292,7 +291,7 @@ internal abstract class CronField protected constructor(private val type: Type) 
             value = value.uppercase(Locale.getDefault())
             for (i in list.indices) {
                 val replacement = (i + 1).toString()
-                value = StringUtils.replace(value, list[i], replacement)
+                value = value.replace(list[i], replacement)
             }
             return value
         }

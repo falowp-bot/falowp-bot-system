@@ -126,7 +126,7 @@ object QQWebSocket : Log {
         log().info("QQ适配器接收到消息:{}", opReceiveMessage)
         val atList = opReceiveMessage.d.content.at
         val guildId = opReceiveMessage.d.guildId
-        val message = opReceiveMessage.d.content.message.trim()
+        val message = opReceiveMessage.d.content.message.trim().substringAfter("/")
         val imageList = opReceiveMessage.d.attachments
         val content = ReceiveMessage.Content(
             message,

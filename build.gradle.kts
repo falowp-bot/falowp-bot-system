@@ -22,7 +22,7 @@ plugins {
 }
 
 group = "com.blr19c.falowp"
-version = "1.0.0"
+version = "1.0.1-beta-1"
 
 application {
     mainClass.set("com.blr19c.ApplicationKt")
@@ -136,12 +136,12 @@ publishing {
                 name.set("${project.group}:falowp-bot-system")
                 description.set("FalowpBot system infrastructure")
                 packaging = "jar"
-                url.set("https://github.com/bingliran/falowp-bot-system.git")
+                url.set("https://github.com/falowp-bot/falowp-bot-system.git")
 
                 scm {
-                    url.set("https://github.com/bingliran/falowp-bot-system")
-                    connection.set("https://github.com/bingliran/falowp-bot-system.git")
-                    developerConnection.set("scm:git:ssh://github.com:bingliran/falowp-bot-system.git")
+                    url.set("https://github.com/falowp-bot/falowp-bot-system.git")
+                    connection.set("https://github.com/falowp-bot/falowp-bot-system.git")
+                    developerConnection.set("scm:git:ssh://github.com:falowp-bot/falowp-bot-system.git")
                 }
 
                 licenses {
@@ -158,7 +158,7 @@ publishing {
                         email.set("bingliran@126.com")
                         organization {
                             name = "blr19c"
-                            url = "https://blr19c.com"
+                            url = "https://falowp.blr19c.com"
                         }
                         timezone.set("+8")
                         roles.add("developer")
