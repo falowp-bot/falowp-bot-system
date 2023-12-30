@@ -1,7 +1,7 @@
 package com.blr19c.falowp.bot.system
 
-import com.blr19c.falowp.bot.system.utils.ClassUtils
-import com.blr19c.falowp.bot.system.utils.ScanUtils.getCallerClass
+import com.blr19c.falowp.bot.system.utils.ScanUtils.configPath
+import com.blr19c.falowp.bot.system.utils.ScanUtils.pluginPath
 import com.typesafe.config.ConfigFactory
 import io.ktor.server.config.*
 import kotlinx.coroutines.Dispatchers
@@ -102,9 +102,8 @@ suspend fun readResource(path: String): ByteArray {
  */
 suspend fun <R> readResource(path: String, block: (InputStream) -> R): R {
     return withContext(Dispatchers.IO) {
-        Thread.currentThread()
-            .contextClassLoader
-            .getResourceAsStream(path)!!
+        (Thread.currentThread().getContextClassLoader().getResourceAsStream(path)
+            ?: throw IllegalStateException("资源${path}不存在"))
             .use { block.invoke(it) }
     }
 }
@@ -122,24 +121,4 @@ suspend fun readPluginResource(path: String): ByteArray {
 suspend fun <R> readPluginResource(path: String, block: (InputStream) -> R): R {
     val pluginPath = pluginPath()
     return readResource("$pluginPath/$path") { block.invoke(it) }
-}
-
-private fun configPath(): String {
-    val callerClass = getCallerClass()
-    val qualifiedPath = callerClass.qualifiedName?.let {
-        val noClassNamePath = it.substringBeforeLast(".")
-        noClassNamePath.substringAfterLast("plugins")
-    }
-    val packageName = qualifiedPath ?: callerClass.java.packageName.substringAfterLast("plugins")
-    return "bot.plugin".plus(packageName).plus(".")
-}
-
-private fun pluginPath(): String {
-    val callerClass = getCallerClass()
-    val qualifiedPath = callerClass.qualifiedName?.let {
-        val noClassNamePath = it.substringBeforeLast(".")
-        noClassNamePath.substringAfterLast("plugins")
-    }
-    val packageName = qualifiedPath ?: callerClass.java.packageName.substringAfterLast("plugins")
-    return ClassUtils.convertClassNameToResourcePath("plugins".plus(packageName))
 }

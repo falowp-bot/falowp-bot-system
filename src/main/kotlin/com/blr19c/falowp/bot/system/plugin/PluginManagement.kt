@@ -33,7 +33,11 @@ object PluginManagement : Log {
 
     fun configure() {
         log().info("初始化插件")
-        val pluginList = systemConfigListProperty("pluginPackage")
+        val pluginPackage = systemConfigListProperty("pluginPackage")
+        if (!pluginPackage.all { it.endsWith(".plugins") }) {
+            throw IllegalStateException("pluginPackage:${pluginPackage}路径必须使用/plugins路径结尾")
+        }
+        val pluginList = pluginPackage
             .map(ScanUtils::scanPackage)
             .flatMap { it.stream().asSequence() }
             .mapNotNull { initPlugin(it) }

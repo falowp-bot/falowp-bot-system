@@ -25,10 +25,35 @@ object ScanUtils {
     }
 
     fun getCallerClass(packageNames: List<String> = systemConfigListProperty("pluginPackage")): KClass<*> {
+        return getCallerClassOrNull(packageNames)!!
+    }
+
+    fun getCallerClassOrNull(packageNames: List<String> = systemConfigListProperty("pluginPackage")): KClass<*>? {
         val className = Thread.currentThread().stackTrace
             .map { it.className }
-            .first { className -> packageNames.any { className.contains(it) } }
-        return Class.forName(className).kotlin
+            .firstOrNull { className -> packageNames.any { className.contains(it) } }
+        return className?.let { Class.forName(it).kotlin }
+    }
+
+
+    fun configPath(): String {
+        val callerClass = getCallerClass()
+        val qualifiedPath = callerClass.qualifiedName?.let {
+            val noClassNamePath = it.substringBeforeLast(".")
+            noClassNamePath.substringAfterLast("plugins")
+        }
+        val packageName = qualifiedPath ?: callerClass.java.packageName.substringAfterLast("plugins")
+        return "bot.plugin".plus(packageName).plus(".")
+    }
+
+    fun pluginPath(): String {
+        val callerClass = getCallerClass()
+        val qualifiedPath = callerClass.qualifiedName?.let {
+            val noClassNamePath = it.substringBeforeLast(".")
+            noClassNamePath.substringAfterLast("plugins")
+        }
+        val packageName = qualifiedPath ?: callerClass.java.packageName.substringAfterLast("plugins")
+        return convertClassNameToResourcePath("plugins".plus(packageName))
     }
 
     private fun scanDirectoryOrJar(url: URL, packageName: String): List<Class<*>> {
