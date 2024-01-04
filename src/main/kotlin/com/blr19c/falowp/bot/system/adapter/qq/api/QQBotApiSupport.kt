@@ -34,7 +34,8 @@ object QQBotApiSupport : SchedulingBotApiSupport {
     }
 
     override suspend fun bot(receiveId: String, originalClass: KClass<*>): BotApi {
-        return QQBotApi(ReceiveMessage.empty().copy(source = ReceiveMessage.Source(receiveId)), originalClass)
+        val message = ReceiveMessage.empty().copy(source = ReceiveMessage.Source.empty().copy(id = receiveId))
+        return QQBotApi(message, originalClass)
     }
 
     suspend fun userInfo(guildId: String, userId: String): OpUser {

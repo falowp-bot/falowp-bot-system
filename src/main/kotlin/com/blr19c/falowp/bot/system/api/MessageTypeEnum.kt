@@ -6,13 +6,13 @@ package com.blr19c.falowp.bot.system.api
 enum class MessageTypeEnum {
 
     /**
-     * 群聊消息
+     * 消息
      */
-    GROUP,
+    MESSAGE,
 
     /**
-     * 私聊消息
+     * 戳一戳
      */
-    PRIVATE
+    POKE
 
 }

@@ -8,7 +8,6 @@ import com.blr19c.falowp.bot.system.readResource
 import com.blr19c.falowp.bot.system.web.RouteInfo
 import com.blr19c.falowp.bot.system.web.WebServer
 import com.blr19c.falowp.bot.system.web.htmlToImageBase64
-import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jsoup.Jsoup

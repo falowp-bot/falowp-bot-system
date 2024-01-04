@@ -2,7 +2,7 @@ package com.blr19c.falowp.bot.system.plugin
 
 import com.blr19c.falowp.bot.system.api.ApiAuth
 import com.blr19c.falowp.bot.system.api.BotApi
-import com.blr19c.falowp.bot.system.api.MessageSubTypeEnum
+import com.blr19c.falowp.bot.system.api.MessageTypeEnum
 import com.blr19c.falowp.bot.system.plugin.hook.HookJoinPoint
 import com.blr19c.falowp.bot.system.plugin.hook.HookTypeEnum
 import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApi
@@ -66,6 +66,7 @@ annotation class Plugin(
                  * @param order 顺序
                  * @param block 执行内容
                  */
+                @JvmOverloads
                 inline fun <reified T : Hook> hook(
                     hookType: HookTypeEnum,
                     order: Int = 0,
@@ -78,6 +79,7 @@ annotation class Plugin(
                 /**
                  * 前置
                  */
+                @JvmOverloads
                 inline fun <reified T : Hook> beforeHook(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
@@ -89,6 +91,7 @@ annotation class Plugin(
                 /**
                  * 后置
                  */
+                @JvmOverloads
                 inline fun <reified T : Hook> afterReturningHook(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
@@ -100,6 +103,7 @@ annotation class Plugin(
                 /**
                  * 异常通知
                  */
+                @JvmOverloads
                 inline fun <reified T : Hook> afterThrowingHook(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
@@ -111,6 +115,7 @@ annotation class Plugin(
                 /**
                  * 最终通知
                  */
+                @JvmOverloads
                 inline fun <reified T : Hook> afterFinallyHook(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
@@ -122,6 +127,7 @@ annotation class Plugin(
                 /**
                  * 环绕
                  */
+                @JvmOverloads
                 inline fun <reified T : Hook> aroundHook(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
@@ -181,6 +187,7 @@ annotation class Plugin(
          * @param terminateEvent 执行完终止事件传播
          * @param block 执行内容
          */
+        @JvmOverloads
         fun message(
             regex: Regex,
             order: Int = 0,
@@ -203,6 +210,7 @@ annotation class Plugin(
          * @param terminateEvent 执行完终止事件传播
          * @param block 执行内容
          */
+        @JvmOverloads
         fun poke(
             order: Int = 0,
             auth: ApiAuth = ApiAuth.ORDINARY_MEMBER,
@@ -211,7 +219,7 @@ annotation class Plugin(
         ): Register {
             return MessagePluginRegister(
                 order,
-                MessagePluginRegisterMatch(messageSubType = MessageSubTypeEnum.POKE, auth = auth, atMe = true),
+                MessagePluginRegisterMatch(messageType = MessageTypeEnum.POKE, auth = auth, atMe = true),
                 terminateEvent,
                 block
             )
@@ -224,6 +232,7 @@ annotation class Plugin(
          * @param terminateEvent 执行完终止事件传播
          * @param block 执行内容
          */
+        @JvmOverloads
         fun message(
             match: MessagePluginRegisterMatch = MessagePluginRegisterMatch.allMatch(),
             order: Int = 0,

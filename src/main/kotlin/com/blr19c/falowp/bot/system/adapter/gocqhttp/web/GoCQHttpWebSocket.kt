@@ -6,9 +6,9 @@ import com.blr19c.falowp.bot.system.adapter.gocqhttp.api.GoCQHttpBotApi
 import com.blr19c.falowp.bot.system.adapter.gocqhttp.api.GoCQHttpEchoMessage
 import com.blr19c.falowp.bot.system.adapter.gocqhttp.api.GoCQHttpMessage
 import com.blr19c.falowp.bot.system.adapter.gocqhttp.api.GoCqHttpBotApiSupport
-import com.blr19c.falowp.bot.system.api.MessageSubTypeEnum
 import com.blr19c.falowp.bot.system.api.MessageTypeEnum
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
+import com.blr19c.falowp.bot.system.api.SourceTypeEnum
 import com.blr19c.falowp.bot.system.image.ImageUrl
 import com.blr19c.falowp.bot.system.json.Json
 import com.blr19c.falowp.bot.system.plugin.PluginManagement
@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference
 object GoCQHttpWebSocket : Log {
 
     fun configure() {
-        embeddedServer(Netty, port = systemConfigProperty("gocqhttp.port").toInt()) {
+        embeddedServer(Netty, port = systemConfigProperty("adapter.gocqhttp.port").toInt()) {
             config()
         }.start(wait = false)
     }
@@ -106,12 +106,11 @@ object GoCQHttpWebSocket : Log {
             GoCqHttpBotApiSupport.apiAuth(userId, goCQHttpMessage.sender?.role),
             GoCqHttpBotApiSupport.avatar(userId)
         )
-        val source = ReceiveMessage.Source(goCQHttpMessage.groupId ?: userId)
+        val source = ReceiveMessage.Source(goCQHttpMessage.groupId ?: userId, messageTypeEnum(goCQHttpMessage))
         val self = ReceiveMessage.Self(goCQHttpMessage.selfId!!)
         val messageId = goCQHttpMessage.messageId ?: UUID.randomUUID().toString()
-        val messageType = messageTypeEnum(goCQHttpMessage)
-        val subType = if (goCQHttpMessage.subType == "poke") MessageSubTypeEnum.POKE else MessageSubTypeEnum.MESSAGE
-        val receiveMessage = ReceiveMessage(messageId, messageType, subType, content, sender, source, self)
+        val messageType = if (goCQHttpMessage.subType == "poke") MessageTypeEnum.POKE else MessageTypeEnum.MESSAGE
+        val receiveMessage = ReceiveMessage(messageId, messageType, content, sender, source, self)
         PluginManagement.message(receiveMessage, GoCQHttpBotApi::class)
     }
 
@@ -200,9 +199,9 @@ object GoCQHttpWebSocket : Log {
     }
 
 
-    private fun messageTypeEnum(goCQHttpMessage: GoCQHttpMessage): MessageTypeEnum {
+    private fun messageTypeEnum(goCQHttpMessage: GoCQHttpMessage): SourceTypeEnum {
         return if (goCQHttpMessage.messageType == "group" || !goCQHttpMessage.groupId.isNullOrBlank())
-            MessageTypeEnum.GROUP
-        else MessageTypeEnum.PRIVATE
+            SourceTypeEnum.GROUP
+        else SourceTypeEnum.PRIVATE
     }
 }

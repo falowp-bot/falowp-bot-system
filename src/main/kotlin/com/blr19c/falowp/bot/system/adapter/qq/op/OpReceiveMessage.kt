@@ -70,6 +70,12 @@ data class OpReceiveMessage(
         val content: OpMessageContent,
 
         /**
+         * 是否私信
+         */
+        @field:JsonProperty("direct_message")
+        val directMessage: Boolean?,
+
+        /**
          * 附加资源
          */
         val attachments: List<Attachment>?,
@@ -155,12 +161,12 @@ data class OpReceiveMessage(
             /**
              * 用户的昵称
              */
-            val nick: String,
+            val nick: String?,
 
             /**
              * 在频道的身份
              */
-            val roles: List<String>,
+            val roles: List<String>?,
         )
     }
 }

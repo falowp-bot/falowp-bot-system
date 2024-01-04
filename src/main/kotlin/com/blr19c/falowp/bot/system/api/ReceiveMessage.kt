@@ -15,10 +15,6 @@ data class ReceiveMessage(
      */
     val messageType: MessageTypeEnum,
     /**
-     * 消息子类型
-     */
-    val messageSubType: MessageSubTypeEnum,
-    /**
      * 消息内容
      */
     val content: Content,
@@ -39,11 +35,10 @@ data class ReceiveMessage(
         fun empty(): ReceiveMessage {
             val content = Content.empty()
             val sender = User.empty()
-            val source = Source("")
+            val source = Source.empty()
             return ReceiveMessage(
                 "",
-                MessageTypeEnum.GROUP,
-                MessageSubTypeEnum.MESSAGE,
+                MessageTypeEnum.MESSAGE,
                 content,
                 sender,
                 source,
@@ -56,14 +51,21 @@ data class ReceiveMessage(
      * 是否为群聊消息
      */
     fun group(): Boolean {
-        return messageType === MessageTypeEnum.GROUP
+        return this.source.type === SourceTypeEnum.GROUP
     }
 
     /**
      * 是否为私聊
      */
     fun private(): Boolean {
-        return messageType === MessageTypeEnum.PRIVATE
+        return this.source.type === SourceTypeEnum.PRIVATE
+    }
+
+    /**
+     * 是否为频道消息
+     */
+    fun channel(): Boolean {
+        return this.source.type === SourceTypeEnum.CHANNEL
     }
 
     /**
@@ -155,7 +157,17 @@ data class ReceiveMessage(
          * 消息来源id
          */
         val id: String,
-    )
+        /**
+         * 消息来源类型
+         */
+        val type: SourceTypeEnum
+    ) {
+        companion object {
+            fun empty(): Source {
+                return Source("", SourceTypeEnum.UNKNOWN)
+            }
+        }
+    }
 
     data class Self(
         /**

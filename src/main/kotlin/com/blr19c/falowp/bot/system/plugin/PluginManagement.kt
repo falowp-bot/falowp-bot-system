@@ -101,8 +101,8 @@ object PluginManagement : Log {
     private fun filterMessagePlugin(receiveMessage: ReceiveMessage, plugin: MessagePluginRegister): Boolean {
         return plugin.match.regex?.matches(receiveMessage.content.message) ?: true
                 && plugin.match.sendId?.contains(receiveMessage.sender.id) ?: true
+                && plugin.match.sourceType?.equals(receiveMessage.source.type) ?: true
                 && plugin.match.messageType?.equals(receiveMessage.messageType) ?: true
-                && plugin.match.messageSubType?.equals(receiveMessage.messageSubType) ?: true
                 && plugin.match.atMe?.let { receiveMessage.atMe() } ?: true
                 && plugin.match.customBlock?.invoke(receiveMessage) ?: true
     }

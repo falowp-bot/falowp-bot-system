@@ -64,13 +64,13 @@ data class MessagePluginRegisterMatch(
      */
     val sendId: List<String>? = null,
     /**
-     * 匹配消息类型
+     * 匹配消息来源
      */
-    val messageType: MessageTypeEnum? = null,
+    val sourceType: SourceTypeEnum? = null,
     /**
      * 匹配消息类型
      */
-    val messageSubType: MessageSubTypeEnum? = null,
+    val messageType: MessageTypeEnum? = null,
     /**
      * 自定义匹配
      */

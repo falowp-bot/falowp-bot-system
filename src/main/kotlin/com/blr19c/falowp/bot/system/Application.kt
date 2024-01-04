@@ -11,8 +11,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 
-
-suspend fun start() = runBlocking {
+/**
+ * 启动
+ */
+fun start() = runBlocking {
     try {
         Resources.configure()
         Webdriver.configure()
@@ -26,8 +28,4 @@ suspend fun start() = runBlocking {
         val log = LoggerFactory.getLogger(this::class.java)
         log.error("启动失败", e)
     }
-}
-
-suspend fun main() {
-    start()
 }

@@ -9,9 +9,9 @@ import com.blr19c.falowp.bot.system.adapter.qq.op.OpCodeEnum.*
 import com.blr19c.falowp.bot.system.adapter.qq.op.OpException
 import com.blr19c.falowp.bot.system.adapter.qq.op.OpReceiveMessage
 import com.blr19c.falowp.bot.system.api.ApiAuth
-import com.blr19c.falowp.bot.system.api.MessageSubTypeEnum
 import com.blr19c.falowp.bot.system.api.MessageTypeEnum
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
+import com.blr19c.falowp.bot.system.api.SourceTypeEnum
 import com.blr19c.falowp.bot.system.image.ImageUrl
 import com.blr19c.falowp.bot.system.image.toImageUrl
 import com.blr19c.falowp.bot.system.json.Json
@@ -78,7 +78,7 @@ object QQWebSocket : Log {
                 block(this, loopParameters)
             }
         } catch (e: Exception) {
-            val delay = 1000 * minOf(reconnectCount, 30)
+            val delay = if (e is OpException) 0 else 1000 * minOf(reconnectCount, 10)
             errorLog("websocket连接中断将在${delay}ms后重新连接", e)
             delay(delay)
             autoReconnectCreateWebSocket(
@@ -121,8 +121,8 @@ object QQWebSocket : Log {
     }
 
     private suspend fun dispatchMessage(readBytes: ByteArray) {
+        println(readBytes.decodeToString())
         val opReceiveMessage = Json.readObj(readBytes, OpReceiveMessage::class)
-        if (opReceiveMessage.isDirect()) return
         log().info("QQ适配器接收到消息:{}", opReceiveMessage)
         val atList = opReceiveMessage.d.content.at
         val guildId = opReceiveMessage.d.guildId
@@ -136,16 +136,16 @@ object QQWebSocket : Log {
         )
         val sender = ReceiveMessage.User(
             opReceiveMessage.d.author.id,
-            opReceiveMessage.d.member.nick,
+            opReceiveMessage.d.member.nick ?: opReceiveMessage.d.author.username,
             apiAuth(opReceiveMessage.d.member.roles, opReceiveMessage.d.author.id),
             opReceiveMessage.d.author.avatar.toImageUrl()
         )
-        val source = ReceiveMessage.Source(opReceiveMessage.d.channelId)
+        val sourceType = if (opReceiveMessage.isDirect()) SourceTypeEnum.PRIVATE else SourceTypeEnum.GROUP
+        val source = ReceiveMessage.Source(opReceiveMessage.d.channelId, sourceType)
         val self = ReceiveMessage.Self(QQBotApiSupport.selfId)
         val messageId = opReceiveMessage.d.id
-        val messageType = MessageTypeEnum.GROUP
-        val subType = MessageSubTypeEnum.MESSAGE
-        val receiveMessage = ReceiveMessage(messageId, messageType, subType, content, sender, source, self)
+        val messageType = MessageTypeEnum.MESSAGE
+        val receiveMessage = ReceiveMessage(messageId, messageType, content, sender, source, self)
         PluginManagement.message(receiveMessage, QQBotApi::class)
     }
 
@@ -168,10 +168,11 @@ object QQWebSocket : Log {
         }.toList()
     }
 
-    private fun apiAuth(roles: List<String>, id: String): ApiAuth {
+    private fun apiAuth(roles: List<String>?, id: String): ApiAuth {
         if (systemConfigListProperty("administrator").contains(id)) {
             return ApiAuth.ADMINISTRATOR
         }
+        roles ?: return ApiAuth.ORDINARY_MEMBER
         val adminRole = listOf("2", "4", "5")
         if (roles.any { adminRole.contains(it) }) {
             return ApiAuth.MANAGER

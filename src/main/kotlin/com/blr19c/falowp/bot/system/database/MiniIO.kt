@@ -18,13 +18,19 @@ private val minioClient by lazy {
 }
 
 internal fun init() {
-    minioClient
+    if (checkEnable())
+        minioClient
+}
+
+private fun checkEnable(): Boolean {
+    return systemConfigProperty("miniIO.enable") == "true"
 }
 
 /**
  * 上传临时照片并获取url
  */
 suspend fun tempImageUrl(byteArray: ByteArray): String {
+    if (!checkEnable()) throw IllegalStateException("未开启miniIO")
     val name = UUID.randomUUID().toString() + ".png"
     withContext(Dispatchers.IO) {
         minioClient.putObject(
@@ -48,6 +54,7 @@ suspend fun tempImageUrl(byteArray: ByteArray): String {
  * 上传永久照片并获取url
  */
 suspend fun permanentImageUrl(byteArray: ByteArray, path: String = ""): String {
+    if (!checkEnable()) throw IllegalStateException("未开启miniIO")
     val name = "$path/${UUID.randomUUID()}.png"
     withContext(Dispatchers.IO) {
         minioClient.putObject(

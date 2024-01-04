@@ -78,7 +78,7 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
             "user_id" to groupId,
             "messages" to buildForwardMessage(*sendMessage),
         )
-        val url = systemConfigProperty("gocqhttp.apiUrl")
+        val url = systemConfigProperty("adapter.gocqhttp.apiUrl")
         val bodyJsonString = Json.toJsonString(body)
         log().info("GoCQHttp适配器发送转发消息:{}", bodyJsonString)
         val res = longTimeoutWebclient().post("$url/$action") {
