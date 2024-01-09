@@ -61,7 +61,6 @@ internal class QuartzCronField
         /**
          * Returns whether the given value is a Quartz day-of-month field.
          */
-        @JvmStatic
         fun isQuartzDaysOfMonthField(value: String): Boolean {
             return value.contains("L") || value.contains("W")
         }
@@ -70,7 +69,6 @@ internal class QuartzCronField
          * Parse the given value into a days of months `QuartzCronField`, the fourth entry of a cron expression.
          * Expects a "L" or "W" in the given value.
          */
-        @JvmStatic
         fun parseDaysOfMonth(value: String): QuartzCronField {
             var idx = value.lastIndexOf('L')
             if (idx != -1) {
@@ -108,7 +106,6 @@ internal class QuartzCronField
         /**
          * Returns whether the given value is a Quartz day-of-week field.
          */
-        @JvmStatic
         fun isQuartzDaysOfWeekField(value: String): Boolean {
             return value.contains("L") || value.contains("#")
         }
@@ -117,7 +114,6 @@ internal class QuartzCronField
          * Parse the given value into a days of week `QuartzCronField`, the sixth entry of a cron expression.
          * Expects a "L" or "#" in the given value.
          */
-        @JvmStatic
         fun parseDaysOfWeek(value: String): QuartzCronField {
             var idx = value.lastIndexOf('L')
             if (idx != -1) {

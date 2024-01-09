@@ -4,13 +4,15 @@ import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.adapter.AdapterApplication
 import com.blr19c.falowp.bot.system.scheduling.cron.Trigger
 import com.blr19c.falowp.bot.system.scheduling.cron.TriggerContext
+import com.blr19c.falowp.bot.system.scheduling.tasks.GreetingTask
 import com.blr19c.falowp.bot.system.utils.ReflectionUtils
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.time.Instant
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.measureTime
 
 /**
  * 协程任务
@@ -22,7 +24,7 @@ class SchedulingRunnable(
     private val trigger: Trigger,
     private val triggerContext: TriggerContext = TriggerContext(),
 ) : Log {
-    private val triggerContextMonitor = Any()
+    private val mutex = Mutex()
 
     @Volatile
     private var currentFuture: Deferred<Unit>? = null
@@ -32,44 +34,42 @@ class SchedulingRunnable(
     /**
      * 取消任务执行
      */
-    fun cancel() = synchronized(triggerContextMonitor) {
+    suspend fun cancel() = mutex.withLock {
         obtainCurrentFuture().cancel(CancellationException("任务被手动取消"))
     }
 
     /**
      * 任务是否取消
      */
-    fun isCancelled() = synchronized(triggerContextMonitor) { obtainCurrentFuture().isCancelled }
+    suspend fun isCancelled() = mutex.withLock { obtainCurrentFuture().isCancelled }
 
     /**
      * 任务是否完成
      */
-    fun isCompleted() = synchronized(triggerContextMonitor) { obtainCurrentFuture() }
+    suspend fun isCompleted() = mutex.withLock { obtainCurrentFuture() }
 
     /**
      * 是否初始化完成
      */
-    private fun isInit() = synchronized(triggerContextMonitor) { AdapterApplication.isLoadingCompleted() }
+    private suspend fun isInit() = mutex.withLock { AdapterApplication.isLoadingCompleted() }
 
     /**
      * 等待任务直至完成
      */
-    suspend fun await() = synchronized(triggerContextMonitor) { obtainCurrentFuture() }.await()
+    suspend fun await() = mutex.withLock { obtainCurrentFuture() }.await()
 
     suspend fun await(timeout: Duration) = withTimeout(timeout) {
-        synchronized(triggerContextMonitor) { obtainCurrentFuture() }.await()
+        mutex.withLock { obtainCurrentFuture() }.await()
     }
 
     /**
      * 开始执行定时任务
      */
     fun schedule(): SchedulingRunnable? {
-        synchronized(triggerContextMonitor) {
-            scheduledExecutionTime = this.trigger.nextExecutionTime(this.triggerContext) ?: return null
-            val initialDelay = (scheduledExecutionTime!!.toEpochMilli() - System.currentTimeMillis()).milliseconds
-            this.currentFuture = executor.async { asyncRun(initialDelay) }
-            return this
-        }
+        scheduledExecutionTime = this.trigger.nextExecutionTime(this.triggerContext) ?: return null
+        val initialDelay = (scheduledExecutionTime!!.toEpochMilli() - System.currentTimeMillis()).milliseconds
+        this.currentFuture = executor.async { asyncRun(initialDelay) }
+        return this
     }
 
 
@@ -77,7 +77,7 @@ class SchedulingRunnable(
         val actualExecutionTime = Instant.now()
         delegateRun()
         val completionTime = Instant.now()
-        synchronized(triggerContextMonitor) {
+        mutex.withLock {
             this.scheduledExecutionTime ?: throw IllegalStateException("No scheduled execution")
             this.triggerContext.update(this.scheduledExecutionTime!!, actualExecutionTime, completionTime)
             if (!obtainCurrentFuture().isCancelled) {
@@ -95,11 +95,13 @@ class SchedulingRunnable(
     }
 
     private suspend fun asyncRun(initialDelay: Duration) {
-        delay(initialDelay.plus(awaitInit()))
+        awaitInit()
+        delay(initialDelay)
+        GreetingTask.delayNextGoodMorning(this.trigger.useGreeting)
         this.run()
     }
 
-    private suspend fun awaitInit(): Duration = measureTime {
+    private suspend fun awaitInit() {
         while (!isInit()) {
             delay(500)
         }

@@ -5,6 +5,7 @@ import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.plugin.TaskPluginRegister
 import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApi
 import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApiSupport
+import com.blr19c.falowp.bot.system.scheduling.tasks.GreetingTask
 import com.blr19c.falowp.bot.system.utils.ScanUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,9 +42,14 @@ object Scheduling : Log {
         botList.sortBy { it.order() }
         val tasks = taskPlugins.map(this::schedulingRunnable)
         log().info("已加载的(周期/cron)任务数量:{}", tasks.size)
-        executorTaskList.addAll(tasks)
+        val systemTasks = initSystemTasks().map(this::schedulingRunnable)
+        executorTaskList.addAll(systemTasks + tasks)
         executorTaskList.forEach(SchedulingRunnable::schedule)
         log().info("初始化(周期/cron)任务完成")
+    }
+
+    private fun initSystemTasks(): List<TaskPluginRegister> {
+        return listOf(GreetingTask.goodMorning, GreetingTask.goodNight)
     }
 
     private fun schedulingRunnable(plugin: TaskPluginRegister): SchedulingRunnable {

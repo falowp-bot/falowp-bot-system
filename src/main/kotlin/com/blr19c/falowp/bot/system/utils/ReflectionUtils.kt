@@ -376,7 +376,6 @@ object ReflectionUtils {
     /**
      * 查找field(向上直到Object类)
      */
-    @JvmOverloads
     fun findField(clazz: Class<*>?, name: String?, type: Class<*>? = null): Field? {
         notNull(clazz, "Class must not be null")
         isTrue(name != null || type != null)
@@ -423,7 +422,6 @@ object ReflectionUtils {
     /**
      * 遍历当前类所有字段并使用ReflectionCallback<Field>执行
     </Field> */
-    @JvmOverloads
     fun doWithLocalFields(clazz: Class<*>?, fc: ReflectionCallback<Field?>, ff: ReflectionFilter<Field?>? = null) {
         for (field in getDeclaredFields(clazz)) {
             if (ff != null && !ff.matches(field)) {
@@ -442,7 +440,6 @@ object ReflectionUtils {
     /**
      * 遍历所有字段并使用ReflectionCallback<Field>执行
     </Field> */
-    @JvmOverloads
     fun doWithFields(clazz: Class<*>?, fc: ReflectionCallback<Field>, ff: ReflectionFilter<Field>? = null) {
         var targetClass = clazz
         do {

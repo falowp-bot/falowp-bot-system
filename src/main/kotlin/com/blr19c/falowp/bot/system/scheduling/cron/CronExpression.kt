@@ -13,14 +13,11 @@ class CronExpression private constructor(
     daysOfWeek: CronField,
     private val expression: String
 ) {
-    private val fields: Array<CronField>
 
-    init {
-
-        // reverse order, to make big changes first
-        // to make sure we end up at 0 nanos, we add an extra field
-        fields = arrayOf(daysOfWeek, months, daysOfMonth, hours, minutes, seconds, CronField.zeroNanos())
-    }
+    // reverse order, to make big changes first
+    // to make sure we end up at 0 nanos, we add an extra field
+    private val fields: Array<CronField> =
+        arrayOf(daysOfWeek, months, daysOfMonth, hours, minutes, seconds, CronField.zeroNanos())
 
     /**
      * Calculate the next [Temporal] that matches this expression.

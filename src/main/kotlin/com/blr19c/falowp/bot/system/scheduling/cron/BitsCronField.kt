@@ -129,7 +129,6 @@ internal class BitsCronField private constructor(type: Type) : CronField(type) {
         /**
          * Parse the given value into a seconds `BitsCronField`, the first entry of a cron expression.
          */
-        @JvmStatic
         fun parseSeconds(value: String): BitsCronField {
             return parseField(value, Type.SECOND)
         }
@@ -137,7 +136,6 @@ internal class BitsCronField private constructor(type: Type) : CronField(type) {
         /**
          * Parse the given value into a minutes `BitsCronField`, the second entry of a cron expression.
          */
-        @JvmStatic
         fun parseMinutes(value: String): BitsCronField {
             return parseField(value, Type.MINUTE)
         }
@@ -145,7 +143,6 @@ internal class BitsCronField private constructor(type: Type) : CronField(type) {
         /**
          * Parse the given value into an hours `BitsCronField`, the third entry of a cron expression.
          */
-        @JvmStatic
         fun parseHours(value: String): BitsCronField {
             return parseField(value, Type.HOUR)
         }
@@ -153,7 +150,6 @@ internal class BitsCronField private constructor(type: Type) : CronField(type) {
         /**
          * Parse the given value into a days of months `BitsCronField`, the fourth entry of a cron expression.
          */
-        @JvmStatic
         fun parseDaysOfMonth(value: String): BitsCronField {
             return parseDate(value, Type.DAY_OF_MONTH)
         }
@@ -161,7 +157,6 @@ internal class BitsCronField private constructor(type: Type) : CronField(type) {
         /**
          * Parse the given value into a month `BitsCronField`, the fifth entry of a cron expression.
          */
-        @JvmStatic
         fun parseMonth(value: String): BitsCronField {
             return parseField(value, Type.MONTH)
         }
@@ -169,7 +164,6 @@ internal class BitsCronField private constructor(type: Type) : CronField(type) {
         /**
          * Parse the given value into a days of week `BitsCronField`, the sixth entry of a cron expression.
          */
-        @JvmStatic
         fun parseDaysOfWeek(value: String): BitsCronField {
             val result = parseDate(value, Type.DAY_OF_WEEK)
             if (result.getBit(0)) {

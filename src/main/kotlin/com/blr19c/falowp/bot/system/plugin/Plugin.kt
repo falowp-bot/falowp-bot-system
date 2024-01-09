@@ -66,7 +66,6 @@ annotation class Plugin(
                  * @param order 顺序
                  * @param block 执行内容
                  */
-                @JvmOverloads
                 inline fun <reified T : Hook> hook(
                     hookType: HookTypeEnum,
                     order: Int = 0,
@@ -79,7 +78,6 @@ annotation class Plugin(
                 /**
                  * 前置
                  */
-                @JvmOverloads
                 inline fun <reified T : Hook> beforeHook(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
@@ -91,7 +89,6 @@ annotation class Plugin(
                 /**
                  * 后置
                  */
-                @JvmOverloads
                 inline fun <reified T : Hook> afterReturningHook(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
@@ -103,7 +100,6 @@ annotation class Plugin(
                 /**
                  * 异常通知
                  */
-                @JvmOverloads
                 inline fun <reified T : Hook> afterThrowingHook(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
@@ -115,7 +111,6 @@ annotation class Plugin(
                 /**
                  * 最终通知
                  */
-                @JvmOverloads
                 inline fun <reified T : Hook> afterFinallyHook(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
@@ -127,7 +122,6 @@ annotation class Plugin(
                 /**
                  * 环绕
                  */
-                @JvmOverloads
                 inline fun <reified T : Hook> aroundHook(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
@@ -144,10 +138,15 @@ annotation class Plugin(
         /**
          * cron表达式执行任务
          * @param cron cron表达式
+         * @param useGreeting 跟随系统的闲时状态执行定时
          * @param block 执行内容
          */
-        fun cronScheduling(cron: String, block: suspend SchedulingBotApi.() -> Unit): Register {
-            return TaskPluginRegister(CronTrigger(cron), block)
+        fun cronScheduling(
+            cron: String,
+            useGreeting: Boolean = true,
+            block: suspend SchedulingBotApi.() -> Unit
+        ): Register {
+            return TaskPluginRegister(CronTrigger(cron, useGreeting), block)
         }
 
         /**
@@ -156,26 +155,31 @@ annotation class Plugin(
          * @param period 执行周期
          * @param initialDelay 首次执行延时时间
          * @param fixedRate 是否为固定速率执行
+         * @param useGreeting 跟随系统的闲时状态执行定时
          * @param block 执行内容
          */
         fun periodicScheduling(
             period: Duration,
             initialDelay: Duration = 0.seconds,
             fixedRate: Boolean = false,
+            useGreeting: Boolean = true,
             block: suspend SchedulingBotApi.() -> Unit
         ): Register {
-            return TaskPluginRegister(PeriodicTrigger(fixedRate, period, initialDelay), block)
+            return TaskPluginRegister(PeriodicTrigger(fixedRate, period, initialDelay, useGreeting), block)
         }
 
         /**
          * 在程序完全启动之后执行
          *
+         * @param useGreeting 跟随系统的闲时状态执行定时
          * @param block 执行内容
          */
-        fun applicationInitScheduling(block: suspend SchedulingBotApi.() -> Unit): Register {
-            return TaskPluginRegister(ApplicationInitTrigger(), block)
+        fun applicationInitScheduling(
+            useGreeting: Boolean = true,
+            block: suspend SchedulingBotApi.() -> Unit
+        ): Register {
+            return TaskPluginRegister(ApplicationInitTrigger(useGreeting), block)
         }
-
     }
 
     object Message {
@@ -187,7 +191,6 @@ annotation class Plugin(
          * @param terminateEvent 执行完终止事件传播
          * @param block 执行内容
          */
-        @JvmOverloads
         fun message(
             regex: Regex,
             order: Int = 0,
@@ -210,7 +213,6 @@ annotation class Plugin(
          * @param terminateEvent 执行完终止事件传播
          * @param block 执行内容
          */
-        @JvmOverloads
         fun poke(
             order: Int = 0,
             auth: ApiAuth = ApiAuth.ORDINARY_MEMBER,
@@ -232,7 +234,6 @@ annotation class Plugin(
          * @param terminateEvent 执行完终止事件传播
          * @param block 执行内容
          */
-        @JvmOverloads
         fun message(
             match: MessagePluginRegisterMatch = MessagePluginRegisterMatch.allMatch(),
             order: Int = 0,

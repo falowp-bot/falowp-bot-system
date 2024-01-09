@@ -296,8 +296,7 @@ internal abstract class CronField protected constructor(private val type: Type) 
             return value
         }
 
-        @JvmStatic
-        protected fun <T> cast(temporal: Temporal): T where T : Temporal? {
+        fun <T> cast(temporal: Temporal): T where T : Temporal? {
             return temporal as T
         }
     }

@@ -8,6 +8,10 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 interface Trigger {
+    /**
+     * 跟随系统的闲时状态执行定时
+     */
+    val useGreeting: Boolean
 
     /**
      * 获取下次执行时间
@@ -32,11 +36,17 @@ interface Trigger {
 /**
  * Cron表达式
  */
-class CronTrigger(cron: String) : Trigger {
-    private val cronExpression = CronExpression.parse(cron)
+data class CronTrigger(
+    /**
+     * cron
+     */
+    val cron: String,
+    override val useGreeting: Boolean
+) : Trigger {
+    private val cronExpression: CronExpression = CronExpression.parse(cron)
 
     override fun nextExecutionTime(triggerContext: TriggerContext): Instant? {
-        val zoneOffset = ZoneOffset.of(systemConfigProperty("zoneOffset"))
+        val zoneOffset = ZoneOffset.of(systemConfigProperty("zoneOffset") { "+8" })
         val date = scheduledDate(triggerContext).atZone(zoneOffset).toLocalDateTime()
         return cronExpression.next(date)?.toInstant(zoneOffset)
     }
@@ -46,19 +56,20 @@ class CronTrigger(cron: String) : Trigger {
 /**
  * 周期循环
  */
-class PeriodicTrigger(
+data class PeriodicTrigger(
     /**
      * 固定速率执行
      */
-    private val fixedRate: Boolean = false,
+    val fixedRate: Boolean = false,
     /**
      * 执行周期
      */
-    private val period: Duration,
+    val period: Duration,
     /**
      * 首次执行间隔
      */
-    private val initialDelay: Duration = 0.seconds
+    val initialDelay: Duration = 0.seconds,
+    override val useGreeting: Boolean,
 ) : Trigger {
 
     override fun nextExecutionTime(triggerContext: TriggerContext): Instant? {
@@ -73,7 +84,7 @@ class PeriodicTrigger(
 /**
  * 在程序完全启动之后执行
  */
-class ApplicationInitTrigger : Trigger {
+class ApplicationInitTrigger(override val useGreeting: Boolean) : Trigger {
 
     private val onlyReadOnceReference by OnlyReadOnceReference {
         Instant.ofEpochMilli(System.currentTimeMillis())

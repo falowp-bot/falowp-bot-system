@@ -23,7 +23,7 @@ internal fun init() {
 }
 
 private fun checkEnable(): Boolean {
-    return systemConfigProperty("miniIO.enable") == "true"
+    return systemConfigProperty("miniIO.enable") { "true" } == "true"
 }
 
 /**

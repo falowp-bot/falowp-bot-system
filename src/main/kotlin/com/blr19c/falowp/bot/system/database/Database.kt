@@ -11,7 +11,7 @@ object Database : Log {
     }
 
     private fun initDatabase() {
-        if (systemConfigProperty("database.enable") == "true") {
+        if (systemConfigProperty("database.enable") { "true" } == "true") {
             log().info("初始化Database")
             org.jetbrains.exposed.sql.Database.connect(
                 url = systemConfigProperty("database.url"),
