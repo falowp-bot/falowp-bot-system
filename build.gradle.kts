@@ -22,7 +22,7 @@ plugins {
 }
 
 group = "com.blr19c.falowp"
-version = "1.0.1-beta-3"
+version = "1.0.1-beta-4"
 
 application {
     mainClass.set("com.blr19c.ApplicationKt")
