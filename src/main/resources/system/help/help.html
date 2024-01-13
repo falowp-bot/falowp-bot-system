@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,83 +9,86 @@
         }
 
         .card-container {
-            width: 1125px;
-            min-height: 650px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            margin: 0 auto;
+            padding-top: 10px;
+            width: 980px;
+            background-color: rgba(246, 202, 173);
+        }
+
+        .card-container::after {
+            content: "";
+            display: table;
+            clear: both;
         }
 
         .card {
-            width: 200px;
-            background-color: #fff;
-            opacity: 0.6;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
             border-radius: 10px;
-            margin: 20px;
-            overflow: hidden;
-            transition: transform 0.3s ease-in-out;
-            position: relative;
+            float: left;
+            margin-right: 10px;
+            margin-left: 10px;
+            border-width: 2px;
+            border-style: solid;
+            border-color: rgba(227, 142, 103);
+            box-shadow: 0 0 10px rgba(227, 142, 103);
+            margin-bottom: 10px;
         }
 
-        .card:hover {
-            transform: scale(1.05);
+        .card-item {
+            border-radius: 100px;
+            border-width: 0.1rem;
+            border-style: solid;
+            border-color: rgba(227, 142, 103);
+            margin: 13px;
+        }
+
+        .card-tag {
+            width: 100%;
+            height: 40px;
+            text-align: center;
+            background-color: rgba(227, 142, 103);
+            color: white;
+            line-height: 40px;
+            border-radius: 5px;
         }
 
         .card-content {
-            padding: 20px;
-            margin-top: 10px;
+            padding: 10px;
+            text-align: left;
         }
 
         .plugin-info {
-            text-align: center;
             font-size: 16px;
             font-weight: bold;
             color: #333;
+            margin-left: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .status {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 14px;
-            font-weight: bold;
+        .plugin-info.disable {
+            text-decoration: line-through;
+            color: gray;
         }
 
-        .status.enabled {
-            color: #4CAF50;
-        }
-
-        .status.disabled {
-            color: #e74c3c;
-        }
-
-        .mask {
-            background: rgba(255, 255, 255, 0.9);
-            opacity: 0.8;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
+        .disable::after {
+            text-decoration: none;
+            content: "(已禁用)";
+            font-size: 13px;
         }
     </style>
     <script type="text/javascript">
         window.onload = function () {
-           /* document.querySelector(".card-container").style.background =
-                `url('${randomBackgroundWidth()}') top no-repeat,
-                 url('${randomBackgroundWidth()}') center center no-repeat,
-                 url('${randomBackgroundWidth()}') top no-repeat`*/
+            /* document.querySelector(".card-container").style.background =
+                 `url('${randomBackgroundWidth()}') top no-repeat,
+                  url('${randomBackgroundWidth()}') center center no-repeat,
+                  url('${randomBackgroundWidth()}') top no-repeat`*/
             document.querySelector(".card-container").style.backgroundSize = "cover";
             document.querySelector(".card-container").style.backgroundPosition = "center";
         }
     </script>
 </head>
 <body>
-<div class="card-container">
-    <div class="mask"></div>
-</div>
+<div class="card-container"></div>
 </body>
 </html>

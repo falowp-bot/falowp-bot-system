@@ -12,7 +12,7 @@
 
 `// https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system`
 
-`implementation("com.blr19c.falowp:falowp-bot-system:1.0.1-beta-4")`
+`implementation("com.blr19c.falowp:falowp-bot-system:1.0.1-beta-5")`
 
 ## [查看文档](https://falowp.blr19c.com)
 

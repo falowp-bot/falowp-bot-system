@@ -57,20 +57,23 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
             inputStream.bufferedReader().use { it.readText() }
         }
         val htmlBody = Jsoup.parse(htmlString)
-        val cardList = mutableListOf<String>()
-        for (pluginInfo in pluginList) {
-            if (pluginInfo.plugin.hidden && !helpEvent.showHidden) continue
-            if (!pluginInfo.plugin.enable && !helpEvent.showDisable) continue
-            val enablePart = if (pluginInfo.plugin.enable)
-                """<div class="status enabled">启用</div>"""
-            else
-                """<div class="status disabled">停用</div>"""
-            val namePart =
-                """<div class="card-content"><div class="plugin-info">${pluginInfo.plugin.name}</div></div>"""
-            val card = """<div class="card">$enablePart$namePart</div>"""
-            cardList.add(card)
+        val tagList = mutableListOf<String>()
+        for ((tag, pluginInfoList) in pluginList.groupBy { it.plugin.tag }) {
+            val cardList = mutableListOf<String>()
+            for (pluginInfo in pluginInfoList) {
+                if (pluginInfo.plugin.hidden && !helpEvent.showHidden) continue
+                if (!pluginInfo.plugin.enable && !helpEvent.showDisable) continue
+                val enablePart = if (pluginInfo.plugin.enable) "" else " disable"
+                val plugin = """<div class="plugin-info$enablePart">${pluginInfo.plugin.name}</div>"""
+                val content = """<div class="card-content">$plugin</div>"""
+                val card = """<div class="card-item">$content</div>"""
+                cardList.add(card)
+            }
+            tagList.add("""<div class="card"><div class="card-tag">$tag</div>${cardList.joinToString("")}</div>""")
         }
-        htmlBody.select(".card-container").append(cardList.joinToString(""))
+        val card = tagList.sortedByDescending { it.length }.joinToString("")
+        htmlBody.select(".card-container").append(card)
+        println(htmlBody.html())
         val base64Help = htmlToImageBase64(htmlBody.html(), ".card-container")
         botApi.sendReply(SendMessage.builder().images(base64Help).build())
     }

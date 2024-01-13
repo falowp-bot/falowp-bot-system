@@ -15,13 +15,9 @@ object Webdriver : Log {
 
     internal fun configure() {
         log().info("初始化Webdriver")
-        playwright
+        Playwright.create().close()
         log().info("初始化Webdriver完成")
     }
-}
-
-private val playwright by lazy {
-    Playwright.create()
 }
 
 /**
@@ -38,22 +34,17 @@ fun <T> Page.existsToExecute(
     return allElementHandle.map { block.invoke(it) }.toList()
 }
 
-
-fun <T> browser(block: Browser.() -> T): T {
-    val chromium = playwright.chromium()
-    return chromium.launch().use { block.invoke(it) }
+fun defaultBrowserContext(): BrowserContext {
+    return Playwright.create().chromium().launch().newContext(
+        Browser.NewContextOptions()
+            .setViewportSize(ViewportSize(1920, 1080))
+            .setUserAgent(commonUserAgent())
+            .setIsMobile(false)
+    )
 }
 
 fun <T> commonWebdriverContext(block: BrowserContext.() -> T): T {
-    return browser {
-        val browserContext = this.newContext(
-            Browser.NewContextOptions()
-                .setViewportSize(ViewportSize(1920, 1080))
-                .setUserAgent(commonUserAgent())
-                .setIsMobile(false)
-        )
-        browserContext.use { block.invoke(it) }
-    }
+    return defaultBrowserContext().use { block.invoke(it) }
 }
 
 suspend fun htmlToImageBase64(html: String, querySelector: String = "body"): String {

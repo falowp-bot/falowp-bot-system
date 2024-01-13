@@ -9,45 +9,41 @@
         }
 
         .card-container {
+            padding-top: 10px;
             width: 800px;
-            min-height: 650px;
+            height: 800px;
+            background-color: rgba(246, 202, 173);
             display: flex;
             justify-content: center;
+            flex-direction: column;
             align-items: center;
-            flex-wrap: wrap;
-            margin: 0 auto;
-        }
-
-        .mask {
-            background: rgba(255, 255, 255, 0.9);
-            opacity: 0.8;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
         }
 
         .card {
-            padding: 50px;
-            background-color: #fff;
+            width: 600px;
+            height: 600px;
+            margin-bottom: 50px;
+            border-color: rgba(227, 142, 103);
             opacity: 0.6;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 80px;
-            margin: 0 20px 20px;
-            overflow: hidden;
-            transition: transform 0.3s ease-in-out;
-            position: relative;
+            box-shadow: 0 0 10px rgba(227, 142, 103);
+            border-radius: 20px;
         }
 
         #pluginName {
             font-size: 20px;
             font-weight: 700;
-            width: 100%;
             text-align: center;
+            height: 40px;
+            color: white;
+            line-height: 40px;
+            background-color: rgba(227, 142, 103);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
         }
 
         #pluginDesc {
+            margin-left: 10px;
+            margin-right: 10px;
             margin-top: 30px;
         }
     </style>
@@ -64,7 +60,6 @@
 </head>
 <body>
 <div class="card-container">
-    <div class="mask"></div>
     <div class="card">
         <div id="pluginName"></div>
         <div id="pluginDesc"></div>
