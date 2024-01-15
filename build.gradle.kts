@@ -15,19 +15,16 @@ val jvmVersion: String = "2.0.0-Beta2"
 
 plugins {
     kotlin("jvm") version "2.0.0-Beta2"
-    id("io.ktor.plugin") version "3.0.0-beta-1"
     id("com.github.ben-manes.versions") version "0.50.0"
     id("maven-publish")
-    signing
+    id("signing")
 }
 
 group = "com.blr19c.falowp"
-version = "1.0.1-beta-5"
+version = "1.1.0"
 
-application {
-    mainClass.set("com.blr19c.ApplicationKt")
-    val isDevelopment: Boolean = project.ext.has("development")
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+kotlin {
+    jvmToolchain(21)
 }
 
 repositories {
@@ -172,16 +169,13 @@ publishing {
         maven {
             url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
             credentials {
-                username = project.findProperty("ossrhUsername").toString()
-                password = project.findProperty("ossrhPassword").toString()
+                username = project.findProperty("s01SonatypeUserName").toString()
+                password = project.findProperty("s01SonatypePassword").toString()
             }
         }
     }
 }
 
 signing {
-    useGpgCmd()
-    setRequired({ true })
     sign(publishing.publications)
 }
-
