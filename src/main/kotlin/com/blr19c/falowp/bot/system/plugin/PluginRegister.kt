@@ -81,6 +81,15 @@ data class MessagePluginRegisterMatch(
             return MessagePluginRegisterMatch()
         }
     }
+
+    fun checkMath(receiveMessage: ReceiveMessage): Boolean {
+        return this.regex?.matches(receiveMessage.content.message) ?: true
+                && this.sendId?.contains(receiveMessage.sender.id) ?: true
+                && this.sourceType?.equals(receiveMessage.source.type) ?: true
+                && this.messageType?.equals(receiveMessage.messageType) ?: true
+                && this.atMe?.let { receiveMessage.atMe() } ?: true
+                && this.customBlock?.invoke(receiveMessage) ?: true
+    }
 }
 
 /**

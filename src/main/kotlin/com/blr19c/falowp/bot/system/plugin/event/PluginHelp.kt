@@ -3,7 +3,9 @@ package com.blr19c.falowp.bot.system.plugin.event
 import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.api.SendMessage
 import com.blr19c.falowp.bot.system.listener.events.HelpEvent
+import com.blr19c.falowp.bot.system.listener.hooks.HelpEventHook
 import com.blr19c.falowp.bot.system.plugin.PluginInfo
+import com.blr19c.falowp.bot.system.plugin.hook.withPluginHook
 import com.blr19c.falowp.bot.system.readResource
 import com.blr19c.falowp.bot.system.web.RouteInfo
 import com.blr19c.falowp.bot.system.web.WebServer
@@ -30,13 +32,20 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
         })
     }
 
+    private suspend fun withPlugin(botApi: BotApi): List<PluginInfo> {
+        val helpEventHook = HelpEventHook(pluginList)
+        withPluginHook(botApi, helpEventHook) {}
+        return helpEventHook.pluginInfo
+    }
+
+
     override suspend fun invoke(botApi: BotApi, helpEvent: HelpEvent) {
         helpEvent.pluginName ?: return allHelp(botApi, helpEvent)
         return pluginHelp(botApi, helpEvent)
     }
 
     private suspend fun pluginHelp(botApi: BotApi, helpEvent: HelpEvent) {
-        val plugin = pluginList
+        val plugin = withPlugin(botApi)
             .filter { it.plugin.name == helpEvent.pluginName }
             .filter { it.plugin.enable || helpEvent.showDisable }
             .find { !it.plugin.hidden || helpEvent.showHidden }
@@ -58,7 +67,7 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
         }
         val htmlBody = Jsoup.parse(htmlString)
         val tagList = mutableListOf<String>()
-        for ((tag, pluginInfoList) in pluginList.groupBy { it.plugin.tag }) {
+        for ((tag, pluginInfoList) in withPlugin(botApi).groupBy { it.plugin.tag }) {
             val cardList = mutableListOf<String>()
             for (pluginInfo in pluginInfoList) {
                 if (pluginInfo.plugin.hidden && !helpEvent.showHidden) continue

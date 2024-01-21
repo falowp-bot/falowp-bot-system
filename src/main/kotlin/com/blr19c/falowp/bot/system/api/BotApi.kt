@@ -1,13 +1,8 @@
 package com.blr19c.falowp.bot.system.api
 
 import com.blr19c.falowp.bot.system.Log
-import com.blr19c.falowp.bot.system.plugin.HookPluginRegister
-import com.blr19c.falowp.bot.system.plugin.HookPluginRegisterMatch
 import com.blr19c.falowp.bot.system.plugin.Plugin
-import com.blr19c.falowp.bot.system.plugin.UnRegister
 import com.blr19c.falowp.bot.system.plugin.event.EventManager
-import com.blr19c.falowp.bot.system.plugin.hook.HookJoinPoint
-import com.blr19c.falowp.bot.system.plugin.hook.HookTypeEnum
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.slf4j.Logger
@@ -33,21 +28,6 @@ abstract class BotApi(val receiveMessage: ReceiveMessage, val originalClass: KCl
     suspend fun <T : Plugin.Listener.Event> publishEvent(event: T) {
         log().info("发布事件:{}", event)
         EventManager.publishEvent(this, event)
-    }
-
-    /**
-     * 注册钩子
-     * 注意请在hook中使用this.botApi而不要要使用注册hook的botApi
-     */
-    inline fun <reified T : Plugin.Listener.Hook> hook(
-        hookType: HookTypeEnum,
-        order: Int = 0,
-        match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
-        noinline block: suspend HookJoinPoint.(T) -> Unit
-    ): UnRegister {
-        val hook = HookPluginRegister(order, T::class, hookType, match, block)
-        hook.register()
-        return hook
     }
 
     /**

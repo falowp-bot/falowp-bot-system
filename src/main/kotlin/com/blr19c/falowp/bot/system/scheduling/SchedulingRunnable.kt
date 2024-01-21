@@ -2,6 +2,10 @@ package com.blr19c.falowp.bot.system.scheduling
 
 import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.adapter.AdapterApplication
+import com.blr19c.falowp.bot.system.listener.hooks.TaskPluginExecutionHook
+import com.blr19c.falowp.bot.system.plugin.TaskPluginRegister
+import com.blr19c.falowp.bot.system.plugin.hook.withPluginHook
+import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApi
 import com.blr19c.falowp.bot.system.scheduling.cron.Trigger
 import com.blr19c.falowp.bot.system.scheduling.cron.TriggerContext
 import com.blr19c.falowp.bot.system.scheduling.tasks.GreetingTask
@@ -19,9 +23,9 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @Suppress("UNUSED")
 class SchedulingRunnable(
-    private val delegate: suspend () -> Unit,
+    private val plugin: TaskPluginRegister,
     private val executor: CoroutineScope,
-    private val trigger: Trigger,
+    private val trigger: Trigger = plugin.trigger,
     private val triggerContext: TriggerContext = TriggerContext(),
 ) : Log {
     private val mutex = Mutex()
@@ -88,7 +92,10 @@ class SchedulingRunnable(
 
     private suspend fun delegateRun() {
         try {
-            delegate.invoke()
+            val schedulingBotApi = SchedulingBotApi(plugin.originalClass)
+            withPluginHook(schedulingBotApi, TaskPluginExecutionHook(plugin)) {
+                plugin.block.invoke(schedulingBotApi)
+            }
         } catch (ex: Throwable) {
             log().error("计划任务异常", ReflectionUtils.skipReflectionException(ex))
         }

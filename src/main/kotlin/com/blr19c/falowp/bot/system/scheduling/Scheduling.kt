@@ -3,7 +3,6 @@ package com.blr19c.falowp.bot.system.scheduling
 import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.plugin.TaskPluginRegister
-import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApi
 import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApiSupport
 import com.blr19c.falowp.bot.system.scheduling.tasks.GreetingTask
 import com.blr19c.falowp.bot.system.utils.ScanUtils
@@ -53,10 +52,6 @@ object Scheduling : Log {
     }
 
     private fun schedulingRunnable(plugin: TaskPluginRegister): SchedulingRunnable {
-        return SchedulingRunnable(
-            { plugin.block.invoke(SchedulingBotApi(plugin.originalClass)) },
-            executor,
-            plugin.trigger
-        )
+        return SchedulingRunnable(plugin, executor)
     }
 }

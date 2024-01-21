@@ -11,17 +11,17 @@ val miniIOVersion: String by project
 val playwrightVersion: String by project
 val animatedGifVersion: String by project
 val jetbrainsAnnotationsVersion: String by project
-val jvmVersion: String = "2.0.0-Beta2"
+val jvmVersion: String = "2.0.0-Beta3"
 
 plugins {
-    kotlin("jvm") version "2.0.0-Beta2"
+    kotlin("jvm") version "2.0.0-Beta3"
     id("com.github.ben-manes.versions") version "0.50.0"
     id("maven-publish")
     id("signing")
 }
 
 group = "com.blr19c.falowp"
-version = "1.1.0"
+version = "1.2.0"
 
 kotlin {
     jvmToolchain(21)
@@ -57,6 +57,7 @@ dependencies {
     //数据库连接
     api("org.jetbrains.exposed:exposed-core:$exposedVersion")
     api("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    api("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
     runtimeOnly("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     api("org.mariadb.jdbc:mariadb-java-client:$mariadbJdbcVersion")
 

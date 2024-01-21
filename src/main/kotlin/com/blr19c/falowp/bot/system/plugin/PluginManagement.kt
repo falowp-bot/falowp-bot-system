@@ -78,7 +78,7 @@ object PluginManagement : Log {
      */
     private suspend fun <T : BotApi> executePlugin(message: ReceiveMessage, botApiClass: KClass<T>) = coroutineScope {
         val allPluginJob = mutableListOf<Job>()
-        for (plugin in messagePlugins.filter { filterMessagePlugin(message, it) }) {
+        for (plugin in messagePlugins.filter { it.match.checkMath(message) }) {
             val originalBotApi = botApiClass.primaryConstructor!!.call(message, plugin.originalClass) as BotApi
             val botApi = PluginBotApi(originalBotApi)
             val args = plugin.match.regex?.find(message.content.message)?.destructured?.toList() ?: listOf()
@@ -96,15 +96,6 @@ object PluginManagement : Log {
             }
         }
         allPluginJob.joinAll()
-    }
-
-    private fun filterMessagePlugin(receiveMessage: ReceiveMessage, plugin: MessagePluginRegister): Boolean {
-        return plugin.match.regex?.matches(receiveMessage.content.message) ?: true
-                && plugin.match.sendId?.contains(receiveMessage.sender.id) ?: true
-                && plugin.match.sourceType?.equals(receiveMessage.source.type) ?: true
-                && plugin.match.messageType?.equals(receiveMessage.messageType) ?: true
-                && plugin.match.atMe?.let { receiveMessage.atMe() } ?: true
-                && plugin.match.customBlock?.invoke(receiveMessage) ?: true
     }
 
     private fun initPlugin(plugin: Class<*>): PluginInfo? {
