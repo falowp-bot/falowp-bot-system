@@ -11,12 +11,16 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:1.2.0")
+implementation("com.blr19c.falowp:falowp-bot-system:1.2.1")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 1.2.1
+
+* 插件更新
 
 ### 1.2.0
 
