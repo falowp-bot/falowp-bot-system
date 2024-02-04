@@ -15,6 +15,7 @@ data class RouteInfo(val path: String, val block: Route.() -> Unit)
 
 object WebServer : Log {
     private val routes = CopyOnWriteArrayList<RouteInfo>()
+
     fun configure() {
         val port = systemConfigProperty("web.port").toInt()
         val server = embeddedServer(Netty, port = port, module = Application::module).start(wait = false)

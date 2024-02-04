@@ -21,7 +21,7 @@ plugins {
 }
 
 group = "com.blr19c.falowp"
-version = "1.2.1"
+version = "1.2.2"
 
 kotlin {
     jvmToolchain(21)
@@ -78,7 +78,7 @@ dependencies {
         exclude("org.easytesting", "fest-assert-core")
     }
     //腾讯云翻译api
-    api("com.tencentcloudapi:tencentcloud-sdk-java-tmt:3.1.922") {
+    api("com.tencentcloudapi:tencentcloud-sdk-java-tmt:3.1.960") {
         exclude("com.squareup.okhttp3", "okhttp")
     }
 }

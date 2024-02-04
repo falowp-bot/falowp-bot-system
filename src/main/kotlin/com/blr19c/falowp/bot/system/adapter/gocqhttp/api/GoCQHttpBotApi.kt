@@ -1,6 +1,5 @@
 package com.blr19c.falowp.bot.system.adapter.gocqhttp.api
 
-import com.blr19c.falowp.bot.system.adapter.gocqhttp.web.GoCQHttpWebSocket
 import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
 import com.blr19c.falowp.bot.system.api.SendMessage
@@ -11,7 +10,7 @@ import com.blr19c.falowp.bot.system.web.longTimeoutWebclient
 import com.fasterxml.jackson.databind.node.ArrayNode
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.websocket.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KClass
 
@@ -19,6 +18,10 @@ import kotlin.reflect.KClass
  * GoCQHttpBotApi
  */
 class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) : BotApi(receiveMessage, originalClass) {
+
+    private val baseUrl by lazy { systemConfigProperty("adapter.gocqhttp.apiUrl") }
+
+    private val client by lazy { longTimeoutWebclient() }
 
     override suspend fun sendGroup(vararg sendMessage: SendMessage, reference: Boolean, forward: Boolean) {
         //当forward时reference失效
@@ -49,27 +52,27 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
     private suspend fun sendGroup(groupId: String, sendMessage: SendMessage, reference: Boolean) {
         log().info("GoCQHttp适配器发送群组消息:{}", sendMessage)
         val body = mapOf(
-            "action" to "send_group_msg",
-            "params" to mapOf(
-                "message_type" to "group",
-                "group_id" to groupId,
-                "message" to buildMessage(sendMessage, reference)
-            )
+            "group_id" to groupId,
+            "message" to buildMessage(sendMessage, reference)
         )
-        GoCQHttpWebSocket.webSocketSession().send(Json.toJsonString(body))
+        retry {
+            client.post("$baseUrl/send_group_msg") {
+                setBody(body)
+            }
+        }
     }
 
     private suspend fun sendPrivate(sendMessage: SendMessage, reference: Boolean) {
         log().info("GoCQHttp适配器发送私聊消息:{}", sendMessage)
         val body = mapOf(
-            "action" to "send_private_msg",
-            "params" to mapOf(
-                "message_type" to "private",
-                "user_id" to receiveMessage.source.id,
-                "message" to buildMessage(sendMessage, reference)
-            )
+            "user_id" to receiveMessage.source.id,
+            "message" to buildMessage(sendMessage, reference)
         )
-        GoCQHttpWebSocket.webSocketSession().send(Json.toJsonString(body))
+        retry {
+            client.post("$baseUrl/send_private_msg") {
+                setBody(body)
+            }
+        }
     }
 
     private suspend fun sendForwardMessage(groupId: String, vararg sendMessage: SendMessage, action: String) {
@@ -78,12 +81,13 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
             "user_id" to groupId,
             "messages" to buildForwardMessage(*sendMessage),
         )
-        val url = systemConfigProperty("adapter.gocqhttp.apiUrl")
         val bodyJsonString = Json.toJsonString(body)
         log().info("GoCQHttp适配器发送转发消息:{}", bodyJsonString)
-        val res = longTimeoutWebclient().post("$url/$action") {
-            setBody(bodyJsonString)
-        }.body<String>()
+        val res = retry {
+            client.post("$baseUrl/$action") {
+                setBody(bodyJsonString)
+            }
+        }
         log().info("GoCQHttp适配器发送转发消息结果:{}", res)
     }
 
@@ -100,6 +104,27 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
             messageNode.add(Json.readJsonNode(forwardData))
         }
         return messageNode
+    }
+
+    private suspend fun retry(
+        retryCount: Int = 2,
+        oldBody: String = "",
+        block: suspend () -> HttpResponse
+    ): String {
+        try {
+            if (retryCount < 0) {
+                return oldBody
+            }
+            val body = block.invoke().body<String>()
+            val jsonBody = Json.readJsonNode(body)
+            if (jsonBody["status"].asText().equals("OK", true)) {
+                return body
+            }
+            return retry(retryCount - 1, body, block)
+        } catch (e: Exception) {
+            log().error("GoCQHttp-retry发送请求失败", e)
+            return retry(retryCount - 1, oldBody, block)
+        }
     }
 
     /**

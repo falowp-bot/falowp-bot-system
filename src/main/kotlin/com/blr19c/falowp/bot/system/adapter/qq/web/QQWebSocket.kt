@@ -121,7 +121,6 @@ object QQWebSocket : Log {
     }
 
     private suspend fun dispatchMessage(readBytes: ByteArray) {
-        println(readBytes.decodeToString())
         val opReceiveMessage = Json.readObj(readBytes, OpReceiveMessage::class)
         log().info("QQ适配器接收到消息:{}", opReceiveMessage)
         val atList = opReceiveMessage.d.content.at

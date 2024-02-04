@@ -12,6 +12,7 @@ import com.blr19c.falowp.bot.system.api.SourceTypeEnum
 import com.blr19c.falowp.bot.system.image.ImageUrl
 import com.blr19c.falowp.bot.system.json.Json
 import com.blr19c.falowp.bot.system.plugin.PluginManagement
+import com.blr19c.falowp.bot.system.systemConfigListProperty
 import com.blr19c.falowp.bot.system.systemConfigProperty
 import com.fasterxml.jackson.databind.JsonNode
 import io.ktor.server.application.*
@@ -34,7 +35,7 @@ object GoCQHttpWebSocket : Log {
     fun configure() {
         embeddedServer(Netty, port = systemConfigProperty("adapter.gocqhttp.port").toInt()) {
             config()
-        }.start(wait = false)
+        }.start(wait = systemConfigListProperty("adapter.enableAdapter").size == 1)
     }
 
     class GoCqHttpWebSocketSession(session: WebSocketSession) : WebSocketSession by session

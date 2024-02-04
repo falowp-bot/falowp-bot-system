@@ -4,8 +4,8 @@ import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.adapter.gocqhttp.GoCQHttpApplication
 import com.blr19c.falowp.bot.system.adapter.qq.QQApplication
 import com.blr19c.falowp.bot.system.systemConfigListProperty
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.LongAdder
 
 /**
@@ -15,7 +15,7 @@ object AdapterApplication : Log {
 
     private val loadSize = LongAdder()
 
-    suspend fun configure() = runBlocking {
+    suspend fun configure() = coroutineScope {
         log().info("初始化协议适配")
         launch { runAdapter("qq") { QQApplication.configure() } }
         launch { runAdapter("gocqhttp") { GoCQHttpApplication.configure() } }

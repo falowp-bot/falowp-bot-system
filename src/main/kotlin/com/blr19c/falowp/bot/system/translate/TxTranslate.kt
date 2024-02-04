@@ -27,6 +27,9 @@ object TxTranslate {
      * 中文转英文
      */
     suspend fun cnToEn(query: String): String {
+        if (query.isBlank()) {
+            return query
+        }
         val chineseRegex = Regex("[\\u4E00-\\u9FA5]+")
         if (!chineseRegex.containsMatchIn(query)) {
             return query

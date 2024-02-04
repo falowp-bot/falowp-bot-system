@@ -82,7 +82,6 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
         }
         val card = tagList.sortedByDescending { it.length }.joinToString("")
         htmlBody.select(".card-container").append(card)
-        println(htmlBody.html())
         val base64Help = htmlToImageBase64(htmlBody.html(), ".card-container")
         botApi.sendReply(SendMessage.builder().images(base64Help).build())
     }

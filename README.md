@@ -11,12 +11,19 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:1.2.1")
+implementation("com.blr19c.falowp:falowp-bot-system:1.2.2")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 1.2.2
+
+* 优化启动配置
+* 翻译和文本验证判断空字符
+* go-cqhttp发送失败时重试2次
+* 更新一些依赖版本
 
 ### 1.2.1
 

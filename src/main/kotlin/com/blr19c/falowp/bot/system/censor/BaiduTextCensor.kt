@@ -27,6 +27,9 @@ object BaiduTextCensor : Log {
      */
     suspend fun censor(content: String, userId: String? = null): CensorResult {
         try {
+            if (content.isBlank()) {
+                return CensorResult(CensorConclusionTypeEnum.COMPLIANT)
+            }
             val body = webclient().post(systemConfigProperty("censor.baidu.censorUrl")) {
                 contentType(ContentType.Application.FormUrlEncoded)
                 parameter("access_token", token)
