@@ -1,13 +1,19 @@
 package com.blr19c.falowp.bot.system
 
+import com.blr19c.falowp.bot.system.utils.ResourceUtils
 import com.blr19c.falowp.bot.system.utils.ScanUtils.configPath
 import com.blr19c.falowp.bot.system.utils.ScanUtils.pluginPath
+import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
+import com.typesafe.config.ConfigList
+import com.typesafe.config.ConfigValue
 import io.ktor.server.config.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.io.InputStream
 import java.util.concurrent.ConcurrentHashMap
+import java.util.jar.JarFile
 
 /**
  * 资源&配置
@@ -21,7 +27,67 @@ object Resources : Log {
     }
 }
 
-private val applicationConfig by lazy { HoconApplicationConfig(ConfigFactory.load()) }
+/**
+ * 合并Bot的配置文件
+ */
+private fun mergeBotConfigs(config1: Config, config2: Config): Config {
+    val mergedMap: MutableMap<String, Any> = config1.root().unwrapped()
+    for ((key, value) in config2.entrySet()) {
+        if (value is ConfigList && key.startsWith("bot")) {
+            var commonKey: Any? = mergedMap
+            val keyItems = key.split(".").toMutableList()
+            val lastKeyItem = keyItems.removeLast()
+            for (keyItem in keyItems) {
+                try {
+                    commonKey = (commonKey as Map<*, *>)[keyItem]!!
+                } catch (e: Exception) {
+                    @Suppress("UNCHECKED_CAST")
+                    (commonKey as MutableMap<String, Any>)[keyItem] = hashMapOf<Any, Any>()
+                    commonKey = commonKey[keyItem]!!
+                }
+            }
+            if (commonKey != null) {
+                val commonValue = (commonKey as Map<*, *>)[lastKeyItem]
+                if (commonValue is List<*>) {
+                    @Suppress("UNCHECKED_CAST")
+                    value.forEach { (commonValue as MutableList<ConfigValue>).addLast(it) }
+                    commonValue.distinct()
+                }
+                if (commonValue == null) {
+                    @Suppress("UNCHECKED_CAST")
+                    (commonKey as MutableMap<String, Any>)[lastKeyItem] = value
+                }
+            }
+        }
+    }
+    return ConfigFactory.parseMap(mergedMap)
+}
+
+private val applicationConfig by lazy {
+    var config = ConfigFactory.load()
+    for (resource in Thread.currentThread().contextClassLoader.getResources("plugin-conf")) {
+        if (ResourceUtils.isJarURL(resource)) {
+            val jarPath = resource.path.substringBefore(ResourceUtils.JAR_URL_SEPARATOR)
+                .replaceFirst(ResourceUtils.FILE_URL_PREFIX, "")
+                .replaceFirst(ResourceUtils.JAR_URL_PREFIX, "")
+            val configPath = resource.path.substringAfter(ResourceUtils.JAR_URL_SEPARATOR) + "/"
+            JarFile(jarPath).use { jar ->
+                jar.entries()
+                    .asSequence()
+                    .filter { it.name.startsWith(configPath) && !it.isDirectory }
+                    .forEach {
+                        config = mergeBotConfigs(config, ConfigFactory.parseReader(jar.getInputStream(it).reader()))
+                    }
+            }
+        } else {
+            for (file in File(resource.path).listFiles() ?: emptyArray()) {
+                config = mergeBotConfigs(config, ConfigFactory.parseFile(file))
+            }
+        }
+    }
+    HoconApplicationConfig(config)
+}
+
 private val configPropertyMap by lazy { ConcurrentHashMap<String, String>() }
 private val configListPropertyMap by lazy { ConcurrentHashMap<String, List<String>>() }
 private val configDefaultValue: (String) -> String = { throw IllegalArgumentException("未找到配置:$it") }
