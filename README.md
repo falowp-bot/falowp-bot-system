@@ -11,12 +11,16 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:1.2.3")
+implementation("com.blr19c.falowp:falowp-bot-system:1.2.4")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 1.2.4
+
+* 修复`帮助功能`tag中没有需要展示的内容时会存在一个空tag的问题
 
 ### 1.2.3
 

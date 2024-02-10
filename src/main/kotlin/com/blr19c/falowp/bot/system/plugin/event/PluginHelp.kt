@@ -78,7 +78,9 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
                 val card = """<div class="card-item">$content</div>"""
                 cardList.add(card)
             }
-            tagList.add("""<div class="card"><div class="card-tag">$tag</div>${cardList.joinToString("")}</div>""")
+            if (cardList.isNotEmpty()) {
+                tagList.add("""<div class="card"><div class="card-tag">$tag</div>${cardList.joinToString("")}</div>""")
+            }
         }
         val card = tagList.sortedByDescending { it.length }.joinToString("")
         htmlBody.select(".card-container").append(card)

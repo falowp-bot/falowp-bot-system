@@ -21,7 +21,7 @@ plugins {
 }
 
 group = "com.blr19c.falowp"
-version = "1.2.3"
+version = "1.2.4"
 
 kotlin {
     jvmToolchain(21)
