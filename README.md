@@ -11,12 +11,16 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:1.2.4")
+implementation("com.blr19c.falowp:falowp-bot-system:1.2.5")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 1.2.5
+
+* 修复任务中使用`SchedulingBotApi.sendAllGroup`会调用未启用的适配器的问题
 
 ### 1.2.4
 

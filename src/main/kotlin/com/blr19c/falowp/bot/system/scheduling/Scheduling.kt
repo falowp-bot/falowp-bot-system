@@ -5,6 +5,7 @@ import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.plugin.TaskPluginRegister
 import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApiSupport
 import com.blr19c.falowp.bot.system.scheduling.tasks.GreetingTask
+import com.blr19c.falowp.bot.system.systemConfigListProperty
 import com.blr19c.falowp.bot.system.utils.ScanUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +38,7 @@ object Scheduling : Log {
         log().info("初始化(周期/cron)任务")
         ScanUtils.scanPackage("com.blr19c.falowp.bot.system.adapter")
             .filter { SchedulingBotApiSupport::class.java.isAssignableFrom(it) }
+            .filter { systemConfigListProperty("adapter.enableAdapter").any { ea -> it.packageName.contains(".$ea.") } }
             .forEach { botList.add(it.kotlin.objectInstance as SchedulingBotApiSupport) }
         botList.sortBy { it.order() }
         val tasks = taskPlugins.map(this::schedulingRunnable)
