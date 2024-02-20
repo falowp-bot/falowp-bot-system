@@ -15,6 +15,7 @@ import com.blr19c.falowp.bot.system.plugin.PluginManagement
 import com.blr19c.falowp.bot.system.systemConfigListProperty
 import com.blr19c.falowp.bot.system.systemConfigProperty
 import com.fasterxml.jackson.databind.JsonNode
+import com.google.common.base.Strings
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -103,7 +104,7 @@ object GoCQHttpWebSocket : Log {
         val content = parseMessage(goCQHttpMessage)
         val sender = ReceiveMessage.User(
             userId,
-            goCQHttpMessage.sender?.card ?: goCQHttpMessage.sender?.nickname ?: "",
+            Strings.emptyToNull(goCQHttpMessage.sender?.card) ?: goCQHttpMessage.sender?.nickname ?: "",
             GoCqHttpBotApiSupport.apiAuth(userId, goCQHttpMessage.sender?.role),
             GoCqHttpBotApiSupport.avatar(userId)
         )
