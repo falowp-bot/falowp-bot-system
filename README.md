@@ -11,12 +11,17 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:1.2.5")
+implementation("com.blr19c.falowp:falowp-bot-system:1.2.6")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 1.2.6
+
+* 修复(go-cqhttp下)群昵称为空字符时无法获取昵称的问题
+* 更新一些依赖的版本
 
 ### 1.2.5
 
@@ -48,7 +53,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:1.2.5")
 
 ### 1.1.0
 
-* java17升级为java21
+* java17 -> java21
 
 ### 1.0.1
 
