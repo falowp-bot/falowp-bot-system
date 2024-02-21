@@ -134,32 +134,31 @@ publishing {
                 name.set("${project.group}:falowp-bot-system")
                 description.set("FalowpBot system infrastructure")
                 packaging = "jar"
-                url.set("https://github.com/falowp-bot/falowp-bot-system.git")
+                url.set("https://github.com/falowp-bot")
 
                 scm {
-                    url.set("https://github.com/falowp-bot/falowp-bot-system.git")
-                    connection.set("https://github.com/falowp-bot/falowp-bot-system.git")
-                    developerConnection.set("scm:git:ssh://github.com:falowp-bot/falowp-bot-system.git")
+                    url.set("https://github.com/falowp-bot")
+                    connection.set("https://github.com/falowp-bot")
+                    developerConnection.set("https://github.com/falowp-bot")
                 }
 
                 licenses {
                     license {
-                        name.set("The Apache License, Version 2.0")
+                        name.set("Apache-2.0 license")
                         url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
 
                 developers {
                     developer {
-                        id.set("blr")
-                        name.set("bingliran")
-                        email.set("bingliran@126.com")
+                        id.set("falowp")
+                        name.set("falowp")
                         organization {
-                            name = "blr19c"
+                            name = "falowp"
                             url = "https://falowp.blr19c.com"
                         }
                         timezone.set("+8")
-                        roles.add("developer")
+                        roles.add("owner")
                     }
                 }
             }
