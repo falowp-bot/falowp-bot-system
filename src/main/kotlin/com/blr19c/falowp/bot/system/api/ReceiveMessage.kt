@@ -95,10 +95,15 @@ data class ReceiveMessage(
          * 分享
          */
         val share: List<Share>,
+
+        /**
+         * 引用消息
+         */
+        val reference: suspend () -> ReceiveMessage?
     ) {
         companion object {
             fun empty(): Content {
-                return Content("", emptyList(), emptyList(), emptyList())
+                return Content("", emptyList(), emptyList(), emptyList()) { null }
             }
         }
     }

@@ -132,7 +132,7 @@ object QQWebSocket : Log {
             atList(guildId, atList),
             imageList(imageList),
             emptyList()
-        )
+        ) { null }
         val sender = ReceiveMessage.User(
             opReceiveMessage.d.author.id,
             opReceiveMessage.d.member.nick ?: opReceiveMessage.d.author.username,

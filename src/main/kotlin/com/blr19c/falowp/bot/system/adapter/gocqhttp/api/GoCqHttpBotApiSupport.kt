@@ -5,6 +5,7 @@ import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
 import com.blr19c.falowp.bot.system.cache.CacheReference
 import com.blr19c.falowp.bot.system.image.ImageUrl
+import com.blr19c.falowp.bot.system.json.Json
 import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApiSupport
 import com.blr19c.falowp.bot.system.systemConfigListProperty
 import com.blr19c.falowp.bot.system.systemConfigProperty
@@ -50,6 +51,13 @@ object GoCqHttpBotApiSupport : SchedulingBotApiSupport {
         }
         return ApiAuth.ORDINARY_MEMBER
     }
+
+    suspend fun getMessage(messageId: String): GoCQHttpMessage {
+        val url = systemConfigProperty("adapter.gocqhttp.apiUrl")
+        return webclient().get("$url/get_msg?message_id=$messageId")
+            .bodyAsJsonNode()["data"].let { Json.readObj(it, GoCQHttpMessage::class) }
+    }
+
 
     private suspend fun groupList(): List<String> {
         val url = systemConfigProperty("adapter.gocqhttp.apiUrl")

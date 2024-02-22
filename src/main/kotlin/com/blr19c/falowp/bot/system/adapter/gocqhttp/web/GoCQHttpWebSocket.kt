@@ -100,8 +100,12 @@ object GoCQHttpWebSocket : Log {
             log().info("GoCQHttp适配器接收到消息没有userId不处理")
             return
         }
+        PluginManagement.message(parseMessage(goCQHttpMessage), GoCQHttpBotApi::class)
+    }
+
+    private fun parseMessage(goCQHttpMessage: GoCQHttpMessage): ReceiveMessage {
         val userId = goCQHttpMessage.userId!!
-        val content = parseMessage(goCQHttpMessage)
+        val content = parseMessageContent(goCQHttpMessage)
         val sender = ReceiveMessage.User(
             userId,
             Strings.emptyToNull(goCQHttpMessage.sender?.card) ?: goCQHttpMessage.sender?.nickname ?: "",
@@ -112,11 +116,10 @@ object GoCQHttpWebSocket : Log {
         val self = ReceiveMessage.Self(goCQHttpMessage.selfId!!)
         val messageId = goCQHttpMessage.messageId ?: UUID.randomUUID().toString()
         val messageType = if (goCQHttpMessage.subType == "poke") MessageTypeEnum.POKE else MessageTypeEnum.MESSAGE
-        val receiveMessage = ReceiveMessage(messageId, messageType, content, sender, source, self)
-        PluginManagement.message(receiveMessage, GoCQHttpBotApi::class)
+        return ReceiveMessage(messageId, messageType, content, sender, source, self)
     }
 
-    private fun parseMessage(goCQHttpMessage: GoCQHttpMessage): ReceiveMessage.Content {
+    private fun parseMessageContent(goCQHttpMessage: GoCQHttpMessage): ReceiveMessage.Content {
         val cqMessage = goCQHttpMessage.message ?: return emptyMessageContent(goCQHttpMessage)
         //处理@
         val atRegex = Regex("\\[CQ:at,qq=(\\d+)]")
@@ -133,14 +136,20 @@ object GoCQHttpWebSocket : Log {
         val shareList = shareRegex.findAll(notImageMessage).map { it.groupValues[1] }.toList()
         val notShareMessage = notImageMessage.replace(shareRegex, "")
 
-        val finalMessage = notShareMessage.trim()
+        //处理引用
+        val referenceRegex = Regex("\\[CQ:reply,id=(\\d+)]")
+        val referenceSingle = referenceRegex.findAll(notShareMessage).map { it.groupValues[1] }.singleOrNull()
+        val notReferenceMessage = notShareMessage.replace(referenceRegex, "")
+
+
+        val finalMessage = notReferenceMessage.trim()
 
         return ReceiveMessage.Content(
             finalMessage,
             atList(atList, goCQHttpMessage),
             imageList(imageList),
             shareList(shareList)
-        )
+        ) { referenceSingle(referenceSingle, goCQHttpMessage) }
     }
 
     private fun emptyMessageContent(goCQHttpMessage: GoCQHttpMessage): ReceiveMessage.Content {
@@ -163,6 +172,16 @@ object GoCQHttpWebSocket : Log {
             .map { Json.readJsonNode(it) }
             .mapNotNull { shareInfo(it) }
             .toList()
+    }
+
+    private suspend fun referenceSingle(referenceSingle: String?, goCQHttpMessage: GoCQHttpMessage): ReceiveMessage? {
+        referenceSingle ?: return null
+        val originalMessage = GoCqHttpBotApiSupport.getMessage(referenceSingle)
+        val finalMessage = originalMessage.copy(
+            selfId = goCQHttpMessage.selfId,
+            userId = originalMessage.sender?.userId
+        )
+        return parseMessage(finalMessage)
     }
 
     private fun shareInfo(jsonNode: JsonNode): ReceiveMessage.Share? {
