@@ -3,6 +3,7 @@ package com.blr19c.falowp.bot.system.plugin
 import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
+import com.blr19c.falowp.bot.system.expand.ChannelQueue
 import com.blr19c.falowp.bot.system.listener.hooks.MessagePluginExecutionHook
 import com.blr19c.falowp.bot.system.listener.hooks.ReceiveMessageHook
 import com.blr19c.falowp.bot.system.plugin.event.EventManager
@@ -11,6 +12,7 @@ import com.blr19c.falowp.bot.system.plugin.hook.withPluginHook
 import com.blr19c.falowp.bot.system.systemConfigListProperty
 import com.blr19c.falowp.bot.system.utils.ScanUtils
 import kotlinx.coroutines.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -22,6 +24,8 @@ import kotlin.streams.asSequence
 object PluginManagement : Log {
 
     private val messagePlugins = CopyOnWriteArrayList<MessagePluginRegister>()
+    private val queueMessageInfos = ConcurrentHashMap<String, QueueMessagePluginRegister>()
+    private val queueMessagePlugins = ConcurrentHashMap<String, ChannelQueue<BotApiJob>>()
     private val executor = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     /**
@@ -29,6 +33,21 @@ object PluginManagement : Log {
      */
     fun registerMessage(pluginRegister: MessagePluginRegister) {
         messagePlugins.add(pluginRegister)
+    }
+
+    /**
+     * 注册消息插件
+     */
+    fun registerMessage(pluginRegister: QueueMessagePluginRegister) {
+        messagePlugins.add(pluginRegister.messagePluginRegister)
+        queueMessageInfos[pluginRegister.pluginId] = pluginRegister
+        queueMessagePlugins[pluginRegister.pluginId] = ChannelQueue(capacity = pluginRegister.queueCapacity)
+        executor.launch {
+            queueMessagePlugins[pluginRegister.pluginId]!!.drainTo { botApiJob ->
+                botApiJob.job.start()
+                botApiJob.job.join()
+            }
+        }
     }
 
     fun configure() {
@@ -80,17 +99,11 @@ object PluginManagement : Log {
         val allPluginJob = mutableListOf<Job>()
         for (plugin in messagePlugins.filter { it.match.checkMath(message) }) {
             val originalBotApi = botApiClass.primaryConstructor!!.call(message, plugin.originalClass) as BotApi
-            val botApi = PluginBotApi(originalBotApi)
-            val args = plugin.match.regex?.find(message.content.message)?.destructured?.toList() ?: listOf()
-            val job = launch {
-                withPluginHook(botApi, MessagePluginExecutionHook(message, plugin)) {
-                    plugin.block(botApi, args.toTypedArray())
-                }
+            val botApiJob = this.buildJob(message, plugin, originalBotApi)
+            if (!executeQueueMessagePlugin(plugin, botApiJob)) {
+                botApiJob.job.start()
+                allPluginJob.add(botApiJob.job)
             }
-            job.invokeOnCompletion { exception ->
-                exception?.let { log().error("插件:${plugin.originalClass}处理失败", exception) }
-            }
-            allPluginJob.add(job)
             if (plugin.terminateEvent) {
                 break
             }
@@ -98,9 +111,46 @@ object PluginManagement : Log {
         allPluginJob.joinAll()
     }
 
+    private suspend fun executeQueueMessagePlugin(plugin: MessagePluginRegister, botApiJob: BotApiJob): Boolean {
+        if (!queueMessageInfos.contains(plugin.pluginId)) {
+            return false
+        }
+        val queueMessageInfo = queueMessageInfos[plugin.pluginId]!!
+
+        val channel = queueMessagePlugins[plugin.pluginId]!!
+        if (channel.offer(botApiJob)) {
+            queueMessageInfo.onSuccess.invoke(botApiJob.botApi, channel.size())
+        } else {
+            queueMessageInfo.onOverFlow.invoke(botApiJob.botApi)
+        }
+        return true
+    }
+
+
+    private fun CoroutineScope.buildJob(
+        message: ReceiveMessage,
+        plugin: MessagePluginRegister,
+        originalBotApi: BotApi
+    ): BotApiJob {
+        val botApi = PluginBotApi(originalBotApi)
+        val args = plugin.match.regex?.find(message.content.message)?.destructured?.toList() ?: listOf()
+        val job = launch(start = CoroutineStart.LAZY) {
+            withPluginHook(botApi, MessagePluginExecutionHook(message, plugin)) {
+                plugin.block(botApi, args.toTypedArray())
+            }
+        }
+        job.invokeOnCompletion { exception ->
+            exception?.let { log().error("插件:${plugin.originalClass}处理失败", exception) }
+        }
+        return BotApiJob(botApi, job)
+    }
+
+
     private fun initPlugin(plugin: Class<*>): PluginInfo? {
         val annotation = plugin.getAnnotation(Plugin::class.java) ?: return null
         if (!annotation.enable) return null
         return PluginInfo(plugin.constructors.first().newInstance(), annotation)
     }
+
+    data class BotApiJob(val botApi: BotApi, val job: Job)
 }

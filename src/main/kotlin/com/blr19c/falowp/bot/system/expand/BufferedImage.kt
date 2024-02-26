@@ -1,4 +1,4 @@
-package com.blr19c.falowp.bot.system.image
+package com.blr19c.falowp.bot.system.expand
 
 import com.madgag.gif.fmsware.AnimatedGifEncoder
 import java.awt.AlphaComposite

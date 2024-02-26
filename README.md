@@ -11,12 +11,22 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:1.2.6")
+implementation("com.blr19c.falowp:falowp-bot-system:1.3.0")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 1.3.0(有内容不向下兼容)
+
+* 支持队列消息
+* 支持获取引用消息内容
+* 发送消息使用链式处理(自定义消息顺序) 注意: 链式消息取代了之前的消息并且不向下兼容
+* 将之前的image扩展移动至了expand扩展,并新增了一些扩展(不兼容原路径)
+* 更新一些依赖
+* 更新默认的useragent
+* 更新一些描述
 
 ### 1.2.6
 

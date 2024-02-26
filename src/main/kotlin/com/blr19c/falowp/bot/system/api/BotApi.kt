@@ -32,35 +32,35 @@ abstract class BotApi(val receiveMessage: ReceiveMessage, val originalClass: KCl
 
     /**
      * 发送群聊消息
-     * @param sendMessage 需要发送的消息
+     * @param sendMessageChain 需要发送的消息链
      * @param reference 是否引用原消息
      * @param forward 是否已转发形式发送
      */
     abstract suspend fun sendGroup(
-        vararg sendMessage: SendMessage,
+        vararg sendMessageChain: SendMessageChain,
         reference: Boolean = false,
         forward: Boolean = false
     )
 
     /**
      * 发送给所有群聊
-     * @param sendMessage 需要发送的消息
+     * @param sendMessageChain 需要发送的消息链
      * @param reference 是否引用原消息
      * @param forward 是否已转发形式发送
      */
     abstract suspend fun sendAllGroup(
-        vararg sendMessage: SendMessage,
+        vararg sendMessageChain: SendMessageChain,
         reference: Boolean = false,
         forward: Boolean = false
     )
 
     /**
      * 发送私聊消息
-     * @param sendMessage 需要发送的消息
+     * @param sendMessageChain 需要发送的消息链
      * @param reference 是否引用原消息
      */
     abstract suspend fun sendPrivate(
-        vararg sendMessage: SendMessage,
+        vararg sendMessageChain: SendMessageChain,
         reference: Boolean = false,
         forward: Boolean = false
     )
@@ -85,16 +85,16 @@ abstract class BotApi(val receiveMessage: ReceiveMessage, val originalClass: KCl
 
     /**
      * 发送回复消息(仅在回复消息时使用，不区分群聊与私聊)
-     * @param sendMessage 需要发送的消息
+     * @param sendMessageChain 需要发送的消息链
      * @param reference 是否引用原消息
      */
     open suspend fun sendReply(
-        vararg sendMessage: SendMessage,
+        vararg sendMessageChain: SendMessageChain,
         reference: Boolean = false,
         forward: Boolean = false
     ) {
-        if (receiveMessage.group()) sendGroup(*sendMessage, reference = reference, forward = forward)
-        if (receiveMessage.private()) sendPrivate(*sendMessage, reference = reference, forward = forward)
+        if (receiveMessage.group()) sendGroup(*sendMessageChain, reference = reference, forward = forward)
+        if (receiveMessage.private()) sendPrivate(*sendMessageChain, reference = reference, forward = forward)
     }
 
 }

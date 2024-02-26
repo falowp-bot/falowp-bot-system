@@ -1,6 +1,6 @@
 package com.blr19c.falowp.bot.system.api
 
-import com.blr19c.falowp.bot.system.image.ImageUrl
+import com.blr19c.falowp.bot.system.expand.ImageUrl
 
 /**
  * 接收的消息

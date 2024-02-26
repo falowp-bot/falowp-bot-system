@@ -9,7 +9,7 @@ import com.blr19c.falowp.bot.system.adapter.gocqhttp.api.GoCqHttpBotApiSupport
 import com.blr19c.falowp.bot.system.api.MessageTypeEnum
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
 import com.blr19c.falowp.bot.system.api.SourceTypeEnum
-import com.blr19c.falowp.bot.system.image.ImageUrl
+import com.blr19c.falowp.bot.system.expand.ImageUrl
 import com.blr19c.falowp.bot.system.json.Json
 import com.blr19c.falowp.bot.system.plugin.PluginManagement
 import com.blr19c.falowp.bot.system.systemConfigListProperty

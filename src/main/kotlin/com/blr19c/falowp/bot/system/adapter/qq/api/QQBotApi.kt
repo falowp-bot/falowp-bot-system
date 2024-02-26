@@ -2,9 +2,7 @@ package com.blr19c.falowp.bot.system.adapter.qq.api
 
 import com.blr19c.falowp.bot.system.adapter.qq.op.OpMessageContent
 import com.blr19c.falowp.bot.system.adapter.qq.op.OpSendMessage
-import com.blr19c.falowp.bot.system.api.BotApi
-import com.blr19c.falowp.bot.system.api.ReceiveMessage
-import com.blr19c.falowp.bot.system.api.SendMessage
+import com.blr19c.falowp.bot.system.api.*
 import com.blr19c.falowp.bot.system.json.Json
 import com.blr19c.falowp.bot.system.systemConfigProperty
 import com.blr19c.falowp.bot.system.web.webclient
@@ -18,28 +16,31 @@ import kotlin.reflect.KClass
  */
 class QQBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) : BotApi(receiveMessage, originalClass) {
 
-    override suspend fun sendGroup(vararg sendMessage: SendMessage, reference: Boolean, forward: Boolean) {
-        sendMessage.forEach { sendGroup(receiveMessage.source.id, it, reference) }
+    override suspend fun sendGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
+        sendMessageChain.forEach { sendGroup(receiveMessage.source.id, it, reference) }
     }
 
-    override suspend fun sendAllGroup(vararg sendMessage: SendMessage, reference: Boolean, forward: Boolean) {
+    override suspend fun sendAllGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         for (channelId in QQBotApiSupport.channelIdList) {
-            sendMessage.forEach { sendGroup(channelId, it, reference) }
+            sendMessageChain.forEach { sendGroup(channelId, it, reference) }
         }
     }
 
-    override suspend fun sendPrivate(vararg sendMessage: SendMessage, reference: Boolean, forward: Boolean) {
+    override suspend fun sendPrivate(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         throw IllegalStateException("QQ适配器不支持私聊消息")
     }
 
-    private suspend fun sendGroup(channelId: String, sendMessage: SendMessage, reference: Boolean) {
-        log().info("QQ适配器发送群组消息:{}", sendMessage)
+    private suspend fun sendGroup(channelId: String, sendMessageChain: SendMessageChain, reference: Boolean) {
+        log().info("QQ适配器发送群组消息:{}", sendMessageChain)
         val messageReference = if (reference) OpSendMessage.Reference(receiveMessage.id) else null
-        val opMessageContent = OpMessageContent(sendMessage.content, sendMessage.at, emptyList())
-        val opSendMessageList = if (sendMessage.images.isEmpty()) {
+        val content = sendMessageChain.messageQueue.filterIsInstance<TextSendMessage>().joinToString("") { it.content }
+        val atList = sendMessageChain.messageQueue.filterIsInstance<AtSendMessage>().map { it.at }.toList()
+        val imageList = sendMessageChain.messageQueue.filterIsInstance<ImageSendMessage>().map { it.image }.toList()
+        val opMessageContent = OpMessageContent(content, atList, emptyList())
+        val opSendMessageList = if (imageList.isEmpty()) {
             listOf(OpSendMessage(opMessageContent, null, messageReference, receiveMessage.id))
         } else {
-            sendMessage.images
+            imageList
                 .map { it.toUrl() }
                 .map { OpSendMessage(opMessageContent, it, messageReference, receiveMessage.id) }
                 .toList()

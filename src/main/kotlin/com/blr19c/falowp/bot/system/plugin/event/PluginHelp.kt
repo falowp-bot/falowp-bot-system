@@ -58,7 +58,7 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
         htmlBody.select("#pluginName").html(plugin.name)
         htmlBody.select("#pluginDesc").html(plugin.desc)
         val base64Help = htmlToImageBase64(htmlBody.html(), ".card-container")
-        botApi.sendReply(SendMessage.builder().images(base64Help).build())
+        botApi.sendReply(SendMessage.builder().image(base64Help).build())
     }
 
     private suspend fun allHelp(botApi: BotApi, helpEvent: HelpEvent) {
@@ -85,6 +85,6 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
         val card = tagList.sortedByDescending { it.length }.joinToString("")
         htmlBody.select(".card-container").append(card)
         val base64Help = htmlToImageBase64(htmlBody.html(), ".card-container")
-        botApi.sendReply(SendMessage.builder().images(base64Help).build())
+        botApi.sendReply(SendMessage.builder().image(base64Help).build())
     }
 }

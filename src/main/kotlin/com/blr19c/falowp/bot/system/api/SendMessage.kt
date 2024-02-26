@@ -1,103 +1,134 @@
 package com.blr19c.falowp.bot.system.api
 
-import com.blr19c.falowp.bot.system.image.ImageUrl
+import com.blr19c.falowp.bot.system.expand.ImageUrl
 import java.util.*
 
 /**
- * 发送的消息
+ * 可以作为发送的消息
  */
-data class SendMessage(
+interface SendMessage {
+
+    companion object {
+        fun builder(content: String): Builder {
+            return Builder().text(content)
+        }
+
+        fun builder(): Builder {
+            return Builder()
+        }
+    }
+
+
+    class Builder(private val messageQueue: Queue<SendMessage> = LinkedList()) {
+
+        fun text(content: String): Builder {
+            messageQueue.add(TextSendMessage(content))
+            return this
+        }
+
+        fun at(at: String): Builder {
+            messageQueue.add(AtSendMessage(at))
+            return this
+        }
+
+        fun at(at: List<String>): Builder {
+            at.asSequence().forEach { messageQueue.add(AtSendMessage(it)) }
+            return this
+        }
+
+        fun at(receiveMessage: ReceiveMessage): Builder {
+            messageQueue.add(AtSendMessage(receiveMessage.sender.id))
+            return this
+        }
+
+        fun image(image: String): Builder {
+            messageQueue.add(ImageSendMessage(ImageUrl(image)))
+            return this
+        }
+
+        fun image(images: List<String>): Builder {
+            images.asSequence()
+                .map { ImageUrl(it) }
+                .forEach { messageQueue.add(ImageSendMessage(it)) }
+            return this
+        }
+
+        fun video(videos: List<String>): Builder {
+            videos.asSequence().forEach { messageQueue.add(VideoSendMessage(it)) }
+            return this
+        }
+
+        fun video(video: String): Builder {
+            messageQueue.add(VideoSendMessage(video))
+            return this
+        }
+
+        fun poke(): Builder {
+            messageQueue.add(PokeSendMessage())
+            return this
+        }
+
+        fun build(): SendMessageChain {
+            return SendMessageChain(UUID.randomUUID().toString(), messageQueue)
+        }
+    }
+}
+
+/**
+ * at消息
+ */
+data class AtSendMessage(
+    /**
+     * at谁
+     */
+    val at: String
+) : SendMessage
+
+/**
+ * 文本消息
+ */
+data class TextSendMessage(
+    /**
+     * 消息内容
+     */
+    val content: String
+) : SendMessage
+
+/**
+ * 图片消息
+ */
+data class ImageSendMessage(
+    /**
+     * 图片(仅支持url和base64)
+     */
+    val image: ImageUrl
+) : SendMessage
+
+/**
+ * 视频消息
+ */
+data class VideoSendMessage(
+    /**
+     * 视频(仅支持url)
+     */
+    val video: String
+) : SendMessage
+
+/**
+ * 戳一戳消息
+ */
+class PokeSendMessage : SendMessage
+
+/**
+ * 消息链
+ */
+data class SendMessageChain(
     /**
      * 消息id
      */
     val id: String,
     /**
-     * 消息内容
+     * 消息内容链
      */
-    val content: String,
-    /**
-     * at谁
-     */
-    val at: List<String> = emptyList(),
-    /**
-     * 图片(仅支持url和base64)
-     */
-    val images: List<ImageUrl> = emptyList(),
-    /**
-     * 视频(仅支持url)
-     */
-    val videos: List<String> = emptyList(),
-    /**
-     * 戳一戳
-     */
-    val poke: Boolean = false,
-) {
-
-    companion object {
-        fun builder(content: String): Builder {
-            return Builder(content)
-        }
-
-        fun builder(): Builder {
-            return Builder("")
-        }
-    }
-
-
-    class Builder(private var content: String) {
-        private val id: String = UUID.randomUUID().toString()
-        private val at: MutableList<String> = arrayListOf()
-        private val images: MutableList<ImageUrl> = arrayListOf()
-        private val videos: MutableList<String> = arrayListOf()
-        private var poke: Boolean = false
-        fun content(content: String): Builder {
-            this.content = content
-            return this
-        }
-
-        fun at(at: String): Builder {
-            this.at.add(at)
-            return this
-        }
-
-        fun at(at: List<String>): Builder {
-            this.at.addAll(at)
-            return this
-        }
-
-        fun at(receiveMessage: ReceiveMessage): Builder {
-            this.at.add(receiveMessage.sender.id)
-            return this
-        }
-
-        fun images(images: String): Builder {
-            this.images.add(ImageUrl(images))
-            return this
-        }
-
-        fun images(images: List<String>): Builder {
-            this.images.addAll(images.map { ImageUrl(it) })
-            return this
-        }
-
-        fun videos(videos: List<String>): Builder {
-            this.videos.addAll(videos)
-            return this
-        }
-
-        fun videos(video: String): Builder {
-            this.videos.add(video)
-            return this
-        }
-
-        fun poke(): Builder {
-            this.poke = true
-            return this
-        }
-
-
-        fun build(): SendMessage {
-            return SendMessage(id, content, at, images, videos, poke)
-        }
-    }
-}
+    val messageQueue: Queue<SendMessage>
+)

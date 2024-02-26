@@ -15,13 +15,13 @@ val jvmVersion: String = "2.0.0-Beta4"
 
 plugins {
     kotlin("jvm") version "2.0.0-Beta4"
-    id("com.github.ben-manes.versions") version "0.50.0"
+    id("com.github.ben-manes.versions") version "0.51.0"
     id("maven-publish")
     id("signing")
 }
 
 group = "com.blr19c.falowp"
-version = "1.2.6"
+version = "1.3.0"
 
 kotlin {
     jvmToolchain(21)
@@ -69,7 +69,12 @@ dependencies {
     //html处理
     api("org.jsoup:jsoup:$jsoupVersion")
     //miniIO
-    api("io.minio:minio:$miniIOVersion")
+    api("io.minio:minio:$miniIOVersion") {
+        exclude("org.apache.commons", "commons-compress")
+    }
+    //临时解决miniIO依赖漏洞commons-compress
+    implementation("org.apache.commons:commons-compress:1.26.0")
+
     //浏览器
     api("com.microsoft.playwright:playwright:$playwrightVersion")
     //gif处理
@@ -78,7 +83,7 @@ dependencies {
         exclude("org.easytesting", "fest-assert-core")
     }
     //腾讯云翻译api
-    api("com.tencentcloudapi:tencentcloud-sdk-java-tmt:3.1.960") {
+    api("com.tencentcloudapi:tencentcloud-sdk-java-tmt:3.1.967") {
         exclude("com.squareup.okhttp3", "okhttp")
     }
 }

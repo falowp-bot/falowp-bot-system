@@ -1,6 +1,6 @@
 package com.blr19c.falowp.bot.system.listener.events
 
-import com.blr19c.falowp.bot.system.api.SendMessage
+import com.blr19c.falowp.bot.system.api.SendMessageChain
 import com.blr19c.falowp.bot.system.plugin.Plugin
 
 /**
@@ -10,7 +10,7 @@ data class SendMessageEvent(
     /**
      * 发送的消息
      */
-    val sendMessage: List<SendMessage>,
+    val sendMessage: List<SendMessageChain>,
     /**
      * 是否引用
      */

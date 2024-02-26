@@ -1,7 +1,7 @@
 package com.blr19c.falowp.bot.system.web
 
 import com.blr19c.falowp.bot.system.Log
-import com.blr19c.falowp.bot.system.image.encodeToBase64String
+import com.blr19c.falowp.bot.system.expand.encodeToBase64String
 import com.microsoft.playwright.*
 import com.microsoft.playwright.options.LoadState
 import com.microsoft.playwright.options.ViewportSize

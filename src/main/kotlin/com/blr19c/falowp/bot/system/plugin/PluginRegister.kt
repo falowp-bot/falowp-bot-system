@@ -9,6 +9,7 @@ import com.blr19c.falowp.bot.system.scheduling.Scheduling
 import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApi
 import com.blr19c.falowp.bot.system.scheduling.cron.Trigger
 import com.blr19c.falowp.bot.system.utils.ScanUtils.getCallerClass
+import kotlinx.coroutines.channels.Channel
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -35,7 +36,7 @@ abstract class PluginRegister : Register {
     /**
      * id
      */
-    val pluginId: String = UUID.randomUUID().toString()
+    open val pluginId: String = UUID.randomUUID().toString()
 
     /**
      * 声明plugin的class
@@ -135,6 +136,37 @@ data class MessagePluginRegister(
         PluginManagement.registerMessage(this)
     }
 }
+
+/**
+ * 队列消息类插件
+ */
+data class QueueMessagePluginRegister(
+    /**
+     * 原消息类插件
+     */
+    val messagePluginRegister: MessagePluginRegister,
+    /**
+     * 最大等待长度限制
+     */
+    val queueCapacity: Int = Channel.RENDEZVOUS,
+    /**
+     * 成功进入队列回调
+     */
+    val onSuccess: suspend BotApi.(queueIndex: Int) -> Unit = {},
+    /**
+     * 超过最大等待长度限制回调
+     */
+    val onOverFlow: suspend BotApi.() -> Unit = {},
+
+    override val pluginId: String = messagePluginRegister.pluginId,
+    override val originalClass: KClass<*> = messagePluginRegister.originalClass
+) : PluginRegister() {
+
+    override fun register() {
+        PluginManagement.registerMessage(this)
+    }
+}
+
 
 /**
  * 任务类插件

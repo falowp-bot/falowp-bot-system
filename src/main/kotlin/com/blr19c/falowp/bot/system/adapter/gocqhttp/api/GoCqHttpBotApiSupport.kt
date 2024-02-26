@@ -4,7 +4,7 @@ import com.blr19c.falowp.bot.system.api.ApiAuth
 import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
 import com.blr19c.falowp.bot.system.cache.CacheReference
-import com.blr19c.falowp.bot.system.image.ImageUrl
+import com.blr19c.falowp.bot.system.expand.ImageUrl
 import com.blr19c.falowp.bot.system.json.Json
 import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApiSupport
 import com.blr19c.falowp.bot.system.systemConfigListProperty

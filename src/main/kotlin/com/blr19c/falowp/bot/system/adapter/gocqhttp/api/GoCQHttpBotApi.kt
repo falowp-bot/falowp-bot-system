@@ -1,9 +1,7 @@
 package com.blr19c.falowp.bot.system.adapter.gocqhttp.api
 
-import com.blr19c.falowp.bot.system.api.BotApi
-import com.blr19c.falowp.bot.system.api.ReceiveMessage
-import com.blr19c.falowp.bot.system.api.SendMessage
-import com.blr19c.falowp.bot.system.image.ImageUrl
+import com.blr19c.falowp.bot.system.api.*
+import com.blr19c.falowp.bot.system.expand.ImageUrl
 import com.blr19c.falowp.bot.system.json.Json
 import com.blr19c.falowp.bot.system.systemConfigProperty
 import com.blr19c.falowp.bot.system.web.longTimeoutWebclient
@@ -23,37 +21,37 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
 
     private val client by lazy { longTimeoutWebclient() }
 
-    override suspend fun sendGroup(vararg sendMessage: SendMessage, reference: Boolean, forward: Boolean) {
+    override suspend fun sendGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         //当forward时reference失效
         if (forward) return sendForwardMessage(
             receiveMessage.source.id,
-            *sendMessage,
+            *sendMessageChain,
             action = "send_group_forward_msg"
         )
-        sendMessage.forEach { sendGroup(receiveMessage.source.id, it, reference) }
+        sendMessageChain.forEach { sendGroup(receiveMessage.source.id, it, reference) }
     }
 
-    override suspend fun sendAllGroup(vararg sendMessage: SendMessage, reference: Boolean, forward: Boolean) {
+    override suspend fun sendAllGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         for (groupId in GoCqHttpBotApiSupport.groupIdList) {
-            if (forward) sendForwardMessage(groupId, *sendMessage, action = "send_group_forward_msg")
-            else sendMessage.forEach { sendGroup(groupId, it, reference) }
+            if (forward) sendForwardMessage(groupId, *sendMessageChain, action = "send_group_forward_msg")
+            else sendMessageChain.forEach { sendGroup(groupId, it, reference) }
         }
     }
 
-    override suspend fun sendPrivate(vararg sendMessage: SendMessage, reference: Boolean, forward: Boolean) {
+    override suspend fun sendPrivate(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         if (forward) return sendForwardMessage(
             receiveMessage.source.id,
-            *sendMessage,
+            *sendMessageChain,
             action = "send_private_forward_msg"
         )
-        sendMessage.forEach { sendPrivate(it, reference) }
+        sendMessageChain.forEach { sendPrivate(it, reference) }
     }
 
-    private suspend fun sendGroup(groupId: String, sendMessage: SendMessage, reference: Boolean) {
-        log().info("GoCQHttp适配器发送群组消息:{}", sendMessage)
+    private suspend fun sendGroup(groupId: String, sendMessageChain: SendMessageChain, reference: Boolean) {
+        log().info("GoCQHttp适配器发送群组消息:{}", sendMessageChain)
         val body = mapOf(
             "group_id" to groupId,
-            "message" to buildMessage(sendMessage, reference)
+            "message" to buildMessage(sendMessageChain, reference)
         )
         retry {
             client.post("$baseUrl/send_group_msg") {
@@ -62,11 +60,11 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
         }
     }
 
-    private suspend fun sendPrivate(sendMessage: SendMessage, reference: Boolean) {
-        log().info("GoCQHttp适配器发送私聊消息:{}", sendMessage)
+    private suspend fun sendPrivate(sendMessageChain: SendMessageChain, reference: Boolean) {
+        log().info("GoCQHttp适配器发送私聊消息:{}", sendMessageChain)
         val body = mapOf(
             "user_id" to receiveMessage.source.id,
-            "message" to buildMessage(sendMessage, reference)
+            "message" to buildMessage(sendMessageChain, reference)
         )
         retry {
             client.post("$baseUrl/send_private_msg") {
@@ -75,11 +73,11 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
         }
     }
 
-    private suspend fun sendForwardMessage(groupId: String, vararg sendMessage: SendMessage, action: String) {
+    private suspend fun sendForwardMessage(groupId: String, vararg sendMessageChain: SendMessageChain, action: String) {
         val body = mapOf(
             "group_id" to groupId,
             "user_id" to groupId,
-            "messages" to buildForwardMessage(*sendMessage),
+            "messages" to buildForwardMessage(*sendMessageChain),
         )
         val bodyJsonString = Json.toJsonString(body)
         log().info("GoCQHttp适配器发送转发消息:{}", bodyJsonString)
@@ -94,12 +92,12 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
     /**
      * 转发消息
      */
-    private fun buildForwardMessage(vararg sendMessages: SendMessage): ArrayNode {
+    private fun buildForwardMessage(vararg sendMessageChains: SendMessageChain): ArrayNode {
         val nickname = systemConfigProperty("nickname")
         val selfId = this.receiveMessage.self.id
         val messageNode = Json.createArrayNode()
-        for (sendMessage in sendMessages) {
-            val message = buildMessage(sendMessage, false)
+        for (sendMessageChain in sendMessageChains) {
+            val message = buildMessage(sendMessageChain, false)
             val forwardData = """{"type":"node","data":{"name":"$nickname","uin":"$selfId","content":"$message"}}"""
             messageNode.add(Json.readJsonNode(forwardData))
         }
@@ -130,34 +128,40 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
     /**
      * 单个消息
      */
-    private fun buildMessage(sendMessage: SendMessage, reference: Boolean): String {
-        return atCQ(sendMessage.at)
-            .plus(if (reference) replyCQ(receiveMessage.id) else "")
-            .plus(if (sendMessage.poke) pokeCQ(receiveMessage.sender.id) else "")
-            .plus(imageCQ(sendMessage.images))
-            .plus(videoCQ(sendMessage.videos))
-            .plus(sendMessage.content)
+    private fun buildMessage(sendMessageChain: SendMessageChain, reference: Boolean): String {
+        val builder = StringBuilder()
+        while (sendMessageChain.messageQueue.isNotEmpty()) {
+            val message = when (val sendMessage = sendMessageChain.messageQueue.poll()) {
+                is AtSendMessage -> atCQ(sendMessage.at)
+                is TextSendMessage -> sendMessage.content
+                is ImageSendMessage -> imageCQ(sendMessage.image)
+                is VideoSendMessage -> videoCQ(sendMessage.video)
+                is PokeSendMessage -> pokeCQ(receiveMessage.sender.id)
+                else -> ""
+            }
+            builder.append(message)
+        }
+        if (reference) {
+            builder.append(replyCQ(receiveMessage.id))
+        }
+        return builder.toString()
     }
 
-    private fun atCQ(at: List<String>): String {
-        return at.joinToString(" ") { "[CQ:at,qq=${it}]" }
+    private fun atCQ(at: String): String {
+        return "[CQ:at,qq=${at}]"
     }
 
     private fun replyCQ(messageId: String): String {
         return "[CQ:reply,id=$messageId]"
     }
 
-    private fun imageCQ(image: List<ImageUrl>): String {
-        return image.joinToString(" ") {
-            runBlocking {
-                if (it.isUrl()) "[CQ:image,type=custom,url=${it.toUrl()},file=图片]"
-                else "[CQ:image,type=custom,url=base64://${it.toBase64()},file=图片]"
-            }
-        }
+    private fun imageCQ(image: ImageUrl): String = runBlocking {
+        if (image.isUrl()) "[CQ:image,type=custom,url=${image.toUrl()},file=图片]"
+        else "[CQ:image,type=custom,url=base64://${image.toBase64()},file=图片]"
     }
 
-    private fun videoCQ(videos: List<String>): String {
-        return videos.joinToString(" ") { "[CQ:video,file=$it]" }
+    private fun videoCQ(videos: String): String {
+        return "[CQ:video,file=$videos]"
     }
 
     private fun pokeCQ(sendId: String): String {
