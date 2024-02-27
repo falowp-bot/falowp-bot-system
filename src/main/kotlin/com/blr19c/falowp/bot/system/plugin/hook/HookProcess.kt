@@ -28,7 +28,8 @@ open class NormalHookProcess(
 ) : HookProcess {
 
     override suspend fun process(hookJoinPoint: HookJoinPoint, hook: Plugin.Listener.Hook) {
-        hookPluginRegister.hook(hookJoinPoint, hook)
+        val botApi = hookJoinPoint.botApi()
+        hookPluginRegister.hook(SpecifiedBotApiNativeHookJoinPoint(botApi, hookJoinPoint), hook)
         hookJoinPoint.process()
     }
 
@@ -46,7 +47,8 @@ class AroundHookProcess(
 ) : HookProcess {
 
     override suspend fun process(hookJoinPoint: HookJoinPoint, hook: Plugin.Listener.Hook) {
-        hookPluginRegister.hook(hookJoinPoint, hook)
+        val botApi = hookJoinPoint.botApi()
+        hookPluginRegister.hook(SpecifiedBotApiNativeHookJoinPoint(botApi, hookJoinPoint), hook)
     }
 
     override fun botApi(): HookBotApi {
@@ -63,10 +65,11 @@ class ThrowingHookProcess(
 ) : HookProcess {
 
     override suspend fun process(hookJoinPoint: HookJoinPoint, hook: Plugin.Listener.Hook) {
+        val botApi = hookJoinPoint.botApi()
         try {
             hookJoinPoint.process()
         } catch (ex: Throwable) {
-            hookPluginRegister.hook(hookJoinPoint, hook)
+            hookPluginRegister.hook(SpecifiedBotApiNativeHookJoinPoint(botApi, hookJoinPoint), hook)
             throw ex
         }
     }
@@ -85,10 +88,11 @@ class FinallyHookProcess(
 ) : HookProcess {
 
     override suspend fun process(hookJoinPoint: HookJoinPoint, hook: Plugin.Listener.Hook) {
+        val botApi = hookJoinPoint.botApi()
         try {
             hookJoinPoint.process()
         } finally {
-            hookPluginRegister.hook(hookJoinPoint, hook)
+            hookPluginRegister.hook(SpecifiedBotApiNativeHookJoinPoint(botApi, hookJoinPoint), hook)
         }
     }
 

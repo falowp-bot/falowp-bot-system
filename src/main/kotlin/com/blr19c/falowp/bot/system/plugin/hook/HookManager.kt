@@ -56,7 +56,7 @@ object HookManager : Log {
         hooks.addAll(around.map { toHookProcess(botApi, it) })
         hooks.addAll(target)
         hooks.addAll(afterReturning.map { toHookProcess(botApi, it) })
-        return HookJoinPoint(pluginInfo, hook, hooks)
+        return NativeHookJoinPoint(pluginInfo, hook, hooks)
     }
 
     /**
