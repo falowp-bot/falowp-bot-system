@@ -11,12 +11,16 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:1.3.0")
+implementation("com.blr19c.falowp:falowp-bot-system:1.3.1")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 1.3.1
+
+* 优化HookJoinPoint中BotApi的获取逻辑
 
 ### 1.3.0(有内容不向下兼容)
 
