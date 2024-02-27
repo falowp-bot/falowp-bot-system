@@ -34,17 +34,19 @@ fun <T> Page.existsToExecute(
     return allElementHandle.map { block.invoke(it) }.toList()
 }
 
-fun defaultBrowserContext(): BrowserContext {
-    return Playwright.create().chromium().launch().newContext(
-        Browser.NewContextOptions()
-            .setViewportSize(ViewportSize(1920, 1080))
-            .setUserAgent(commonUserAgent())
-            .setIsMobile(false)
-    )
+fun defaultNewContextOptions(): Browser.NewContextOptions {
+    return Browser.NewContextOptions()
+        .setViewportSize(ViewportSize(1920, 1080))
+        .setUserAgent(commonUserAgent())
+        .setIsMobile(false)
 }
 
 fun <T> commonWebdriverContext(block: BrowserContext.() -> T): T {
-    return defaultBrowserContext().use { block.invoke(it) }
+    return Playwright.create().chromium().launch().use { browser ->
+        browser.newContext(defaultNewContextOptions()).use { browserContext ->
+            block.invoke(browserContext)
+        }
+    }
 }
 
 suspend fun htmlToImageBase64(html: String, querySelector: String = "body"): String {
