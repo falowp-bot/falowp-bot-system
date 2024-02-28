@@ -130,8 +130,8 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
      */
     private fun buildMessage(sendMessageChain: SendMessageChain, reference: Boolean): String {
         val builder = StringBuilder()
-        while (sendMessageChain.messageQueue.isNotEmpty()) {
-            val message = when (val sendMessage = sendMessageChain.messageQueue.poll()) {
+        for (sendMessage in sendMessageChain.messageList) {
+            val message = when (sendMessage) {
                 is AtSendMessage -> atCQ(sendMessage.at)
                 is TextSendMessage -> sendMessage.content
                 is ImageSendMessage -> imageCQ(sendMessage.image)

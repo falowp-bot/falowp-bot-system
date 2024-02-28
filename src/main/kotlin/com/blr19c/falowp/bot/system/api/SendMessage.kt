@@ -19,57 +19,57 @@ interface SendMessage {
     }
 
 
-    class Builder(private val messageQueue: Queue<SendMessage> = LinkedList()) {
+    class Builder(private val messageList: List<SendMessage> = arrayListOf()) {
 
         fun text(content: String): Builder {
-            messageQueue.add(TextSendMessage(content))
+            messageList.addLast(TextSendMessage(content))
             return this
         }
 
         fun at(at: String): Builder {
-            messageQueue.add(AtSendMessage(at))
+            messageList.addLast(AtSendMessage(at))
             return this
         }
 
         fun at(at: List<String>): Builder {
-            at.asSequence().forEach { messageQueue.add(AtSendMessage(it)) }
+            at.asSequence().forEach { messageList.addLast(AtSendMessage(it)) }
             return this
         }
 
         fun at(receiveMessage: ReceiveMessage): Builder {
-            messageQueue.add(AtSendMessage(receiveMessage.sender.id))
+            messageList.addLast(AtSendMessage(receiveMessage.sender.id))
             return this
         }
 
         fun image(image: String): Builder {
-            messageQueue.add(ImageSendMessage(ImageUrl(image)))
+            messageList.addLast(ImageSendMessage(ImageUrl(image)))
             return this
         }
 
         fun image(images: List<String>): Builder {
             images.asSequence()
                 .map { ImageUrl(it) }
-                .forEach { messageQueue.add(ImageSendMessage(it)) }
+                .forEach { messageList.addLast(ImageSendMessage(it)) }
             return this
         }
 
         fun video(videos: List<String>): Builder {
-            videos.asSequence().forEach { messageQueue.add(VideoSendMessage(it)) }
+            videos.asSequence().forEach { messageList.addLast(VideoSendMessage(it)) }
             return this
         }
 
         fun video(video: String): Builder {
-            messageQueue.add(VideoSendMessage(video))
+            messageList.addLast(VideoSendMessage(video))
             return this
         }
 
         fun poke(): Builder {
-            messageQueue.add(PokeSendMessage())
+            messageList.addLast(PokeSendMessage())
             return this
         }
 
         fun build(): SendMessageChain {
-            return SendMessageChain(UUID.randomUUID().toString(), messageQueue)
+            return SendMessageChain(UUID.randomUUID().toString(), messageList)
         }
     }
 }
@@ -130,5 +130,5 @@ data class SendMessageChain(
     /**
      * 消息内容链
      */
-    val messageQueue: Queue<SendMessage>
+    val messageList: List<SendMessage>
 )

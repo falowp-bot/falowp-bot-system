@@ -33,9 +33,9 @@ class QQBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) : BotAp
     private suspend fun sendGroup(channelId: String, sendMessageChain: SendMessageChain, reference: Boolean) {
         log().info("QQ适配器发送群组消息:{}", sendMessageChain)
         val messageReference = if (reference) OpSendMessage.Reference(receiveMessage.id) else null
-        val content = sendMessageChain.messageQueue.filterIsInstance<TextSendMessage>().joinToString("") { it.content }
-        val atList = sendMessageChain.messageQueue.filterIsInstance<AtSendMessage>().map { it.at }.toList()
-        val imageList = sendMessageChain.messageQueue.filterIsInstance<ImageSendMessage>().map { it.image }.toList()
+        val content = sendMessageChain.messageList.filterIsInstance<TextSendMessage>().joinToString("") { it.content }
+        val atList = sendMessageChain.messageList.filterIsInstance<AtSendMessage>().map { it.at }.toList()
+        val imageList = sendMessageChain.messageList.filterIsInstance<ImageSendMessage>().map { it.image }.toList()
         val opMessageContent = OpMessageContent(content, atList, emptyList())
         val opSendMessageList = if (imageList.isEmpty()) {
             listOf(OpSendMessage(opMessageContent, null, messageReference, receiveMessage.id))
