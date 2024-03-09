@@ -21,7 +21,7 @@ plugins {
 }
 
 group = "com.blr19c.falowp"
-version = "1.3.1"
+version = "1.3.2"
 
 kotlin {
     jvmToolchain(21)
@@ -69,11 +69,7 @@ dependencies {
     //html处理
     api("org.jsoup:jsoup:$jsoupVersion")
     //miniIO
-    api("io.minio:minio:$miniIOVersion") {
-        exclude("org.apache.commons", "commons-compress")
-    }
-    //临时解决miniIO依赖漏洞commons-compress
-    implementation("org.apache.commons:commons-compress:1.26.0")
+    api("io.minio:minio:$miniIOVersion")
 
     //浏览器
     api("com.microsoft.playwright:playwright:$playwrightVersion")

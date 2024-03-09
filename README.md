@@ -11,12 +11,17 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:1.3.1")
+implementation("com.blr19c.falowp:falowp-bot-system:1.3.2")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 1.3.2
+
+* 修复message队列引起的不能重复获取消息问题
+* 修复Webdriver没有逐级关闭导致残留chrome进程的问题
 
 ### 1.3.1
 
