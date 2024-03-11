@@ -6,7 +6,6 @@ import com.blr19c.falowp.bot.system.plugin.hook.HookJoinPoint
 import com.blr19c.falowp.bot.system.plugin.hook.HookManager
 import com.blr19c.falowp.bot.system.plugin.hook.HookTypeEnum
 import com.blr19c.falowp.bot.system.scheduling.Scheduling
-import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApi
 import com.blr19c.falowp.bot.system.scheduling.cron.Trigger
 import com.blr19c.falowp.bot.system.utils.ScanUtils.getCallerClass
 import kotlinx.coroutines.channels.Channel
@@ -179,7 +178,7 @@ data class TaskPluginRegister(
     /**
      * 执行内容
      */
-    val block: suspend SchedulingBotApi.() -> Unit,
+    val block: suspend BotApi.() -> Unit,
     override val originalClass: KClass<*> = getCallerClass()
 ) : PluginRegister() {
 

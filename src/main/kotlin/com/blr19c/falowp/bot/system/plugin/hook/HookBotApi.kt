@@ -10,19 +10,29 @@ import com.blr19c.falowp.bot.system.plugin.Plugin
  */
 class HookBotApi(
     private val delegateBotApi: BotApi,
-    val register: HookPluginRegister<out Plugin.Listener.Hook>
+    register: HookPluginRegister<out Plugin.Listener.Hook>
 ) : BotApi(delegateBotApi.receiveMessage, register.originalClass) {
 
-    override suspend fun sendGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
-        delegateBotApi.sendGroup(*sendMessageChain, reference = reference, forward = forward)
+    override suspend fun sendGroup(
+        vararg sendMessageChain: SendMessageChain,
+        sourceId: String,
+        reference: Boolean,
+        forward: Boolean
+    ) {
+        delegateBotApi.sendGroup(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
     }
 
     override suspend fun sendAllGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         delegateBotApi.sendAllGroup(*sendMessageChain, reference = reference, forward = forward)
     }
 
-    override suspend fun sendPrivate(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
-        delegateBotApi.sendPrivate(*sendMessageChain, reference = reference, forward = forward)
+    override suspend fun sendPrivate(
+        vararg sendMessageChain: SendMessageChain,
+        sourceId: String,
+        reference: Boolean,
+        forward: Boolean,
+    ) {
+        delegateBotApi.sendPrivate(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
     }
 
     override suspend fun sendReply(vararg sendMessage: String, reference: Boolean, forward: Boolean) {

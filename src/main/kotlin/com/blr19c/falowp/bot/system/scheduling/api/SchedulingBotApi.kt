@@ -10,35 +10,45 @@ import kotlin.reflect.KClass
  * 定时任务的botApi
  */
 class SchedulingBotApi(originalClass: KClass<*>) : BotApi(ReceiveMessage.empty(), originalClass) {
-    private val receiveList = arrayListOf<String>()
 
-    override suspend fun sendGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
-        receiveList.map { Scheduling.selectBot(it, originalClass) }
-            .forEach { it?.sendGroup(*sendMessageChain, reference = reference, forward = forward) }
-        receiveList.clear()
+    override suspend fun sendGroup(
+        vararg sendMessageChain: SendMessageChain,
+        sourceId: String,
+        reference: Boolean,
+        forward: Boolean
+    ) {
+        selectBot(sourceId) {
+            this.sendGroup(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
+        }
     }
 
     override suspend fun sendAllGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
-        Scheduling.allBot(originalClass)
-            .map { it.sendAllGroup(*sendMessageChain, reference = reference, forward = forward) }
-        receiveList.clear()
+        allBot {
+            this.sendAllGroup(*sendMessageChain, reference = reference, forward = forward)
+        }
     }
 
-    override suspend fun sendPrivate(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
-        receiveList.map { Scheduling.selectBot(it, originalClass) }
-            .forEach { it?.sendPrivate(*sendMessageChain, reference = reference, forward = forward) }
-        receiveList.clear()
+    override suspend fun sendPrivate(
+        vararg sendMessageChain: SendMessageChain,
+        sourceId: String,
+        reference: Boolean,
+        forward: Boolean
+    ) {
+        selectBot(sourceId) {
+            this.sendPrivate(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
+        }
+    }
+
+    private suspend fun selectBot(sourceId: String, block: suspend BotApi.() -> Unit) {
+        Scheduling.selectBot(sourceId, originalClass)?.let { block.invoke(it) }
+    }
+
+    private suspend fun allBot(block: suspend BotApi.() -> Unit) {
+        Scheduling.allBot(originalClass)
+            .forEach { block.invoke(it) }
     }
 
     override suspend fun sendReply(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         throw IllegalStateException("定时任务BotAPi无法回复消息")
     }
-
-    /**
-     * 添加接收人
-     */
-    fun addReceive(receive: List<String>) {
-        receiveList.addAll(receive)
-    }
-
 }

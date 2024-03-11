@@ -13,9 +13,14 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
     BotApi(delegateBotApi.receiveMessage, delegateBotApi.originalClass) {
     private val messageIds = ConcurrentSet<String>()
 
-    override suspend fun sendGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
+    override suspend fun sendGroup(
+        vararg sendMessageChain: SendMessageChain,
+        sourceId: String,
+        reference: Boolean,
+        forward: Boolean
+    ) {
         publishSendMessageEvent(*sendMessageChain, reference = reference, forward = forward)
-        delegateBotApi.sendGroup(*sendMessageChain, reference = reference, forward = forward)
+        delegateBotApi.sendGroup(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
     }
 
     override suspend fun sendAllGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
@@ -23,9 +28,14 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
         delegateBotApi.sendAllGroup(*sendMessageChain, reference = reference, forward = forward)
     }
 
-    override suspend fun sendPrivate(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
+    override suspend fun sendPrivate(
+        vararg sendMessageChain: SendMessageChain,
+        sourceId: String,
+        reference: Boolean,
+        forward: Boolean
+    ) {
         publishSendMessageEvent(*sendMessageChain, reference = reference, forward = forward)
-        delegateBotApi.sendPrivate(*sendMessageChain, reference = reference, forward = forward)
+        delegateBotApi.sendPrivate(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
     }
 
     override suspend fun sendReply(vararg sendMessage: String, reference: Boolean, forward: Boolean) {

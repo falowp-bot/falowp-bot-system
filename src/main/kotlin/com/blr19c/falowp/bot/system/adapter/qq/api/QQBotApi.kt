@@ -16,8 +16,13 @@ import kotlin.reflect.KClass
  */
 class QQBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) : BotApi(receiveMessage, originalClass) {
 
-    override suspend fun sendGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
-        sendMessageChain.forEach { sendGroup(receiveMessage.source.id, it, reference) }
+    override suspend fun sendGroup(
+        vararg sendMessageChain: SendMessageChain,
+        sourceId: String,
+        reference: Boolean,
+        forward: Boolean
+    ) {
+        sendMessageChain.forEach { sendGroup(sourceId, it, reference) }
     }
 
     override suspend fun sendAllGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
@@ -26,7 +31,12 @@ class QQBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) : BotAp
         }
     }
 
-    override suspend fun sendPrivate(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
+    override suspend fun sendPrivate(
+        vararg sendMessageChain: SendMessageChain,
+        sourceId: String,
+        reference: Boolean,
+        forward: Boolean
+    ) {
         throw IllegalStateException("QQ适配器不支持私聊消息")
     }
 

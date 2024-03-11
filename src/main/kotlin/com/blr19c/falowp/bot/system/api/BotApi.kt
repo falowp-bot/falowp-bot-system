@@ -38,6 +38,7 @@ abstract class BotApi(val receiveMessage: ReceiveMessage, val originalClass: KCl
      */
     abstract suspend fun sendGroup(
         vararg sendMessageChain: SendMessageChain,
+        sourceId: String = receiveMessage.source.id,
         reference: Boolean = false,
         forward: Boolean = false
     )
@@ -61,6 +62,7 @@ abstract class BotApi(val receiveMessage: ReceiveMessage, val originalClass: KCl
      */
     abstract suspend fun sendPrivate(
         vararg sendMessageChain: SendMessageChain,
+        sourceId: String = receiveMessage.source.id,
         reference: Boolean = false,
         forward: Boolean = false
     )

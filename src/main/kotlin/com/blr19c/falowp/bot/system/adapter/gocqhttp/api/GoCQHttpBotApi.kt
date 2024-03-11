@@ -21,14 +21,19 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
 
     private val client by lazy { longTimeoutWebclient() }
 
-    override suspend fun sendGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
+    override suspend fun sendGroup(
+        vararg sendMessageChain: SendMessageChain,
+        sourceId: String,
+        reference: Boolean,
+        forward: Boolean
+    ) {
         //当forward时reference失效
         if (forward) return sendForwardMessage(
-            receiveMessage.source.id,
+            sourceId,
             *sendMessageChain,
             action = "send_group_forward_msg"
         )
-        sendMessageChain.forEach { sendGroup(receiveMessage.source.id, it, reference) }
+        sendMessageChain.forEach { sendGroup(sourceId, it, reference) }
     }
 
     override suspend fun sendAllGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
@@ -38,13 +43,18 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
         }
     }
 
-    override suspend fun sendPrivate(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
+    override suspend fun sendPrivate(
+        vararg sendMessageChain: SendMessageChain,
+        sourceId: String,
+        reference: Boolean,
+        forward: Boolean
+    ) {
         if (forward) return sendForwardMessage(
-            receiveMessage.source.id,
+            sourceId,
             *sendMessageChain,
             action = "send_private_forward_msg"
         )
-        sendMessageChain.forEach { sendPrivate(it, reference) }
+        sendMessageChain.forEach { sendPrivate(it, reference, sourceId) }
     }
 
     private suspend fun sendGroup(groupId: String, sendMessageChain: SendMessageChain, reference: Boolean) {
@@ -60,10 +70,10 @@ class GoCQHttpBotApi(receiveMessage: ReceiveMessage, originalClass: KClass<*>) :
         }
     }
 
-    private suspend fun sendPrivate(sendMessageChain: SendMessageChain, reference: Boolean) {
+    private suspend fun sendPrivate(sendMessageChain: SendMessageChain, reference: Boolean, sourceId: String) {
         log().info("GoCQHttp适配器发送私聊消息:{}", sendMessageChain)
         val body = mapOf(
-            "user_id" to receiveMessage.source.id,
+            "user_id" to sourceId,
             "message" to buildMessage(sendMessageChain, reference)
         )
         retry {

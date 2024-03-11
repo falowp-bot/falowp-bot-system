@@ -5,7 +5,6 @@ import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.api.MessageTypeEnum
 import com.blr19c.falowp.bot.system.plugin.hook.HookJoinPoint
 import com.blr19c.falowp.bot.system.plugin.hook.HookTypeEnum
-import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApi
 import com.blr19c.falowp.bot.system.scheduling.cron.ApplicationInitTrigger
 import com.blr19c.falowp.bot.system.scheduling.cron.CronTrigger
 import com.blr19c.falowp.bot.system.scheduling.cron.PeriodicTrigger
@@ -145,7 +144,7 @@ annotation class Plugin(
         fun cronScheduling(
             cron: String,
             useGreeting: Boolean = true,
-            block: suspend SchedulingBotApi.() -> Unit
+            block: suspend BotApi.() -> Unit
         ): Register {
             return TaskPluginRegister(CronTrigger(cron, useGreeting), block)
         }
@@ -164,7 +163,7 @@ annotation class Plugin(
             initialDelay: Duration = 0.seconds,
             fixedRate: Boolean = false,
             useGreeting: Boolean = true,
-            block: suspend SchedulingBotApi.() -> Unit
+            block: suspend BotApi.() -> Unit
         ): Register {
             return TaskPluginRegister(PeriodicTrigger(fixedRate, period, initialDelay, useGreeting), block)
         }
@@ -177,7 +176,7 @@ annotation class Plugin(
          */
         fun applicationInitScheduling(
             useGreeting: Boolean = true,
-            block: suspend SchedulingBotApi.() -> Unit
+            block: suspend BotApi.() -> Unit
         ): Register {
             return TaskPluginRegister(ApplicationInitTrigger(useGreeting), block)
         }
