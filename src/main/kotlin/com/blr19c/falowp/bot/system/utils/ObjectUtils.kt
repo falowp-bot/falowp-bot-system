@@ -94,9 +94,6 @@ object ObjectUtils {
      * @return `true` if the object is `null` or *empty*
      * @see Optional.isPresent
      * @see ObjectUtils.isEmpty
-     * @see StringUtils.hasLength
-     * @see CollectionUtils.isEmpty
-     * @see CollectionUtils.isEmpty
      * @since 4.2
      */
 

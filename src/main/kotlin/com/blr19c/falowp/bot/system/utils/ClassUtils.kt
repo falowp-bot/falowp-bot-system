@@ -1,6 +1,5 @@
 package com.blr19c.falowp.bot.system.utils
 
-import com.blr19c.falowp.bot.system.utils.CollectionUtils.isEmpty
 import java.beans.Introspector
 import java.io.Closeable
 import java.io.Externalizable
@@ -638,7 +637,7 @@ object ClassUtils {
     }
 
     fun classNamesToString(classes: Collection<Class<*>?>): String {
-        if (isEmpty(classes)) {
+        if (classes.isEmpty()) {
             return "[]"
         }
         val stringJoiner = StringJoiner(", ", "[", "]")
@@ -655,12 +654,11 @@ object ClassUtils {
      *
      * @param collection the `Collection` to copy
      * @return the `Class` array
-     * @see StringUtils.toStringArray
      *
      * @since 3.1
      */
     fun toClassArray(collection: Collection<Class<*>?>): Array<Class<*>> {
-        return if (!isEmpty(collection)) collection.filterNotNull().toTypedArray() else EMPTY_CLASS_ARRAY
+        return if (collection.isNotEmpty()) collection.filterNotNull().toTypedArray() else EMPTY_CLASS_ARRAY
     }
 
     /**
@@ -1148,27 +1146,6 @@ object ClassUtils {
             }
         }
         return clazz.superclass != null && hasAtLeastOneMethodWithName(clazz.superclass, methodName)
-    }
-
-    fun getMostSpecificMethod(method: Method, targetClass: Class<*>?): Method {
-        if (targetClass != null && targetClass != method.declaringClass && isOverridable(method, targetClass)) {
-            try {
-                return if (Modifier.isPublic(method.modifiers)) {
-                    try {
-                        targetClass.getMethod(method.name, *method.parameterTypes)
-                    } catch (ex: NoSuchMethodException) {
-                        method
-                    }
-                } else {
-                    val specificMethod: Method? =
-                        ReflectionUtils.findMethod(targetClass, method.name, *method.parameterTypes)
-                    specificMethod ?: method
-                }
-            } catch (ex: SecurityException) {
-                // Security settings are disallowing reflective access; fall back to 'method' below.
-            }
-        }
-        return method
     }
 
     /**
