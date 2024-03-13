@@ -33,7 +33,7 @@ data class ImageUrl(
 
     private val summaryBytes by lazy {
         if (bytesDelegate.isInitialized()) {
-            bytesDelegate.value
+            bytesDelegate.value.take(1024 * 100).toByteArray()
         } else {
             runBlocking {
                 if (isUrl()) longTimeoutWebclient()
