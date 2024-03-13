@@ -11,12 +11,18 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:1.4.0")
+implementation("com.blr19c.falowp:falowp-bot-system:1.4.1")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 1.4.1
+
+* 更新一些依赖版本
+* 精简了utils中内容
+* 优化了ImageUrl中获取摘要的逻辑
 
 ### 1.4.0(有内容不向下兼容)
 
