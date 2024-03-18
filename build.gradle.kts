@@ -178,6 +178,8 @@ publishing {
 }
 
 signing {
-    useGpgCmd()
+    if (System.getenv("GPG_PRIVATE_KEY") != null) {
+        useInMemoryPgpKeys(System.getenv("GPG_PRIVATE_KEY"), System.getenv("GPG_PASSPHRASE"))
+    }
     sign(publishing.publications)
 }

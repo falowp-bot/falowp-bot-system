@@ -17,14 +17,11 @@ jobs:
         with:
           java-version: 21
           distribution: temurin
-      - name: Import GPG key
-        run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --batch --import
-        shell: bash
       - name: Build and publish
         env:
           MAVEN_USERNAME: ${{ secrets.S01_SONATYPE_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.S01_SONATYPE_PASSWORD }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSWORD }}
         run: |
           ./gradlew publish
