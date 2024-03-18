@@ -13,7 +13,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 21
-          distribution: OpenJDK
+          distribution: temurin
       - name: Import GPG key
         run: echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --batch --passphrase "${{ secrets.GPG_PRIVATE_KEY_PASSWORD }}" --import
       - name: Build and publish
