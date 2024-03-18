@@ -23,6 +23,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:1.4.1")
 * 更新一些依赖版本
 * 精简了utils中内容
 * 优化了ImageUrl中获取摘要的逻辑
+* 使用github-workflows发布
 
 ### 1.4.0(有内容不向下兼容)
 

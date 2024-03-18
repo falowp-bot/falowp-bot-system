@@ -1,0 +1,23 @@
+name: Publish to Maven Central
+on:
+  push:
+    branches:
+      - main
+jobs:
+  publish:
+    runs-on: debian-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 21
+      - name: Import GPG key
+        run: echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --batch --passphrase "${{ secrets.GPG_PRIVATE_KEY_PASSWORD }}" --import
+      - name: Build and publish
+        env:
+          MAVEN_USERNAME: ${{ secrets.S01_SONATYPE_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.S01_SONATYPE_PASSWORD }}
+        run: |
+          ./gradlew publish
