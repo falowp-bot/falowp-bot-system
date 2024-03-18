@@ -19,11 +19,12 @@ jobs:
           distribution: temurin
       - name: Import GPG key
         run: |
-          echo "${{secrets.GPG_PRIVATE_KEY}}" > ~/.gradle/secring.gpg.base64
-          && base64 -d ~/.gradle/secret.gpg.base64 > ~/.gradle/secret.gpg
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --batch --import
+        shell: bash
       - name: Build and publish
         env:
           MAVEN_USERNAME: ${{ secrets.S01_SONATYPE_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.S01_SONATYPE_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PRIVATE_KEY_PASSWORD }}
         run: |
-          ./gradlew publish -Psigning.keyId=${{secrets.GPG_KEYID}} -Psigning.password=${{secrets.GPG_PRIVATE_KEY_PASSWORD}} -Psigning.secretKeyRingFile=$(echo ~/.gradle/secret.gpg)
+          ./gradlew publish
