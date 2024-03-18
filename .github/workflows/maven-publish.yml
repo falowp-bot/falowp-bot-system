@@ -14,7 +14,8 @@ jobs:
         with:
           java-version: 21
           distribution: temurin
-      - name: Import GPG key
+      - name: Import GPG Key
+        shell: bash
         run: echo "${{ secrets.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --batch --passphrase "${{ secrets.GPG_PRIVATE_KEY_PASSWORD }}" --import
       - name: Build and publish
         env:
