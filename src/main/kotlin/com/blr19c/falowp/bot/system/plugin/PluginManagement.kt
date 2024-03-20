@@ -112,7 +112,7 @@ object PluginManagement : Log {
     }
 
     private suspend fun executeQueueMessagePlugin(plugin: MessagePluginRegister, botApiJob: BotApiJob): Boolean {
-        if (!queueMessageInfos.contains(plugin.pluginId)) {
+        if (!queueMessageInfos.containsKey(plugin.pluginId)) {
             return false
         }
         val queueMessageInfo = queueMessageInfos[plugin.pluginId]!!

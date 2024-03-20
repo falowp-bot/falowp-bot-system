@@ -147,7 +147,7 @@ data class QueueMessagePluginRegister(
     /**
      * 最大等待长度限制
      */
-    val queueCapacity: Int = Channel.RENDEZVOUS,
+    val queueCapacity: Int = Channel.UNLIMITED,
     /**
      * 成功进入队列回调
      */

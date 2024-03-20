@@ -262,7 +262,7 @@ annotation class Plugin(
             order: Int = 0,
             auth: ApiAuth = ApiAuth.ORDINARY_MEMBER,
             terminateEvent: Boolean = true,
-            queueCapacity: Int = Channel.RENDEZVOUS,
+            queueCapacity: Int = Channel.UNLIMITED,
             block: suspend BotApi.(args: Array<String>) -> Unit
         ): Register {
             return queueMessage(
@@ -288,7 +288,7 @@ annotation class Plugin(
             match: MessagePluginRegisterMatch = MessagePluginRegisterMatch.allMatch(),
             order: Int = 0,
             terminateEvent: Boolean = true,
-            queueCapacity: Int = Channel.RENDEZVOUS,
+            queueCapacity: Int = Channel.UNLIMITED,
             onSuccess: suspend BotApi.(queueIndex: Int) -> Unit = { queueIndex ->
                 if (queueIndex > 0) this.sendReply(
                     "已成功进入队列,当前位于第${queueIndex}位,请耐心等待",
