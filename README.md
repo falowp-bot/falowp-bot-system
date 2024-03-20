@@ -11,12 +11,17 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:1.4.1")
+implementation("com.blr19c.falowp:falowp-bot-system:1.4.2")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 1.4.2
+
+* 修复了队列消息无法正常处理顺序的问题
+* `ChannelQueue`和`queueMessage`的默认队列大小从0改为无限
 
 ### 1.4.1
 
