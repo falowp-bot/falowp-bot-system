@@ -6,7 +6,6 @@ import com.blr19c.falowp.bot.system.web.longTimeoutWebclient
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.utils.io.core.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -31,18 +30,9 @@ data class ImageUrl(
         }
     }
 
-    private val summaryBytes by lazy {
-        if (bytesDelegate.isInitialized()) {
-            bytesDelegate.value.take(1024 * 100).toByteArray()
-        } else {
-            runBlocking {
-                if (isUrl()) longTimeoutWebclient()
-                    .get(toUrl()) { header(HttpHeaders.UserAgent, commonUserAgent()) }
-                    .bodyAsChannel()
-                    .readRemaining(1024 * 100)
-                    .use { it.readBytes() }
-                else toBase64().decodeFromBase64String()
-            }
+    private val summary by lazy {
+        runBlocking {
+            return@runBlocking toBase64().md5()
         }
     }
 
@@ -61,9 +51,9 @@ data class ImageUrl(
         }
     }
 
-    suspend fun toSummaryBytes(): ByteArray {
+    suspend fun toSummary(): String {
         return withContext(Dispatchers.IO) {
-            summaryBytes
+            summary
         }
     }
 
