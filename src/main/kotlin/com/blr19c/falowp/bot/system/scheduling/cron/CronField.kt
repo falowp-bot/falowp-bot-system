@@ -14,7 +14,7 @@ import java.util.function.BiFunction
  * Single field in a cron pattern. Created using the `parse*` methods,
  * main and only entry point is [.nextOrSame].
  */
-@Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate", "UNUSED")
+@Suppress("UNCHECKED_CAST", "UNUSED")
 internal abstract class CronField protected constructor(private val type: Type) {
     /**
      * Get the next or same [Temporal] in the sequence matching this

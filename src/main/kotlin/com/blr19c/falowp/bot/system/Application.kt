@@ -1,7 +1,6 @@
 package com.blr19c.falowp.bot.system
 
 import com.blr19c.falowp.bot.system.adapter.AdapterApplication
-import com.blr19c.falowp.bot.system.database.Database
 import com.blr19c.falowp.bot.system.plugin.PluginManagement
 import com.blr19c.falowp.bot.system.scheduling.Scheduling
 import com.blr19c.falowp.bot.system.web.WebClient
@@ -19,13 +18,12 @@ fun start() = runBlocking {
         Resources.configure()
         Webdriver.configure()
         WebClient.configure()
-        Database.configure()
         PluginManagement.configure()
         Scheduling.configure()
         launch { AdapterApplication.configure() }
         launch { WebServer.configure() }
-    } catch (e: Exception) {
+    } catch (ex: Throwable) {
         val log = LoggerFactory.getLogger(this::class.java)
-        log.error("启动失败", e)
+        log.error("启动失败", ex)
     }
 }

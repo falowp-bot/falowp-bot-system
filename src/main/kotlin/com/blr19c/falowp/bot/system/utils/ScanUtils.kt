@@ -86,7 +86,7 @@ object ScanUtils {
 
     private fun forName(className: String): Class<*>? {
         return try {
-            Class.forName(className)
+            Class.forName(className, false, this.javaClass.classLoader)
         } catch (e: Exception) {
             null
         }

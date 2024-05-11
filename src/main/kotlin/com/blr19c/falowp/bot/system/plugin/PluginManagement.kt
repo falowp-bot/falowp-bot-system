@@ -56,9 +56,13 @@ object PluginManagement : Log {
         if (!pluginPackage.all { it.endsWith(".plugins") }) {
             throw IllegalStateException("pluginPackage:${pluginPackage}路径必须使用/plugins路径结尾")
         }
-        val pluginList = pluginPackage
+        val classList = pluginPackage
             .map(ScanUtils::scanPackage)
             .flatMap { it.stream().asSequence() }
+
+        classList.forEach { initPluginUtils(it) }
+
+        val pluginList = classList
             .mapNotNull { initPlugin(it) }
             .toList()
         val nameList = pluginList
@@ -145,6 +149,11 @@ object PluginManagement : Log {
         return BotApiJob(botApi, job)
     }
 
+    private fun initPluginUtils(plugin: Class<*>) {
+        if (plugin.isAnnotationPresent(PluginUtils::class.java)) {
+            plugin.kotlin.objectInstance
+        }
+    }
 
     private fun initPlugin(plugin: Class<*>): PluginInfo? {
         val annotation = plugin.getAnnotation(Plugin::class.java) ?: return null

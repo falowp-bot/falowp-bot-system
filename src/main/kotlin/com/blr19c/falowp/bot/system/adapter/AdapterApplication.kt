@@ -1,38 +1,45 @@
 package com.blr19c.falowp.bot.system.adapter
 
 import com.blr19c.falowp.bot.system.Log
-import com.blr19c.falowp.bot.system.adapter.gocqhttp.GoCQHttpApplication
-import com.blr19c.falowp.bot.system.adapter.qq.QQApplication
 import com.blr19c.falowp.bot.system.systemConfigListProperty
+import com.blr19c.falowp.bot.system.utils.ScanUtils
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.LongAdder
+import kotlin.streams.asSequence
 
 /**
  * 对于不同的api适配
  */
 object AdapterApplication : Log {
 
+    private lateinit var load: Any
     private val loadSize = LongAdder()
+    private val loadAdapter = CopyOnWriteArrayList<BotAdapterInterface>()
 
     suspend fun configure() = coroutineScope {
         log().info("初始化协议适配")
-        launch { runAdapter("qq") { QQApplication.configure() } }
-        launch { runAdapter("gocqhttp") { GoCQHttpApplication.configure() } }
-        log().info("初始化协议适配完成:{}", systemConfigListProperty("adapter.enableAdapter"))
+        val botAdapterRegister = BotAdapterRegister(loadAdapter)
+        systemConfigListProperty("adapterPackage")
+            .map(ScanUtils::scanPackage)
+            .flatMap { it.stream().asSequence() }
+            .forEach { launch { initAdapter(it, botAdapterRegister) } }
+        log().info("初始化协议适配完成")
     }
 
-    private suspend fun runAdapter(adapterName: String, block: suspend () -> Unit) {
-        if (systemConfigListProperty("adapter.enableAdapter").contains(adapterName))
-            block.invoke()
-    }
-
-    fun onload() {
+    private suspend fun initAdapter(adapter: Class<*>, botAdapterRegister: BotAdapterRegister): BotAdapterInfo? {
+        val annotation = adapter.getAnnotation(BotAdapter::class.java) ?: return null
+        @Suppress("UNCHECKED_CAST")
+        adapter as Class<out BotAdapterInterface>
         loadSize.increment()
+        load = true
+        val adapterInstance = adapter.constructors.first().newInstance() as BotAdapterInterface
+        adapterInstance.start(botAdapterRegister)
+        return BotAdapterInfo(annotation.name, adapter)
     }
 
     fun isLoadingCompleted(): Boolean {
-        val size = systemConfigListProperty("adapter.enableAdapter").size
-        return loadSize.sum() == size.toLong()
+        return ::load.isInitialized && loadSize.toInt() == loadAdapter.size
     }
 }

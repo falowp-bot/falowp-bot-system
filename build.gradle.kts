@@ -7,7 +7,7 @@ val mariadbJdbcVersion: String by project
 val jacksonVersion: String by project
 val jsoupVersion: String by project
 val guavaVersion: String by project
-val miniIOVersion: String by project
+val minIOVersion: String by project
 val playwrightVersion: String by project
 val animatedGifVersion: String by project
 val jetbrainsAnnotationsVersion: String by project
@@ -21,7 +21,7 @@ plugins {
 }
 
 group = "com.blr19c.falowp"
-version = "1.4.3"
+version = "2.0.0-RC1"
 
 kotlin {
     jvmToolchain(21)
@@ -54,13 +54,6 @@ dependencies {
     api("io.ktor:ktor-serialization-jackson:$ktorVersion")
     api("ch.qos.logback:logback-classic:$logbackVersion")
 
-    //数据库连接
-    api("org.jetbrains.exposed:exposed-core:$exposedVersion")
-    api("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-    api("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
-    runtimeOnly("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    api("org.mariadb.jdbc:mariadb-java-client:$mariadbJdbcVersion")
-
     //jackson
     api("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
@@ -68,8 +61,6 @@ dependencies {
     api("com.google.guava:guava:$guavaVersion")
     //html处理
     api("org.jsoup:jsoup:$jsoupVersion")
-    //miniIO
-    api("io.minio:minio:$miniIOVersion")
 
     //浏览器
     api("com.microsoft.playwright:playwright:$playwrightVersion")
@@ -77,10 +68,6 @@ dependencies {
     api("com.madgag:animated-gif-lib:$animatedGifVersion") {
         exclude("junit", "junit")
         exclude("org.easytesting", "fest-assert-core")
-    }
-    //腾讯云翻译api
-    api("com.tencentcloudapi:tencentcloud-sdk-java-tmt:3.1.967") {
-        exclude("com.squareup.okhttp3", "okhttp")
     }
 }
 

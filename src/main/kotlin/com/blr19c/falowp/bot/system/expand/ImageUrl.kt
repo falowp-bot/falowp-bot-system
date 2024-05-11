@@ -1,6 +1,5 @@
 package com.blr19c.falowp.bot.system.expand
 
-import com.blr19c.falowp.bot.system.database.tempImageUrl
 import com.blr19c.falowp.bot.system.web.commonUserAgent
 import com.blr19c.falowp.bot.system.web.longTimeoutWebclient
 import io.ktor.client.request.*
@@ -13,6 +12,12 @@ import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.net.URI
 import javax.imageio.ImageIO
+
+private lateinit var toUrlFunction: suspend (ByteArray) -> String
+
+fun registerImageUrlToUrlFun(function: suspend (ByteArray) -> String) {
+    toUrlFunction = function
+}
 
 /**
  * image(支持base64和url)
@@ -42,7 +47,10 @@ data class ImageUrl(
 
     suspend fun toUrl(): String {
         if (isUrl()) return info
-        return tempImageUrl(info.decodeFromBase64String())
+        if (!::toUrlFunction.isInitialized) {
+            throw IllegalStateException("无可用Image存储")
+        }
+        return toUrlFunction.invoke(info.decodeFromBase64String())
     }
 
     suspend fun toBytes(): ByteArray {

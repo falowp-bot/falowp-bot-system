@@ -12,6 +12,14 @@ import kotlinx.coroutines.channels.Channel
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * 插件工具/一个特殊的插件 只会激活其object::init方法
+ */
+annotation class PluginUtils
+
+/**
+ * 插件
+ */
 annotation class Plugin(
     /**
      * 插件名称
