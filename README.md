@@ -18,6 +18,13 @@ implementation("com.blr19c.falowp:falowp-bot-system:1.4.3")
 
 ## 更新日志
 
+### 2.0.0-RC1(不向下兼容)
+
+* 更新一些依赖版本
+* 重做了协议适配器、文本检测、翻译、数据源、MinIO
+* `ImageUrl`支持自定义注册
+* 修复了一些已知问题
+
 ### 1.4.3
 
 * 优化了ImageUrl中获取摘要的逻辑

@@ -5,7 +5,7 @@ import java.time.temporal.Temporal
 /**
  * Extension of [CronField] that wraps an array of cron fields.
  */
-@Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate", "UNUSED")
+@Suppress("UNCHECKED_CAST", "UNUSED")
 internal class CompositeCronField private constructor(
     type: Type,
     private val fields: Array<CronField>,

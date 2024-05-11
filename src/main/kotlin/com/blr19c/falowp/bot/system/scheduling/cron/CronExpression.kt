@@ -3,7 +3,7 @@ package com.blr19c.falowp.bot.system.scheduling.cron
 import java.time.temporal.ChronoUnit
 import java.time.temporal.Temporal
 
-@Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate", "UNUSED")
+@Suppress("UNCHECKED_CAST", "UNUSED")
 class CronExpression private constructor(
     seconds: CronField,
     minutes: CronField,

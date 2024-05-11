@@ -9,6 +9,7 @@ import kotlin.reflect.KProperty
 class OnlyReadOnceReference<T>(
     private val block: suspend () -> T,
 ) {
+    @Volatile
     private var firstCall = true
 
     @Synchronized

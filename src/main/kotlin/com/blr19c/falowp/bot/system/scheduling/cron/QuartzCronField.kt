@@ -7,7 +7,7 @@ import java.time.temporal.*
 /**
  * Extension of [CronField] for
  */
-@Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate", "UNUSED")
+@Suppress("UNCHECKED_CAST", "UNUSED")
 internal class QuartzCronField
 /**
  * Constructor for fields that need to roll forward over a different type

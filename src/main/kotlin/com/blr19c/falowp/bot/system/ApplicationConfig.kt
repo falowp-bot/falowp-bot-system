@@ -50,8 +50,8 @@ private fun mergeBotConfigs(config1: Config, config2: Config): Config {
                 val commonValue = (commonKey as Map<*, *>)[lastKeyItem]
                 if (commonValue is List<*>) {
                     @Suppress("UNCHECKED_CAST")
-                    value.forEach { (commonValue as MutableList<ConfigValue>).addLast(it) }
-                    commonValue.distinct()
+                    commonValue as MutableList<ConfigValue>
+                    value.forEach { if (!commonValue.contains(it.unwrapped())) commonValue.addLast(it) }
                 }
                 if (commonValue == null) {
                     @Suppress("UNCHECKED_CAST")
@@ -134,6 +134,26 @@ fun systemConfigListProperty(
     defaultValue: (String) -> List<String> = configDefaultListValue
 ): List<String> {
     return configListProperty("bot.system.".plus(key), defaultValue)
+}
+
+/**
+ * 读取application.conf配置文件-添加适配器前缀
+ */
+fun adapterConfigProperty(
+    key: String,
+    defaultValue: (String) -> String = configDefaultValue
+): String {
+    return configProperty("bot.adapter.".plus(key), defaultValue)
+}
+
+/**
+ * 读取application.conf配置文件-添加适配器前缀
+ */
+fun adapterConfigListProperty(
+    key: String,
+    defaultValue: (String) -> List<String> = configDefaultListValue
+): List<String> {
+    return configListProperty("bot.adapter.".plus(key), defaultValue)
 }
 
 /**
