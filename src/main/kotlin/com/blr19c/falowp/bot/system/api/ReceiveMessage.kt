@@ -1,6 +1,7 @@
 package com.blr19c.falowp.bot.system.api
 
 import com.blr19c.falowp.bot.system.expand.ImageUrl
+import java.net.URI
 
 /**
  * 接收的消息
@@ -84,6 +85,10 @@ data class ReceiveMessage(
          */
         val message: String,
         /**
+         * 语音
+         */
+        val voice: URI?,
+        /**
          * at谁
          */
         val at: List<User>,
@@ -103,7 +108,7 @@ data class ReceiveMessage(
     ) {
         companion object {
             fun empty(): Content {
-                return Content("", emptyList(), emptyList(), emptyList()) { null }
+                return Content("", null, emptyList(), emptyList(), emptyList()) { null }
             }
         }
     }

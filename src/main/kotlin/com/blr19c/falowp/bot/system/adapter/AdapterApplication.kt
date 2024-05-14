@@ -1,10 +1,12 @@
 package com.blr19c.falowp.bot.system.adapter
 
 import com.blr19c.falowp.bot.system.Log
+import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApiSupport
 import com.blr19c.falowp.bot.system.systemConfigListProperty
 import com.blr19c.falowp.bot.system.utils.ScanUtils
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.LongAdder
 import kotlin.streams.asSequence
@@ -17,6 +19,7 @@ object AdapterApplication : Log {
     private lateinit var load: Any
     private val loadSize = LongAdder()
     private val loadAdapter = CopyOnWriteArrayList<BotAdapterInterface>()
+    private val botApiSupportList = CopyOnWriteArrayList<SchedulingBotApiSupport>()
 
     suspend fun configure() = coroutineScope {
         log().info("初始化协议适配")
@@ -29,6 +32,11 @@ object AdapterApplication : Log {
     }
 
     private suspend fun initAdapter(adapter: Class<*>, botAdapterRegister: BotAdapterRegister): BotAdapterInfo? {
+        if (SchedulingBotApiSupport::class.java.isAssignableFrom(adapter)) {
+            botApiSupportList.add(adapter.kotlin.objectInstance as SchedulingBotApiSupport)
+            botApiSupportList.sortBy { it.order() }
+            return null
+        }
         val annotation = adapter.getAnnotation(BotAdapter::class.java) ?: return null
         @Suppress("UNCHECKED_CAST")
         adapter as Class<out BotAdapterInterface>
@@ -41,5 +49,9 @@ object AdapterApplication : Log {
 
     fun isLoadingCompleted(): Boolean {
         return ::load.isInitialized && loadSize.toInt() == loadAdapter.size
+    }
+
+    fun botApiSupportList(): List<SchedulingBotApiSupport> {
+        return Collections.unmodifiableList(botApiSupportList)
     }
 }

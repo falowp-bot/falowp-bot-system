@@ -1,6 +1,7 @@
 package com.blr19c.falowp.bot.system.api
 
 import com.blr19c.falowp.bot.system.expand.ImageUrl
+import java.net.URI
 import java.util.*
 
 /**
@@ -53,12 +54,17 @@ interface SendMessage {
             return this
         }
 
-        fun video(videos: List<String>): Builder {
+        fun voice(video: URI): Builder {
+            messageList.addLast(VoiceSendMessage(video))
+            return this
+        }
+
+        fun video(videos: List<URI>): Builder {
             videos.asSequence().forEach { messageList.addLast(VideoSendMessage(it)) }
             return this
         }
 
-        fun video(video: String): Builder {
+        fun video(video: URI): Builder {
             messageList.addLast(VideoSendMessage(video))
             return this
         }
@@ -95,11 +101,21 @@ data class TextSendMessage(
 ) : SendMessage
 
 /**
+ * 语音消息
+ */
+data class VoiceSendMessage(
+    /**
+     * 语音
+     */
+    val voice: URI
+) : SendMessage
+
+/**
  * 图片消息
  */
 data class ImageSendMessage(
     /**
-     * 图片(仅支持url和base64)
+     * 图片
      */
     val image: ImageUrl
 ) : SendMessage
@@ -109,9 +125,9 @@ data class ImageSendMessage(
  */
 data class VideoSendMessage(
     /**
-     * 视频(仅支持url)
+     * 视频
      */
-    val video: String
+    val video: URI
 ) : SendMessage
 
 /**
