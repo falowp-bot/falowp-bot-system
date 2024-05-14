@@ -1,13 +1,8 @@
 package com.blr19c.falowp.bot.system.listener.events
 
-import com.blr19c.falowp.bot.system.api.BotApi
-import com.blr19c.falowp.bot.system.api.MessageTypeEnum
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
 import com.blr19c.falowp.bot.system.api.SendMessageChain
-import com.blr19c.falowp.bot.system.plugin.MessagePluginRegister
-import com.blr19c.falowp.bot.system.plugin.MessagePluginRegisterMatch
 import com.blr19c.falowp.bot.system.plugin.Plugin
-import com.blr19c.falowp.bot.system.plugin.Register
 
 /**
  * 机器人发送了消息的事件
@@ -68,22 +63,3 @@ data class WithdrawMessageEvent(
      */
     val withdrawUser: ReceiveMessage.User
 ) : Plugin.Listener.Event
-
-/**
- * 撤回消息
- *
- * @param terminateEvent 执行完终止事件传播
- * @param block 执行内容
- */
-fun withdrawMessage(
-    order: Int = 0,
-    terminateEvent: Boolean = true,
-    block: suspend BotApi.(args: Array<String>) -> Unit
-): Register {
-    return MessagePluginRegister(
-        order,
-        MessagePluginRegisterMatch(messageType = MessageTypeEnum.WITHDRAW_MESSAGE),
-        terminateEvent,
-        block
-    )
-}

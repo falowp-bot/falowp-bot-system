@@ -11,22 +11,7 @@ enum class MessageTypeEnum {
     MESSAGE,
 
     /**
-     * 撤回消息
-     */
-    WITHDRAW_MESSAGE,
-
-    /**
      * 戳一戳
      */
     POKE,
-
-    /**
-     * 新用户进群
-     */
-    GROUP_INCREASE,
-
-    /**
-     * 用户退群
-     */
-    GROUP_DECREASE,
 }
