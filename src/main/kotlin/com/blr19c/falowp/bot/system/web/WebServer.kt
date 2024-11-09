@@ -4,17 +4,17 @@ import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.systemConfigProperty
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 import java.util.concurrent.CopyOnWriteArrayList
 
-data class RouteInfo(val path: String, val block: Route.() -> Unit)
-
 object WebServer : Log {
-    private val routes = CopyOnWriteArrayList<RouteInfo>()
+    private val routes = CopyOnWriteArrayList<Route.() -> Unit>()
 
     fun configure() {
         val port = systemConfigProperty("web.port").toInt()
@@ -22,12 +22,24 @@ object WebServer : Log {
         server.application.registerDynamicRoute(routes)
     }
 
-    fun registerRoute(route: RouteInfo) {
+    fun registerRoute(route: Route.() -> Unit) {
         routes.add(route)
     }
 }
 
 private fun Application.module() {
+    install(WebSockets)
+    install(Authentication) {
+        basic {
+            realm = "falowp-bot"
+            validate {
+                if (it.password == systemConfigProperty("web.auth")) {
+                    return@validate UserIdPrincipal("falowp-bot-user")
+                }
+                return@validate null
+            }
+        }
+    }
     install(ContentNegotiation) {
         jackson { }
     }
@@ -38,8 +50,8 @@ private fun Application.module() {
     }
 }
 
-private fun Application.registerDynamicRoute(routeInfos: List<RouteInfo>) {
+private fun Application.registerDynamicRoute(routes: List<Route.() -> Unit>) {
     routing {
-        routeInfos.forEach { route(it.path) { it.block.invoke(this) } }
+        routes.forEach { it() }
     }
 }

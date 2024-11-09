@@ -7,7 +7,6 @@ import com.blr19c.falowp.bot.system.listener.hooks.HelpEventHook
 import com.blr19c.falowp.bot.system.plugin.PluginInfo
 import com.blr19c.falowp.bot.system.plugin.hook.withPluginHook
 import com.blr19c.falowp.bot.system.readResource
-import com.blr19c.falowp.bot.system.web.RouteInfo
 import com.blr19c.falowp.bot.system.web.WebServer
 import com.blr19c.falowp.bot.system.web.htmlToImageBase64
 import io.ktor.server.response.*
@@ -25,11 +24,11 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
 
     init {
         pluginList.sortedBy { it.plugin.name }
-        WebServer.registerRoute(RouteInfo("/plugins") {
-            post {
+        WebServer.registerRoute {
+            post("/plugins") {
                 call.respond(pluginInfoRet)
             }
-        })
+        }
     }
 
     private suspend fun withPlugin(botApi: BotApi): List<PluginInfo> {

@@ -11,17 +11,17 @@ val minIOVersion: String by project
 val playwrightVersion: String by project
 val animatedGifVersion: String by project
 val jetbrainsAnnotationsVersion: String by project
-val jvmVersion: String = "2.0.0-RC1"
+val jvmVersion: String = "2.1.0-RC"
 
 plugins {
-    kotlin("jvm") version "2.0.0-RC1"
+    kotlin("jvm") version "2.1.0-RC"
     id("com.github.ben-manes.versions") version "0.51.0"
     id("maven-publish")
     id("signing")
 }
 
 group = "com.blr19c.falowp"
-version = "2.0.0-RC2"
+version = "2.0.0-RC3"
 
 kotlin {
     jvmToolchain(21)
@@ -41,6 +41,7 @@ dependencies {
     api("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
     api("io.ktor:ktor-server-websockets-jvm:$ktorVersion")
     api("io.ktor:ktor-server-netty-jvm:$ktorVersion")
+    api("io.ktor:ktor-server-auth-jvm:$ktorVersion")
 
     // Ktor client
     api("io.ktor:ktor-client-websockets-jvm:$ktorVersion")
