@@ -18,7 +18,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:1.4.3")
 
 ## 更新日志
 
-### 2.0.0-RC1/2(不向下兼容)
+### 2.0.0-RC1/2/3(不向下兼容)
 
 * 更新一些依赖版本
 * 重做了协议适配器、文本检测、翻译、数据源、MinIO
@@ -27,6 +27,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:1.4.3")
 * 支持语音消息
 * 支持进退群事件
 * 支持撤回消息事件
+* 优化了截图分辨率
 
 ### 1.4.3
 
