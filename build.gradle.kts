@@ -1,13 +1,9 @@
 val kotlinxCoroutinesVersion: String by project
 val ktorVersion: String by project
-val kotlinVersion: String by project
 val logbackVersion: String by project
-val exposedVersion: String by project
-val mariadbJdbcVersion: String by project
 val jacksonVersion: String by project
 val jsoupVersion: String by project
 val guavaVersion: String by project
-val minIOVersion: String by project
 val playwrightVersion: String by project
 val animatedGifVersion: String by project
 val jetbrainsAnnotationsVersion: String by project
