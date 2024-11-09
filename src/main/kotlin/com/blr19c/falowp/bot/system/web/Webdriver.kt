@@ -4,7 +4,6 @@ import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.expand.encodeToBase64String
 import com.microsoft.playwright.*
 import com.microsoft.playwright.options.LoadState
-import com.microsoft.playwright.options.ViewportSize
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -36,7 +35,8 @@ fun <T> Page.existsToExecute(
 
 fun defaultNewContextOptions(): Browser.NewContextOptions {
     return Browser.NewContextOptions()
-        .setViewportSize(ViewportSize(1920, 1080))
+        .setViewportSize(3024, 1964)
+        .setDeviceScaleFactor(2.0)
         .setUserAgent(commonUserAgent())
         .setIsMobile(false)
 }
