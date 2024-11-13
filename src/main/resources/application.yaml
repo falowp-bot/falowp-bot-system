@@ -1,0 +1,22 @@
+#bot:
+#  system:
+#    #机器人名称
+#    nickname: "小花落"
+#    #超级管理员账号
+#    administrator: [ ]
+#    #时区
+#    zoneOffset: "+8"
+#    #协议适配器位置
+#    adapterPackage:
+#      - com.xx
+#    #插件位置
+#    pluginPackage:
+#      - com.xx
+#    #早晚安(闲时)
+#    greeting:
+#      goodMorning: "0 0 7 * * ?"
+#      goodNight: "0 0 23 * * ?"
+#    #web
+#    web:
+#      port: 8051
+#      auth: "your_password"
