@@ -59,12 +59,20 @@ object Json {
         })
     }
 
+    fun <T : Any> readObj(byteArray: ByteArray, typeReference: TypeReference<T>): T {
+        return json.readValue(byteArray, typeReference)
+    }
+
     fun <T : Any> readObj(treeNode: TreeNode, kClass: KClass<T>): T {
         return json.treeToValue(treeNode, object : TypeReference<T>() {
             override fun getType(): Type {
                 return kClass.java
             }
         })
+    }
+
+    fun <T : Any> readObj(treeNode: TreeNode, typeReference: TypeReference<T>): T {
+        return json.treeToValue(treeNode, typeReference)
     }
 
     fun createArrayNode(): ArrayNode {

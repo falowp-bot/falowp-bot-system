@@ -38,6 +38,7 @@ dependencies {
     api("io.ktor:ktor-server-websockets-jvm:$ktorVersion")
     api("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     api("io.ktor:ktor-server-auth-jvm:$ktorVersion")
+    api("io.ktor:ktor-server-config-yaml-jvm:$ktorVersion")
 
     // Ktor client
     api("io.ktor:ktor-client-websockets-jvm:$ktorVersion")

@@ -1,7 +1,9 @@
 package com.blr19c.falowp.bot.system.utils
 
+import java.io.File
+import java.io.InputStream
 import java.net.*
-import java.util.*
+import java.util.jar.JarFile
 
 /**
  * util来源于spring
@@ -162,5 +164,42 @@ object ResourceUtils {
 
         // Regular "jar:file:...my-jar.jar!/my-entry.txt"
         return extractJarFileURL(jarUrl)
+    }
+
+    /**
+     *
+     * Get the file jar or file list of the specified url
+     *
+     * @param resource the original URL
+     * @return the URL for the actual files InputStream
+     */
+    fun <R> resourceToInputStream(resource: URL, suffix: String, consumer: (InputStream) -> R): List<R> {
+        if (isJarURL(resource)) {
+            val jarPath = resource.path.substringBefore(JAR_URL_SEPARATOR)
+                .replaceFirst(FILE_URL_PREFIX, "")
+                .replaceFirst(JAR_URL_PREFIX, "")
+            val configPath = resource.path.substringAfter(JAR_URL_SEPARATOR) + "/"
+            return JarFile(jarPath).use { jar ->
+                jar.entries()
+                    .asSequence()
+                    .filter { it.name.startsWith(configPath) && !it.isDirectory }
+                    .filter { it.name.endsWith(suffix) }
+                    .map { jar.getInputStream(it) }
+                    .map { it.use { inp -> consumer.invoke(inp) } }
+                    .toList()
+            }
+        }
+        val file = File(resource.path)
+        if (file.isDirectory) {
+            return file.listFiles()
+                ?.filter { it.name.endsWith(suffix) }
+                ?.map { it.inputStream() }
+                ?.map { it.use { inp -> consumer.invoke(inp) } }
+                ?: emptyList()
+        }
+        if (file.name.endsWith(suffix)) {
+            return listOf(file.inputStream().use { consumer.invoke(it) })
+        }
+        return emptyList()
     }
 }

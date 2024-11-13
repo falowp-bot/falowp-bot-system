@@ -11,11 +11,6 @@ enum class SourceTypeEnum {
     GROUP,
 
     /**
-     * 频道消息
-     */
-    CHANNEL,
-
-    /**
      * 私聊消息
      */
     PRIVATE,

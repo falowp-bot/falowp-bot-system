@@ -63,13 +63,6 @@ data class ReceiveMessage(
     }
 
     /**
-     * 是否为频道消息
-     */
-    fun channel(): Boolean {
-        return this.source.type === SourceTypeEnum.CHANNEL
-    }
-
-    /**
      * 是否@我
      */
     fun atMe(): Boolean {

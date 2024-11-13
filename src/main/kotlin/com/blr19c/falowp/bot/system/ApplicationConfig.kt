@@ -3,17 +3,17 @@ package com.blr19c.falowp.bot.system
 import com.blr19c.falowp.bot.system.utils.ResourceUtils
 import com.blr19c.falowp.bot.system.utils.ScanUtils.configPath
 import com.blr19c.falowp.bot.system.utils.ScanUtils.pluginPath
-import com.typesafe.config.Config
-import com.typesafe.config.ConfigFactory
-import com.typesafe.config.ConfigList
-import com.typesafe.config.ConfigValue
 import io.ktor.server.config.*
+import io.ktor.server.config.yaml.YamlConfig
+import io.ktor.server.config.yaml.YamlConfigLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
+import net.mamoe.yamlkt.Yaml
+import net.mamoe.yamlkt.YamlMap
 import java.io.InputStream
 import java.util.concurrent.ConcurrentHashMap
-import java.util.jar.JarFile
+import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.jvm.isAccessible
 
 /**
  * 资源&配置
@@ -28,64 +28,26 @@ object Resources : Log {
 }
 
 /**
- * 合并Bot的配置文件
+ * 加载YAML
  */
-private fun mergeBotConfigs(config1: Config, config2: Config): Config {
-    val mergedMap: MutableMap<String, Any> = config1.root().unwrapped()
-    for ((key, value) in config2.entrySet()) {
-        if (value is ConfigList && key.startsWith("bot")) {
-            var commonKey: Any? = mergedMap
-            val keyItems = key.split(".").toMutableList()
-            val lastKeyItem = keyItems.removeLast()
-            for (keyItem in keyItems) {
-                try {
-                    commonKey = (commonKey as Map<*, *>)[keyItem]!!
-                } catch (e: Exception) {
-                    @Suppress("UNCHECKED_CAST")
-                    (commonKey as MutableMap<String, Any>)[keyItem] = hashMapOf<Any, Any>()
-                    commonKey = commonKey[keyItem]!!
-                }
-            }
-            if (commonKey != null) {
-                val commonValue = (commonKey as Map<*, *>)[lastKeyItem]
-                if (commonValue is List<*>) {
-                    @Suppress("UNCHECKED_CAST")
-                    commonValue as MutableList<ConfigValue>
-                    value.forEach { if (!commonValue.contains(it.unwrapped())) commonValue.addLast(it) }
-                }
-                if (commonValue == null) {
-                    @Suppress("UNCHECKED_CAST")
-                    (commonKey as MutableMap<String, Any>)[lastKeyItem] = value
-                }
-            }
-        }
-    }
-    return ConfigFactory.parseMap(mergedMap)
+private fun loadYaml(inputStream: InputStream): ApplicationConfig {
+    val content = inputStream.readBytes().toString(Charsets.UTF_8)
+    val yamlElement = Yaml.decodeYamlFromString(content)
+    val yaml = yamlElement as? YamlMap ?: throw IllegalArgumentException("配置应该是yaml字典")
+    val constructor = YamlConfig::class.primaryConstructor!!
+    constructor.isAccessible = true
+    return constructor.call(yaml).apply { checkEnvironmentVariables() }
 }
 
 private val applicationConfig by lazy {
-    var config = ConfigFactory.load()
+    val yamlConfigLoader = YamlConfigLoader()
+    var config = yamlConfigLoader.load(null) ?: throw IllegalArgumentException("未找到有效的application.yaml配置")
     for (resource in Thread.currentThread().contextClassLoader.getResources("plugin-conf")) {
-        if (ResourceUtils.isJarURL(resource)) {
-            val jarPath = resource.path.substringBefore(ResourceUtils.JAR_URL_SEPARATOR)
-                .replaceFirst(ResourceUtils.FILE_URL_PREFIX, "")
-                .replaceFirst(ResourceUtils.JAR_URL_PREFIX, "")
-            val configPath = resource.path.substringAfter(ResourceUtils.JAR_URL_SEPARATOR) + "/"
-            JarFile(jarPath).use { jar ->
-                jar.entries()
-                    .asSequence()
-                    .filter { it.name.startsWith(configPath) && !it.isDirectory }
-                    .forEach {
-                        config = mergeBotConfigs(config, ConfigFactory.parseReader(jar.getInputStream(it).reader()))
-                    }
-            }
-        } else {
-            for (file in File(resource.path).listFiles() ?: emptyArray()) {
-                config = mergeBotConfigs(config, ConfigFactory.parseFile(file))
-            }
-        }
+        val subConfig = ResourceUtils.resourceToInputStream(resource, ".yaml") { loadYaml(it) }
+            .reduce { a1, a2 -> a1.withFallback(a2) }
+        config = config.withFallback(subConfig)
     }
-    HoconApplicationConfig(config)
+    config
 }
 
 private val configPropertyMap by lazy { ConcurrentHashMap<String, String>() }
