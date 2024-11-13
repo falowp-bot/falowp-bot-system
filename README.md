@@ -28,6 +28,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:1.4.3")
 * 支持进退群事件
 * 支持撤回消息事件
 * 优化了截图分辨率
+* 配置文件由conf类型改为yaml
 
 ### 1.4.3
 
