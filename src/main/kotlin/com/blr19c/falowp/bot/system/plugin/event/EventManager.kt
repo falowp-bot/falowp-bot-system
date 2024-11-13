@@ -42,7 +42,7 @@ object EventManager : Log {
     /**
      * 处理事件
      */
-    suspend fun <T : Plugin.Listener.Event> publishEvent(botApi: BotApi, event: T) {
+    fun <T : Plugin.Listener.Event> publishEvent(botApi: BotApi, event: T) {
         eventPlugins[event::class]?.forEach {
             executor.launch {
                 withPluginHook(botApi, EventPluginExecutionHook(event, it)) {

@@ -81,6 +81,6 @@ object HookManager : Log {
         plugin: HookPluginRegister<out Plugin.Listener.Hook>
     ): Boolean {
         return plugin.listener.isInstance(hook)
-                && plugin.match.customBlock?.invoke(pluginInfo) ?: true
+                && plugin.match.customBlock?.invoke(pluginInfo) != false
     }
 }

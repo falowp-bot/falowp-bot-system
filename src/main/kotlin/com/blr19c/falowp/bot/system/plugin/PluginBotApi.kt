@@ -52,7 +52,7 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
         delegateBotApi.sendReply(*sendMessageChain, reference = reference, forward = forward)
     }
 
-    private suspend fun publishSendMessageEvent(
+    private fun publishSendMessageEvent(
         vararg sendMessageChain: SendMessageChain,
         reference: Boolean,
         forward: Boolean

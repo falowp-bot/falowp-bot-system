@@ -83,7 +83,7 @@ object PluginManagement : Log {
      * @param receiveMessage 接收到的message
      * @param botApiClass 使用的botApi
      */
-    suspend fun <T : BotApi> message(receiveMessage: ReceiveMessage, botApiClass: KClass<T>) {
+    fun <T : BotApi> message(receiveMessage: ReceiveMessage, botApiClass: KClass<T>) {
         executor.launch {
             log().info("接收到消息:$receiveMessage")
             val botApi = botApiClass.primaryConstructor!!.call(receiveMessage, botApiClass) as BotApi

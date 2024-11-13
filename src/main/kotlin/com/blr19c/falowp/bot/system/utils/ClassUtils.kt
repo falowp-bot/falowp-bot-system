@@ -626,7 +626,7 @@ object ClassUtils {
      * in the given array.
      *
      * Basically like `AbstractCollection.toString()`, but stripping
-     * the "class "/"interface " prefix before every class name.
+     * the class " interface " prefix before every class name.
      *
      * @param classes an array of Class objects
      * @return a String of form "[com.foo.Bar, com.foo.Baz]"

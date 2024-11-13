@@ -25,7 +25,7 @@ abstract class BotApi(val receiveMessage: ReceiveMessage, val originalClass: KCl
     /**
      * 发布事件
      */
-    suspend fun <T : Plugin.Listener.Event> publishEvent(event: T) {
+    fun <T : Plugin.Listener.Event> publishEvent(event: T) {
         log().info("发布事件:{}", event)
         EventManager.publishEvent(this, event)
     }
