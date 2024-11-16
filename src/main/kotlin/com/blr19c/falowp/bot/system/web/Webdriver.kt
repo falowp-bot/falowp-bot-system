@@ -3,6 +3,7 @@ package com.blr19c.falowp.bot.system.web
 import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.expand.encodeToBase64String
 import com.microsoft.playwright.*
+import com.microsoft.playwright.BrowserType.LaunchOptions
 import com.microsoft.playwright.options.LoadState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,13 +37,22 @@ fun <T> Page.existsToExecute(
 fun defaultNewContextOptions(): Browser.NewContextOptions {
     return Browser.NewContextOptions()
         .setViewportSize(3024, 1964)
-        .setDeviceScaleFactor(2.0)
+        .setDeviceScaleFactor(3.0)
         .setUserAgent(commonUserAgent())
         .setIsMobile(false)
 }
 
 fun <T> commonWebdriverContext(block: BrowserContext.() -> T): T {
-    return Playwright.create().chromium().launch().use { browser ->
+    val launchOptions = LaunchOptions().setArgs(
+        listOf(
+            "--font-render-hinting=medium",
+            "--font-render-hinting=none",
+            "--disable-font-subpixel-positioning",
+            "--enable-font-antialiasing",
+            "--enable-harfbuzz-rendertext"
+        )
+    )
+    return Playwright.create().chromium().launch(launchOptions).use { browser ->
         browser.newContext(defaultNewContextOptions()).use { browserContext ->
             block.invoke(browserContext)
         }
