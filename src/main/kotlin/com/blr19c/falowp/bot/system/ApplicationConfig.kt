@@ -44,8 +44,8 @@ private val applicationConfig by lazy {
     var config = yamlConfigLoader.load(null) ?: throw IllegalArgumentException("未找到有效的application.yaml配置")
     for (resource in Thread.currentThread().contextClassLoader.getResources("plugin-conf")) {
         val subConfig = ResourceUtils.resourceToInputStream(resource, ".yaml") { loadYaml(it) }
-            .reduce { a1, a2 -> a1.withFallback(a2) }
-        config = config.withFallback(subConfig)
+            .reduce { a1, a2 -> MergedApplicationConfig(a1, a2) }
+        config = MergedApplicationConfig(config, subConfig)
     }
     config
 }
@@ -54,6 +54,60 @@ private val configPropertyMap by lazy { ConcurrentHashMap<String, String>() }
 private val configListPropertyMap by lazy { ConcurrentHashMap<String, List<String>>() }
 private val configDefaultValue: (String) -> String = { throw IllegalArgumentException("未找到配置:$it") }
 private val configDefaultListValue: (String) -> List<String> = { throw IllegalArgumentException("未找到配置:$it") }
+
+
+internal class MergedApplicationConfig(
+    val first: ApplicationConfig,
+    val second: ApplicationConfig
+) : ApplicationConfig {
+
+    private val firstKeys by lazy { first.keys() }
+    private val secondKeys by lazy { second.keys() }
+
+    override fun property(path: String): ApplicationConfigValue {
+        return propertyOrNull(path) ?: throw ApplicationConfigurationException("Property $path not found.")
+    }
+
+    override fun propertyOrNull(path: String): ApplicationConfigValue? {
+        if (firstKeys.contains(path) && secondKeys.contains(path)) {
+            return MergedApplicationConfigValue(first.property(path), second.property(path))
+        }
+        return when {
+            firstKeys.contains(path) -> first.property(path)
+            else -> second.propertyOrNull(path)
+        }
+    }
+
+    override fun config(path: String): ApplicationConfig {
+        if (firstKeys.none { it.startsWith("$path.") }) return second.config(path)
+        if (secondKeys.none { it.startsWith("$path.") }) return first.config(path)
+        return MergedApplicationConfig(first.config(path), second.config(path))
+    }
+
+    override fun configList(path: String): List<ApplicationConfig> {
+        val firstList = if (firstKeys.contains(path)) first.configList(path) else emptyList()
+        val secondList = if (secondKeys.contains(path)) second.configList(path) else emptyList()
+        return firstList + secondList
+    }
+
+    override fun keys(): Set<String> = firstKeys + secondKeys
+
+    override fun toMap(): Map<String, Any?> = second.toMap() + first.toMap()
+}
+
+internal class MergedApplicationConfigValue(
+    val first: ApplicationConfigValue,
+    val second: ApplicationConfigValue
+) : ApplicationConfigValue {
+
+    override fun getString(): String {
+        return first.getString()
+    }
+
+    override fun getList(): List<String> {
+        return first.getList() + second.getList()
+    }
+}
 
 /**
  * 读取application.conf配置文件
