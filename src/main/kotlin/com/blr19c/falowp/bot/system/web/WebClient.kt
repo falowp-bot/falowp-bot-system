@@ -29,7 +29,7 @@ object WebClient : Log {
     }
 }
 
-private val client by lazy {
+private val client by lazy(LazyThreadSafetyMode.PUBLICATION) {
     HttpClient(CIO) {
         defaultRequest {
             contentType(ContentType.Application.Json)
@@ -51,7 +51,7 @@ private val client by lazy {
     }
 }
 
-private val commonUserAgent by lazy {
+private val commonUserAgent by lazy(LazyThreadSafetyMode.PUBLICATION) {
     runBlocking {
         readResource("system/webclient/useragent.txt") {
             val reader = BufferedReader(InputStreamReader(it))
