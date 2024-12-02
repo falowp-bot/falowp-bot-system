@@ -30,7 +30,7 @@ data class ImageUrl(
         runBlocking {
             if (isUrl()) longTimeoutWebclient()
                 .get(toUrl()) { header(HttpHeaders.UserAgent, commonUserAgent()) }
-                .readBytes()
+                .readRawBytes()
             else toBase64().decodeFromBase64String()
         }
     }
