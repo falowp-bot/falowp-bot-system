@@ -105,7 +105,7 @@ internal class MergedApplicationConfigValue(
     }
 
     override fun getList(): List<String> {
-        return first.getList() + second.getList()
+        return (first.getList() + second.getList()).distinct()
     }
 }
 
