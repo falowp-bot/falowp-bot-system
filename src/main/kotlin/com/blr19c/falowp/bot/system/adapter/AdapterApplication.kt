@@ -32,11 +32,6 @@ object AdapterApplication : Log {
     }
 
     private suspend fun initAdapter(adapter: Class<*>, botAdapterRegister: BotAdapterRegister): BotAdapterInfo? {
-        if (SchedulingBotApiSupport::class.java.isAssignableFrom(adapter)) {
-            botApiSupportList.add(adapter.kotlin.objectInstance as SchedulingBotApiSupport)
-            botApiSupportList.sortBy { it.order() }
-            return null
-        }
         val annotation = adapter.getAnnotation(BotAdapter::class.java) ?: return null
         @Suppress("UNCHECKED_CAST")
         adapter as Class<out BotAdapterInterface>
@@ -53,5 +48,10 @@ object AdapterApplication : Log {
 
     fun botApiSupportList(): List<SchedulingBotApiSupport> {
         return Collections.unmodifiableList(botApiSupportList)
+    }
+
+    fun botApiSupportRegister(botApiSupport: SchedulingBotApiSupport) {
+        botApiSupportList.add(botApiSupport)
+        botApiSupportList.sortBy(SchedulingBotApiSupport::order)
     }
 }
