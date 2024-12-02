@@ -18,7 +18,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:1.4.3")
 
 ## 更新日志
 
-### 2.0.0-RC1/2/3/4/5/6(不向下兼容)
+### 2.0.0-RC1/2/3/4/5/6/7(不向下兼容)
 
 * 更新一些依赖版本
 * 重做了协议适配器、文本检测、翻译、数据源、MinIO
@@ -30,6 +30,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:1.4.3")
 * 优化了截图分辨率和字体渲染
 * 配置文件由conf类型改为yaml
 * 修复WebClient可能出现死锁的问题
+* 修改BotApiSupport注册逻辑
 
 ### 1.4.3
 
