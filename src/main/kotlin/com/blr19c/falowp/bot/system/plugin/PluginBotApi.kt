@@ -4,6 +4,8 @@ import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.api.SendMessage
 import com.blr19c.falowp.bot.system.api.SendMessageChain
 import com.blr19c.falowp.bot.system.listener.events.SendMessageEvent
+import com.blr19c.falowp.bot.system.listener.hooks.SendMessageHook
+import com.blr19c.falowp.bot.system.plugin.hook.withPluginHook
 import io.ktor.util.collections.*
 
 /**
@@ -19,13 +21,21 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
         reference: Boolean,
         forward: Boolean
     ) {
-        publishSendMessageEvent(*sendMessageChain, reference = reference, forward = forward)
-        delegateBotApi.sendGroup(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
+        val sendMessageHook = SendMessageHook(sendMessageChain.toMutableList())
+        withPluginHook(delegateBotApi, sendMessageHook) {
+            val message = sendMessageHook.sendMessageChain.toTypedArray()
+            publishSendMessageEvent(*message, reference = reference, forward = forward)
+            delegateBotApi.sendGroup(*message, sourceId = sourceId, reference = reference, forward = forward)
+        }
     }
 
     override suspend fun sendAllGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
-        publishSendMessageEvent(*sendMessageChain, reference = reference, forward = forward)
-        delegateBotApi.sendAllGroup(*sendMessageChain, reference = reference, forward = forward)
+        val sendMessageHook = SendMessageHook(sendMessageChain.toMutableList())
+        withPluginHook(delegateBotApi, sendMessageHook) {
+            val message = sendMessageHook.sendMessageChain.toTypedArray()
+            publishSendMessageEvent(*message, reference = reference, forward = forward)
+            delegateBotApi.sendAllGroup(*message, reference = reference, forward = forward)
+        }
     }
 
     override suspend fun sendPrivate(
@@ -34,22 +44,29 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
         reference: Boolean,
         forward: Boolean
     ) {
-        publishSendMessageEvent(*sendMessageChain, reference = reference, forward = forward)
-        delegateBotApi.sendPrivate(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
+        val sendMessageHook = SendMessageHook(sendMessageChain.toMutableList())
+        withPluginHook(delegateBotApi, sendMessageHook) {
+            val message = sendMessageHook.sendMessageChain.toTypedArray()
+            publishSendMessageEvent(*message, reference = reference, forward = forward)
+            delegateBotApi.sendPrivate(*message, sourceId = sourceId, reference = reference, forward = forward)
+        }
     }
 
     override suspend fun sendReply(vararg sendMessage: String, reference: Boolean, forward: Boolean) {
-        publishSendMessageEvent(
+        sendReply(
             *sendMessage.map { SendMessage.builder(it).build() }.toTypedArray(),
             reference = reference,
             forward = forward
         )
-        delegateBotApi.sendReply(*sendMessage, reference = reference, forward = forward)
     }
 
     override suspend fun sendReply(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
-        publishSendMessageEvent(*sendMessageChain, reference = reference, forward = forward)
-        delegateBotApi.sendReply(*sendMessageChain, reference = reference, forward = forward)
+        val sendMessageHook = SendMessageHook(sendMessageChain.toMutableList())
+        withPluginHook(delegateBotApi, sendMessageHook) {
+            val message = sendMessageHook.sendMessageChain.toTypedArray()
+            publishSendMessageEvent(*message, reference = reference, forward = forward)
+            delegateBotApi.sendReply(*message, reference = reference, forward = forward)
+        }
     }
 
     private fun publishSendMessageEvent(

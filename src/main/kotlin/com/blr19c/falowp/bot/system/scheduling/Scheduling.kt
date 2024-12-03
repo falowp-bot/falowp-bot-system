@@ -3,6 +3,7 @@ package com.blr19c.falowp.bot.system.scheduling
 import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.adapter.AdapterApplication.botApiSupportList
 import com.blr19c.falowp.bot.system.api.BotApi
+import com.blr19c.falowp.bot.system.plugin.PluginBotApi
 import com.blr19c.falowp.bot.system.plugin.TaskPluginRegister
 import com.blr19c.falowp.bot.system.scheduling.tasks.GreetingTask
 import kotlinx.coroutines.CoroutineScope
@@ -21,11 +22,14 @@ object Scheduling : Log {
     private val executorTaskList = CopyOnWriteArrayList<SchedulingRunnable>()
 
     suspend fun selectBot(receive: String, originalClass: KClass<*>): BotApi? {
-        return botApiSupportList().firstOrNull { it.supportReceive(receive) }?.bot(receive, originalClass)
+        return botApiSupportList()
+            .firstOrNull { it.supportReceive(receive) }
+            ?.bot(receive, originalClass)
+            ?.let { PluginBotApi(it) }
     }
 
     suspend fun allBot(originalClass: KClass<*>): List<BotApi> {
-        return botApiSupportList().map { it.bot("", originalClass) }.toList()
+        return botApiSupportList().map { PluginBotApi(it.bot("", originalClass)) }.toList()
     }
 
     fun registerTask(pluginRegister: TaskPluginRegister) {
