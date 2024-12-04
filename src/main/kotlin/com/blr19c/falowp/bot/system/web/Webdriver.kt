@@ -52,9 +52,11 @@ fun <T> commonWebdriverContext(block: BrowserContext.() -> T): T {
             "--enable-harfbuzz-rendertext"
         )
     )
-    return Playwright.create().chromium().launch(launchOptions).use { browser ->
-        browser.newContext(defaultNewContextOptions()).use { browserContext ->
-            block.invoke(browserContext)
+    return Playwright.create().use { playwright ->
+        playwright.chromium().launch(launchOptions).use { browser ->
+            browser.newContext(defaultNewContextOptions()).use { browserContext ->
+                block.invoke(browserContext)
+            }
         }
     }
 }
