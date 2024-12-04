@@ -1,8 +1,11 @@
 package com.blr19c.falowp.bot.system.plugin.hook
 
 import com.blr19c.falowp.bot.system.api.BotApi
+import com.blr19c.falowp.bot.system.api.SendMessage
 import com.blr19c.falowp.bot.system.listener.hooks.ReceiveMessageHook
+import com.blr19c.falowp.bot.system.listener.hooks.SendMessageHook
 import com.blr19c.falowp.bot.system.plugin.*
+import com.blr19c.falowp.bot.system.plugin.Plugin.Listener.Hook.Companion.beforeHook
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -65,3 +68,19 @@ suspend fun <T : Any> BotApi.awaitReply(
 }
 
 
+/**
+ * 发送消息预处理hook
+ */
+fun sendMessageHook(block: suspend HookJoinPoint.(List<SendMessage>) -> List<SendMessage>): Register {
+    return beforeHook<SendMessageHook> { sendMessageHook ->
+        val originalMessageList = sendMessageHook.sendMessageChain.toList()
+        sendMessageHook.sendMessageChain.clear()
+        for (sendMessageChain in originalMessageList) {
+            val messageList = sendMessageChain.messageList
+            val newMessageList = messageList + block(messageList)
+            val newSendMessageChain = sendMessageChain.copy(sendMessageChain.id, newMessageList)
+            sendMessageHook.sendMessageChain.add(newSendMessageChain)
+        }
+        this.process()
+    }
+}

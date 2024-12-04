@@ -20,7 +20,7 @@ interface SendMessage {
     }
 
 
-    class Builder(private val messageList: MutableList<SendMessage> = arrayListOf()) {
+    class Builder(val messageList: MutableList<SendMessage> = arrayListOf()) {
 
         fun text(content: String): Builder {
             messageList.addLast(TextSendMessage(content))
