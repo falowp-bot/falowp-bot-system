@@ -11,12 +11,17 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:1.4.3")
+implementation("com.blr19c.falowp:falowp-bot-system:2.0.0")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 2.0.0
+
+* 2.0.0-RC?的正式版本
+* 修复了一些问题
 
 ### 2.0.0-RC1/2/3/4/5/6/7/8(不向下兼容)
 
