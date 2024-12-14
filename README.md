@@ -18,6 +18,13 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.0.0")
 
 ## 更新日志
 
+### 2.1.0
+
+* 更新一些依赖版本
+* 支持NapCatQQ
+* 所有插件注册器都支持取消注册
+* 支持更多消息类型
+
 ### 2.0.0
 
 * 2.0.0-RC?的正式版本
