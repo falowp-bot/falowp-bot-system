@@ -24,6 +24,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.0.0")
 * 支持NapCatQQ
 * 所有插件注册器都支持取消注册
 * 支持更多消息类型
+* 更新默认的useragent
 
 ### 2.0.0
 
