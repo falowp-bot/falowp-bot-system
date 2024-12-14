@@ -39,7 +39,7 @@ data class ReceiveMessage(
             val source = Source.empty()
             return ReceiveMessage(
                 "",
-                MessageTypeEnum.MESSAGE,
+                MessageTypeEnum.OTHER,
                 content,
                 sender,
                 source,
@@ -93,7 +93,6 @@ data class ReceiveMessage(
          * 分享
          */
         val share: List<Share>,
-
         /**
          * 引用消息
          */
