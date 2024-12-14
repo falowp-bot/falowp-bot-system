@@ -40,6 +40,15 @@ object EventManager : Log {
     }
 
     /**
+     * 取消注册事件
+     */
+    fun <T : Plugin.Listener.Event> unregisterEvent(pluginRegister: EventPluginRegister<T>) {
+        eventPlugins.computeIfPresent(pluginRegister.listener) { _, v ->
+            v.filter { it != pluginRegister }
+        }
+    }
+
+    /**
      * 处理事件
      */
     fun <T : Plugin.Listener.Event> publishEvent(botApi: BotApi, event: T) {

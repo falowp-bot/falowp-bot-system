@@ -9,6 +9,7 @@ import com.blr19c.falowp.bot.system.scheduling.tasks.GreetingTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.KClass
 
@@ -17,7 +18,6 @@ import kotlin.reflect.KClass
  */
 object Scheduling : Log {
 
-    private val taskPlugins = CopyOnWriteArrayList<TaskPluginRegister>()
     private val executor = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val executorTaskList = CopyOnWriteArrayList<SchedulingRunnable>()
 
@@ -33,24 +33,37 @@ object Scheduling : Log {
     }
 
     fun registerTask(pluginRegister: TaskPluginRegister) {
-        taskPlugins.add(pluginRegister)
+        executorTaskList.add(schedulingRunnable(pluginRegister))
+    }
+
+    fun unregisterTask(pluginRegister: TaskPluginRegister) {
+        executor.launch {
+            val runnable = executorTaskList.singleOrNull { it.plugin == pluginRegister }
+            runnable?.let {
+                it.cancel()
+                executorTaskList.remove(it)
+            }
+        }
     }
 
     fun configure() {
         log().info("初始化(周期/cron)任务")
-        val tasks = taskPlugins.map(this::schedulingRunnable)
-        log().info("已加载的(周期/cron)任务数量:{}", tasks.size)
-        val systemTasks = initSystemTasks().map(this::schedulingRunnable)
-        executorTaskList.addAll(systemTasks + tasks)
-        executorTaskList.forEach(SchedulingRunnable::schedule)
+        val systemTasks = initSystemTasks()
+        executorTaskList.addAll(systemTasks)
+        log().info("已加载的(周期/cron)任务数量:{}", executorTaskList.size)
         log().info("初始化(周期/cron)任务完成")
     }
 
-    private fun initSystemTasks(): List<TaskPluginRegister> {
-        return listOf(GreetingTask.goodMorning, GreetingTask.goodNight)
+    private fun initSystemTasks(): List<SchedulingRunnable> {
+        return listOf(
+            schedulingRunnable(GreetingTask.goodMorning),
+            schedulingRunnable(GreetingTask.goodNight)
+        )
     }
 
     private fun schedulingRunnable(plugin: TaskPluginRegister): SchedulingRunnable {
-        return SchedulingRunnable(plugin, executor)
+        val runnable = SchedulingRunnable(plugin, executor)
+        runnable.schedule()
+        return runnable
     }
 }

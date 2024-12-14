@@ -36,6 +36,13 @@ object PluginManagement : Log {
     }
 
     /**
+     * 取消注册消息插件
+     */
+    fun unregisterMessage(pluginRegister: MessagePluginRegister) {
+        messagePlugins.remove(pluginRegister)
+    }
+
+    /**
      * 注册消息插件
      */
     fun registerMessage(pluginRegister: QueueMessagePluginRegister) {
@@ -48,6 +55,15 @@ object PluginManagement : Log {
                 botApiJob.job.join()
             }
         }
+    }
+
+    /**
+     * 取消注册消息插件
+     */
+    fun unregisterMessage(pluginRegister: QueueMessagePluginRegister) {
+        messagePlugins.remove(pluginRegister.messagePluginRegister)
+        queueMessageInfos.remove(pluginRegister.pluginId)
+        queueMessagePlugins.remove(pluginRegister.pluginId)?.close()
     }
 
     fun configure() {

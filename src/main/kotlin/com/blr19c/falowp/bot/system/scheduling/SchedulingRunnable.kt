@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 @Suppress("UNUSED")
 class SchedulingRunnable(
-    private val plugin: TaskPluginRegister,
+    val plugin: TaskPluginRegister,
     private val executor: CoroutineScope,
     private val trigger: Trigger = plugin.trigger,
     private val triggerContext: TriggerContext = TriggerContext(),

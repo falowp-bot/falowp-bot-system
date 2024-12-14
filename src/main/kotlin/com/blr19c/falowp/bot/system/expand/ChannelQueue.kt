@@ -1,6 +1,7 @@
 package com.blr19c.falowp.bot.system.expand
 
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.consumeEach
 import java.util.concurrent.atomic.LongAdder
 
@@ -48,11 +49,19 @@ class ChannelQueue<E>(capacity: Int = Channel.UNLIMITED) {
     }
 
     suspend fun drainTo(action: suspend (E) -> Unit) {
-        channel.consumeEach {
-            count.decrement()
-            action.invoke(it)
+        try {
+            channel.consumeEach {
+                count.decrement()
+                action.invoke(it)
+            }
+        } catch (_: ClosedReceiveChannelException) {
+
         }
     }
 
     fun size(): Int = count.sum().toInt()
+
+    fun close() {
+        channel.close()
+    }
 }

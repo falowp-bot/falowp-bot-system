@@ -31,7 +31,7 @@ interface UnRegister {
 /**
  * 插件注册器
  */
-abstract class PluginRegister : Register {
+abstract class PluginRegister : Register, UnRegister {
     /**
      * id
      */
@@ -134,6 +134,10 @@ data class MessagePluginRegister(
     override fun register() {
         PluginManagement.registerMessage(this)
     }
+
+    override fun unregister() {
+        PluginManagement.unregisterMessage(this)
+    }
 }
 
 /**
@@ -164,6 +168,10 @@ data class QueueMessagePluginRegister(
     override fun register() {
         PluginManagement.registerMessage(this)
     }
+
+    override fun unregister() {
+        PluginManagement.unregisterMessage(this)
+    }
 }
 
 
@@ -185,6 +193,10 @@ data class TaskPluginRegister(
     override fun register() {
         Scheduling.registerTask(this)
     }
+
+    override fun unregister() {
+        Scheduling.unregisterTask(this)
+    }
 }
 
 /**
@@ -202,13 +214,17 @@ data class EventPluginRegister<T : Plugin.Listener.Event>(
     override val originalClass: KClass<*> = getCallerClass()
 ) : PluginRegister() {
 
+    suspend fun publish(botApi: BotApi, event: Any) {
+        @Suppress("UNCHECKED_CAST")//因为data class无法使用reified，导致T被擦出无法正确识别T
+        block.invoke(botApi, event as T)
+    }
+
     override fun register() {
         EventManager.registerEvent(this)
     }
 
-    suspend fun publish(botApi: BotApi, event: Any) {
-        @Suppress("UNCHECKED_CAST")//因为data class无法使用reified，导致T被擦出无法正确识别T
-        block.invoke(botApi, event as T)
+    override fun unregister() {
+        EventManager.unregisterEvent(this)
     }
 }
 
@@ -237,7 +253,7 @@ data class HookPluginRegister<T : Plugin.Listener.Hook>(
      */
     val block: suspend HookJoinPoint.(hook: T) -> Unit,
     override val originalClass: KClass<*> = getCallerClass()
-) : PluginRegister(), UnRegister {
+) : PluginRegister() {
 
     override fun register() {
         HookManager.registerHook(this)
