@@ -77,8 +77,8 @@ fun sendMessageHook(block: suspend HookJoinPoint.(List<SendMessage>) -> List<Sen
         sendMessageHook.sendMessageChain.clear()
         for (sendMessageChain in originalMessageList) {
             val messageList = sendMessageChain.messageList
-            val newMessageList = messageList + block(messageList)
-            val newSendMessageChain = sendMessageChain.copy(sendMessageChain.id, newMessageList)
+            val newMessageList = block(messageList)
+            val newSendMessageChain = sendMessageChain.copy(id = sendMessageChain.id, messageList = newMessageList)
             sendMessageHook.sendMessageChain.add(newSendMessageChain)
         }
         this.process()
