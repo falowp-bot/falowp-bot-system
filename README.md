@@ -11,12 +11,18 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:2.0.0")
+implementation("com.blr19c.falowp:falowp-bot-system:2.1.1")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 2.1.1
+
+* 发送消息预处理hook不再返回默认message
+* 接受消息添加适配器信息
+* 支持NapCatQQ所有扩展api
 
 ### 2.1.0
 
