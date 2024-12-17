@@ -30,7 +30,11 @@ data class ReceiveMessage(
     /**
      * 机器人信息
      */
-    val self: Self
+    val self: Self,
+    /**
+     * 消息来源适配器
+     */
+    val adapter: Adapter
 ) {
     companion object {
         fun empty(): ReceiveMessage {
@@ -43,7 +47,8 @@ data class ReceiveMessage(
                 content,
                 sender,
                 source,
-                Self("")
+                Self(""),
+                Adapter.empty()
             )
         }
     }
@@ -177,4 +182,21 @@ data class ReceiveMessage(
          */
         val id: String,
     )
+
+    data class Adapter(
+        /**
+         * 适配器id
+         */
+        val id: String,
+        /**
+         * 适配器挂载数据
+         */
+        val data: Any
+    ) {
+        companion object {
+            fun empty(): Adapter {
+                return Adapter("", "")
+            }
+        }
+    }
 }
