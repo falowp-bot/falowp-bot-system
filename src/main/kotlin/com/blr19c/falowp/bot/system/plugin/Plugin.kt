@@ -79,7 +79,7 @@ annotation class Plugin(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
                     noinline block: suspend HookJoinPoint.(T) -> Unit
-                ): Register {
+                ): PluginRegister {
                     return HookPluginRegister(order, T::class, hookType, match, block)
                 }
 
@@ -90,7 +90,7 @@ annotation class Plugin(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
                     noinline block: suspend HookJoinPoint.(T) -> Unit
-                ): Register {
+                ): PluginRegister {
                     return hook<T>(HookTypeEnum.BEFORE, order, match, block)
                 }
 
@@ -101,7 +101,7 @@ annotation class Plugin(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
                     noinline block: suspend HookJoinPoint.(T) -> Unit
-                ): Register {
+                ): PluginRegister {
                     return hook<T>(HookTypeEnum.AFTER_RETURNING, order, match, block)
                 }
 
@@ -112,7 +112,7 @@ annotation class Plugin(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
                     noinline block: suspend HookJoinPoint.(T) -> Unit
-                ): Register {
+                ): PluginRegister {
                     return hook<T>(HookTypeEnum.AFTER_THROWING, order, match, block)
                 }
 
@@ -123,7 +123,7 @@ annotation class Plugin(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
                     noinline block: suspend HookJoinPoint.(T) -> Unit
-                ): Register {
+                ): PluginRegister {
                     return hook<T>(HookTypeEnum.AFTER_FINALLY, order, match, block)
                 }
 
@@ -134,7 +134,7 @@ annotation class Plugin(
                     order: Int = 0,
                     match: HookPluginRegisterMatch = HookPluginRegisterMatch.allMatch(),
                     noinline block: suspend HookJoinPoint.(T) -> Unit
-                ): Register {
+                ): PluginRegister {
                     return hook<T>(HookTypeEnum.AROUND, order, match, block)
                 }
             }
@@ -153,7 +153,7 @@ annotation class Plugin(
             cron: String,
             useGreeting: Boolean = true,
             block: suspend BotApi.() -> Unit
-        ): Register {
+        ): PluginRegister {
             return TaskPluginRegister(CronTrigger(cron, useGreeting), block)
         }
 
@@ -172,7 +172,7 @@ annotation class Plugin(
             fixedRate: Boolean = false,
             useGreeting: Boolean = true,
             block: suspend BotApi.() -> Unit
-        ): Register {
+        ): PluginRegister {
             return TaskPluginRegister(PeriodicTrigger(fixedRate, period, initialDelay, useGreeting), block)
         }
 
@@ -185,7 +185,7 @@ annotation class Plugin(
         fun applicationInitScheduling(
             useGreeting: Boolean = true,
             block: suspend BotApi.() -> Unit
-        ): Register {
+        ): PluginRegister {
             return TaskPluginRegister(ApplicationInitTrigger(useGreeting), block)
         }
     }
@@ -203,7 +203,7 @@ annotation class Plugin(
             auth: ApiAuth = ApiAuth.ORDINARY_MEMBER,
             terminateEvent: Boolean = true,
             block: suspend BotApi.(args: Array<String>) -> Unit
-        ): Register {
+        ): PluginRegister {
             return MessagePluginRegister(
                 order,
                 MessagePluginRegisterMatch(messageType = MessageTypeEnum.POKE, auth = auth, atMe = true),
@@ -226,7 +226,7 @@ annotation class Plugin(
             auth: ApiAuth = ApiAuth.ORDINARY_MEMBER,
             terminateEvent: Boolean = true,
             block: suspend BotApi.(args: Array<String>) -> Unit
-        ): Register {
+        ): PluginRegister {
             return MessagePluginRegister(
                 order,
                 MessagePluginRegisterMatch(regex, auth),
@@ -247,7 +247,7 @@ annotation class Plugin(
             order: Int = 0,
             terminateEvent: Boolean = true,
             block: suspend BotApi.(args: Array<String>) -> Unit
-        ): Register {
+        ): PluginRegister {
             return MessagePluginRegister(
                 order,
                 match,
@@ -272,7 +272,7 @@ annotation class Plugin(
             terminateEvent: Boolean = true,
             queueCapacity: Int = Channel.UNLIMITED,
             block: suspend BotApi.(args: Array<String>) -> Unit
-        ): Register {
+        ): PluginRegister {
             return queueMessage(
                 MessagePluginRegisterMatch(regex, auth),
                 order,
@@ -307,7 +307,7 @@ annotation class Plugin(
                 this.sendReply("当前功能请求人数较多,请稍后再试")
             },
             block: suspend BotApi.(args: Array<String>) -> Unit
-        ): Register {
+        ): PluginRegister {
             return QueueMessagePluginRegister(
                 message(match, order, terminateEvent, block) as MessagePluginRegister,
                 queueCapacity,

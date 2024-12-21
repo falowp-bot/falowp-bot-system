@@ -71,7 +71,7 @@ suspend fun <T : Any> BotApi.awaitReply(
 /**
  * 发送消息预处理hook
  */
-fun sendMessageHook(block: suspend HookJoinPoint.(List<SendMessage>) -> List<SendMessage>): Register {
+fun sendMessageHook(block: suspend HookJoinPoint.(List<SendMessage>) -> List<SendMessage>): PluginRegister {
     return beforeHook<SendMessageHook> { sendMessageHook ->
         val originalMessageList = sendMessageHook.sendMessageChain.toList()
         sendMessageHook.sendMessageChain.clear()
