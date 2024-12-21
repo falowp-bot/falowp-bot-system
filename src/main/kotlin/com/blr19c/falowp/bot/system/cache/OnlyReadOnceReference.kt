@@ -13,7 +13,7 @@ class OnlyReadOnceReference<T>(
     private var firstCall = true
 
     @Synchronized
-    operator fun getValue(thisRef: Any, property: KProperty<*>): T? {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T? {
         return if (firstCall) {
             firstCall = false
             runBlocking { block.invoke() }

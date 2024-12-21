@@ -18,7 +18,7 @@ class CacheReference<T>(
         .expireAfterWrite(duration.toJavaDuration())
         .build(CacheLoader.from<String, T> { _ -> runBlocking { block.invoke() } })
 
-    operator fun getValue(thisRef: Any, property: KProperty<*>): T {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return cache.get("onlyKey")
     }
 

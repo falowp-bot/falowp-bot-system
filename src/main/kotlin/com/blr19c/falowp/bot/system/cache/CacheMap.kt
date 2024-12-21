@@ -18,7 +18,7 @@ class CacheMap<K : Any, V : Any>(
         .expireAfterWrite(duration.toJavaDuration())
         .build(CacheLoader.from<K, V> { key -> runBlocking { block.invoke(key) } })
 
-    operator fun getValue(thisRef: Any, property: KProperty<*>): suspend (K) -> V {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): suspend (K) -> V {
         return { key: K -> cache.get(key) }
     }
 
