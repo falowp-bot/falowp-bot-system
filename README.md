@@ -18,6 +18,13 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.1.1")
 
 ## 更新日志
 
+### 2.1.2
+
+* 更新一些依赖版本
+* 优化事件
+* 优化插件注册器返回内容
+* 优化cache委托
+
 ### 2.1.1
 
 * 发送消息预处理hook不再返回默认message
