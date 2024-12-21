@@ -2,6 +2,8 @@ package com.blr19c.falowp.bot.system.plugin.event
 
 import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.api.SendMessage
+import com.blr19c.falowp.bot.system.api.SendMessageChain
+import com.blr19c.falowp.bot.system.api.SourceTypeEnum.*
 import com.blr19c.falowp.bot.system.listener.events.HelpEvent
 import com.blr19c.falowp.bot.system.listener.hooks.HelpEventHook
 import com.blr19c.falowp.bot.system.plugin.PluginInfo
@@ -57,7 +59,7 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
         htmlBody.select("#pluginName").html(plugin.name)
         htmlBody.select("#pluginDesc").html(plugin.desc)
         val base64Help = htmlToImageBase64(htmlBody.html(), ".card-container")
-        botApi.sendReply(SendMessage.builder().image(base64Help).build())
+        botApi.send(helpEvent, SendMessage.builder().image(base64Help).build())
     }
 
     private suspend fun allHelp(botApi: BotApi, helpEvent: HelpEvent) {
@@ -84,6 +86,14 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
         val card = tagList.sortedByDescending { it.length }.joinToString("")
         htmlBody.select(".card-container").append(card)
         val base64Help = htmlToImageBase64(htmlBody.html(), ".card-container")
-        botApi.sendReply(SendMessage.builder().image(base64Help).build())
+        botApi.send(helpEvent, SendMessage.builder().image(base64Help).build())
+    }
+
+    private suspend fun BotApi.send(event: HelpEvent, message: SendMessageChain) {
+        when (event.sourceType) {
+            GROUP -> this.sendGroup(message, sourceId = event.sourceId!!)
+            PRIVATE -> this.sendPrivate(message, sourceId = event.sourceId!!)
+            UNKNOWN, null -> this.sendReply(message)
+        }
     }
 }

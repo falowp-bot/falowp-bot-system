@@ -1,5 +1,6 @@
 package com.blr19c.falowp.bot.system.listener.events
 
+import com.blr19c.falowp.bot.system.api.SourceTypeEnum
 import com.blr19c.falowp.bot.system.plugin.Plugin
 
 
@@ -21,4 +22,14 @@ data class HelpEvent(
      * 获取功能的帮助
      */
     val pluginName: String? = null,
+
+    /**
+     * 来源类型(为空的时候使用reply)
+     */
+    val sourceType: SourceTypeEnum? = null,
+
+    /**
+     * 来源id
+     */
+    val sourceId: String? = null,
 ) : Plugin.Listener.Event
