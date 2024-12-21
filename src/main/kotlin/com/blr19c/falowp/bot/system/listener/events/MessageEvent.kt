@@ -2,7 +2,7 @@ package com.blr19c.falowp.bot.system.listener.events
 
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
 import com.blr19c.falowp.bot.system.api.SendMessageChain
-import com.blr19c.falowp.bot.system.plugin.Plugin
+import com.blr19c.falowp.bot.system.plugin.Plugin.Listener.Event
 
 /**
  * 机器人发送了消息的事件
@@ -20,7 +20,7 @@ data class SendMessageEvent(
      * 是否转发
      */
     val forward: Boolean
-) : Plugin.Listener.Event
+) : Event
 
 /**
  * 新用户进群事件
@@ -34,7 +34,7 @@ data class GroupIncreaseEvent(
      * 来源
      */
     val source: ReceiveMessage.Source
-) : Plugin.Listener.Event
+) : Event
 
 /**
  * 用户退群事件
@@ -48,7 +48,7 @@ data class GroupDecreaseEvent(
      * 来源
      */
     val source: ReceiveMessage.Source
-) : Plugin.Listener.Event
+) : Event
 
 /**
  * 撤回消息事件
@@ -62,4 +62,52 @@ data class WithdrawMessageEvent(
      * 撤回人
      */
     val withdrawUser: ReceiveMessage.User
-) : Plugin.Listener.Event
+) : Event
+
+/**
+ * 申请添加好友事件
+ */
+data class RequestAddFriendEvent(
+    /**
+     * 申请人
+     */
+    val userId: String,
+    /**
+     * 来源
+     */
+    val source: ReceiveMessage.Source,
+    /**
+     * 验证信息
+     */
+    val comment: String,
+    /**
+     * 加好友标识
+     */
+    val flag: Any
+) : Event
+
+/**
+ * 申请进群事件
+ */
+data class RequestJoinGroupEvent(
+    /**
+     * 进群人
+     */
+    val userId: String,
+    /**
+     * 来源
+     */
+    val source: ReceiveMessage.Source,
+    /**
+     * 验证信息
+     */
+    val comment: String,
+    /**
+     * 进群标识
+     */
+    val flag: Any,
+    /**
+     * 进群类型
+     */
+    val type: String,
+) : Event
