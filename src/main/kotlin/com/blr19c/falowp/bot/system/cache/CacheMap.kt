@@ -29,4 +29,12 @@ class CacheMap<K : Any, V : Any>(
     fun refreshAll() {
         cache.cleanUp()
     }
+
+    fun put(key: K, value: V) {
+        cache.put(key, value)
+    }
+
+    fun putAll(map: Map<K, V>) {
+        cache.putAll(map)
+    }
 }
