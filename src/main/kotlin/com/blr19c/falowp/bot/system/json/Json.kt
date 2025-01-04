@@ -1,17 +1,18 @@
 package com.blr19c.falowp.bot.system.json
 
+import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.TreeNode
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import java.lang.reflect.Type
+import java.io.InputStream
+import java.nio.ByteBuffer
 import java.time.LocalDateTime
-import kotlin.reflect.KClass
+import java.util.*
 
 
 /**
@@ -27,55 +28,60 @@ object Json {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }
 
-    fun toJsonString(data: Any): String {
-        return json.writeValueAsString(data)
+    fun objectMapper(): ObjectMapper {
+        return json
     }
 
-    fun <K, V> readMap(jsonData: String): Map<K, V> {
-        return json.readValue(jsonData, object : TypeReference<Map<K, V>>() {})
+    inline fun <reified T : Any> readObj(jsonData: String): T {
+        return objectMapper().readValue(jsonData, object : TypeReference<T>() {})
     }
 
-    fun <K, V> readMap(jsonData: ByteArray): Map<K, V> {
-        return json.readValue(jsonData, object : TypeReference<Map<K, V>>() {})
+    inline fun <reified T : Any> readObj(jsonData: ByteArray): T {
+        return objectMapper().readValue(jsonData, object : TypeReference<T>() {})
+    }
+
+    inline fun <reified T : Any> readObj(jsonData: TreeNode): T {
+        return objectMapper().treeToValue(jsonData, object : TypeReference<T>() {})
+    }
+
+    inline fun <reified T : Any> readObj(jsonData: Map<*, *>): T {
+        return objectMapper().convertValue(jsonData, object : TypeReference<T>() {})
+    }
+
+    inline fun <reified T : Any> readObj(jsonData: ByteBuffer): T {
+        return objectMapper().readValue(jsonData.array(), object : TypeReference<T>() {})
+    }
+
+    inline fun <reified T : Any> readObj(jsonData: JsonParser): T {
+        return objectMapper().readValue(jsonData, object : TypeReference<T>() {})
+    }
+
+    inline fun <reified T : Any> readObj(jsonData: InputStream): T {
+        return objectMapper().readValue(jsonData, object : TypeReference<T>() {})
+    }
+
+    inline fun <reified T : Any> readObj(jsonData: Properties): T {
+        val map = jsonData.stringPropertyNames().associateWith { jsonData[it] }
+        return objectMapper().convertValue(map, object : TypeReference<T>() {})
     }
 
     fun readJsonNode(jsonData: String): JsonNode {
-        return json.readTree(jsonData)
+        return objectMapper().readTree(jsonData)
     }
 
-    fun <T : Any> readObj(jsonData: String, kClass: KClass<T>): T {
-        return json.readValue(jsonData, object : TypeReference<T>() {
-            override fun getType(): Type {
-                return kClass.java
-            }
-        })
+    fun readJsonNode(jsonData: ByteArray): JsonNode {
+        return objectMapper().readTree(jsonData)
     }
 
-    fun <T : Any> readObj(byteArray: ByteArray, kClass: KClass<T>): T {
-        return json.readValue(byteArray, object : TypeReference<T>() {
-            override fun getType(): Type {
-                return kClass.java
-            }
-        })
+    fun readJsonNode(jsonData: ByteBuffer): JsonNode {
+        return objectMapper().readTree(jsonData.array())
     }
 
-    fun <T : Any> readObj(byteArray: ByteArray, typeReference: TypeReference<T>): T {
-        return json.readValue(byteArray, typeReference)
+    fun readJsonNode(jsonData: InputStream): JsonNode {
+        return objectMapper().readTree(jsonData)
     }
 
-    fun <T : Any> readObj(treeNode: TreeNode, kClass: KClass<T>): T {
-        return json.treeToValue(treeNode, object : TypeReference<T>() {
-            override fun getType(): Type {
-                return kClass.java
-            }
-        })
-    }
-
-    fun <T : Any> readObj(treeNode: TreeNode, typeReference: TypeReference<T>): T {
-        return json.treeToValue(treeNode, typeReference)
-    }
-
-    fun createArrayNode(): ArrayNode {
-        return json.createArrayNode()
+    fun toJsonString(data: Any): String {
+        return objectMapper().writeValueAsString(data)
     }
 }

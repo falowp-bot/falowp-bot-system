@@ -102,8 +102,8 @@ suspend fun HttpResponse.bodyAsArrayNode(): ArrayNode {
 /**
  * body转为Map
  */
-suspend fun <K, V> HttpResponse.bodyAsMap(): Map<K, V> {
-    return Json.readMap(this.bodyAsText(UTF_8))
+suspend inline fun <reified K, reified V> HttpResponse.bodyAsMap(): Map<K, V> {
+    return Json.readObj(this.bodyAsText(UTF_8))
 }
 
 /**
