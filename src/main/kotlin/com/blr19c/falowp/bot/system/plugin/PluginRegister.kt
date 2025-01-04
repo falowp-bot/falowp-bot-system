@@ -72,6 +72,10 @@ data class MessagePluginRegisterMatch(
      */
     val messageType: MessageTypeEnum? = null,
     /**
+     * 来自的适配器
+     */
+    val adapterId: String? = null,
+    /**
      * 自定义匹配
      */
     val customBlock: ((ReceiveMessage) -> Boolean)? = null,
@@ -87,6 +91,7 @@ data class MessagePluginRegisterMatch(
                 && this.sendId?.contains(receiveMessage.sender.id) != false
                 && this.sourceType?.equals(receiveMessage.source.type) != false
                 && this.messageType?.equals(receiveMessage.messageType) != false
+                && this.adapterId?.equals(receiveMessage.adapter.id) != false
                 && this.atMe?.let { receiveMessage.atMe() } != false
                 && this.customBlock?.invoke(receiveMessage) != false
     }
