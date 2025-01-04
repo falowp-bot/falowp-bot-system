@@ -6,7 +6,6 @@ import com.blr19c.falowp.bot.system.scheduling.Scheduling
 import com.blr19c.falowp.bot.system.web.WebClient
 import com.blr19c.falowp.bot.system.web.WebServer
 import com.blr19c.falowp.bot.system.web.Webdriver
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 
@@ -20,8 +19,8 @@ fun start() = runBlocking {
         WebClient.configure()
         PluginManagement.configure()
         Scheduling.configure()
-        launch { AdapterApplication.configure() }
-        launch { WebServer.configure() }
+        AdapterApplication.configure()
+        WebServer.configure()
     } catch (ex: Throwable) {
         val log = LoggerFactory.getLogger(this::class.java)
         log.error("启动失败", ex)
