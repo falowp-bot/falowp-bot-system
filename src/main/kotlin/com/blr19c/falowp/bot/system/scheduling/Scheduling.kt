@@ -38,8 +38,7 @@ object Scheduling : Log {
 
     fun unregisterTask(pluginRegister: TaskPluginRegister) {
         executor.launch {
-            val runnable = executorTaskList.singleOrNull { it.plugin == pluginRegister }
-            runnable?.let {
+            executorTaskList.singleOrNull { it.plugin.pluginId == pluginRegister.pluginId }?.let {
                 it.cancel()
                 executorTaskList.remove(it)
             }
