@@ -21,6 +21,11 @@ enum class MessageTypeEnum {
     VOICE,
 
     /**
+     * 视频消息
+     */
+    VIDEO,
+
+    /**
      * 分享内容(应用和小程序分享的消息)
      */
     SHARE,
