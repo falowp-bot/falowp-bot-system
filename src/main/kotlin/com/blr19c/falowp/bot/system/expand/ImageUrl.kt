@@ -13,9 +13,9 @@ import java.io.ByteArrayInputStream
 import java.net.URI
 import javax.imageio.ImageIO
 
-private lateinit var toUrlFunction: suspend (ByteArray) -> String
+private lateinit var toUrlFunction: suspend (ImageUrl) -> String
 
-fun registerImageUrlToUrlFun(function: suspend (ByteArray) -> String) {
+fun registerImageUrlToUrlFun(function: suspend (ImageUrl) -> String) {
     toUrlFunction = function
 }
 
@@ -50,7 +50,7 @@ data class ImageUrl(
         if (!::toUrlFunction.isInitialized) {
             throw IllegalStateException("无可用Image存储")
         }
-        return toUrlFunction.invoke(info.decodeFromBase64String())
+        return toUrlFunction.invoke(this)
     }
 
     suspend fun toBytes(): ByteArray {
