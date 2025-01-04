@@ -42,8 +42,8 @@ fun defaultNewContextOptions(): Browser.NewContextOptions {
         .setIsMobile(false)
 }
 
-fun <T> commonWebdriverContext(block: BrowserContext.() -> T): T {
-    val launchOptions = LaunchOptions().setArgs(
+fun defaultLaunchOptions(): LaunchOptions {
+    return LaunchOptions().setArgs(
         listOf(
             "--font-render-hinting=medium",
             "--font-render-hinting=none",
@@ -52,13 +52,23 @@ fun <T> commonWebdriverContext(block: BrowserContext.() -> T): T {
             "--enable-harfbuzz-rendertext"
         )
     )
+}
+
+fun <T> commonBrowserContext(block: BrowserContext.() -> T): T {
     return Playwright.create().use { playwright ->
-        playwright.chromium().launch(launchOptions).use { browser ->
+        playwright.chromium().launch(defaultLaunchOptions()).use { browser ->
             browser.newContext(defaultNewContextOptions()).use { browserContext ->
                 block.invoke(browserContext)
             }
         }
     }
+}
+
+fun <T> commonWebdriverContext(browserContext: BrowserContext? = null, block: BrowserContext.() -> T): T {
+    if (browserContext != null) {
+        return browserContext.use { block(it) }
+    }
+    return commonBrowserContext { block(this) }
 }
 
 suspend fun htmlToImageBase64(html: String, querySelector: String = "body"): String {
