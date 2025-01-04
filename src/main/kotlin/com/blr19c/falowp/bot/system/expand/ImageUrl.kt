@@ -1,12 +1,13 @@
 package com.blr19c.falowp.bot.system.expand
 
-import com.blr19c.falowp.bot.system.web.commonUserAgent
-import com.blr19c.falowp.bot.system.web.longTimeoutWebclient
+import com.blr19c.falowp.bot.system.web.webclient
+import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -25,15 +26,9 @@ fun registerImageUrlToUrlFun(function: suspend (ImageUrl) -> String) {
 data class ImageUrl(
     val info: String
 ) {
-
-    private val bytesDelegate = lazy {
-        runBlocking {
-            if (isUrl()) longTimeoutWebclient()
-                .get(toUrl()) { header(HttpHeaders.UserAgent, commonUserAgent()) }
-                .readRawBytes()
-            else toBase64().decodeFromBase64String()
-        }
-    }
+    @Volatile
+    private var cachedBytes: ByteArray? = null
+    private val mutex = Mutex()
 
     private val summary by lazy {
         runBlocking {
@@ -53,9 +48,14 @@ data class ImageUrl(
         return toUrlFunction.invoke(this)
     }
 
-    suspend fun toBytes(): ByteArray {
-        return withContext(Dispatchers.IO) {
-            bytesDelegate.value
+    suspend fun toBytes(webclient: HttpClient = webclient()): ByteArray {
+        return cachedBytes ?: mutex.withLock {
+            cachedBytes ?: run {
+                val data = if (isUrl()) webclient.get(toUrl()).readRawBytes()
+                else toBase64(webclient).decodeFromBase64String()
+                cachedBytes = data
+                data
+            }
         }
     }
 
@@ -65,20 +65,20 @@ data class ImageUrl(
         }
     }
 
-    suspend fun toBase64(): String {
+    suspend fun toBase64(webclient: HttpClient = webclient()): String {
         return withContext(Dispatchers.IO) {
             if (!isUrl()) info
-            else toBytes().encodeToBase64String()
+            else toBytes(webclient).encodeToBase64String()
         }
     }
 
-    suspend fun toHtmlBase64(): String {
-        return "data:image/jpeg;base64,${toBase64()}"
+    suspend fun toHtmlBase64(webclient: HttpClient = webclient()): String {
+        return "data:image/jpeg;base64,${toBase64(webclient)}"
     }
 
-    suspend fun toBufferedImage(): BufferedImage {
+    suspend fun toBufferedImage(webclient: HttpClient = webclient()): BufferedImage {
         return withContext(Dispatchers.IO) {
-            ImageIO.read(ByteArrayInputStream(toBytes()))
+            ImageIO.read(ByteArrayInputStream(toBytes(webclient)))
         }
     }
 
