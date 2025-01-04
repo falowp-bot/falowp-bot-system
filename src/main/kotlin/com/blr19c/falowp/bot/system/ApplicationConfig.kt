@@ -4,8 +4,7 @@ import com.blr19c.falowp.bot.system.utils.ResourceUtils
 import com.blr19c.falowp.bot.system.utils.ScanUtils.configPath
 import com.blr19c.falowp.bot.system.utils.ScanUtils.pluginPath
 import io.ktor.server.config.*
-import io.ktor.server.config.yaml.YamlConfig
-import io.ktor.server.config.yaml.YamlConfigLoader
+import io.ktor.server.config.yaml.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.yamlkt.Yaml
@@ -57,8 +56,8 @@ private val configDefaultListValue: (String) -> List<String> = { throw IllegalAr
 
 
 internal class MergedApplicationConfig(
-    val first: ApplicationConfig,
-    val second: ApplicationConfig
+    private val first: ApplicationConfig,
+    private val second: ApplicationConfig
 ) : ApplicationConfig {
 
     private val firstKeys by lazy { first.keys() }
@@ -96,8 +95,8 @@ internal class MergedApplicationConfig(
 }
 
 internal class MergedApplicationConfigValue(
-    val first: ApplicationConfigValue,
-    val second: ApplicationConfigValue
+    private val first: ApplicationConfigValue,
+    private val second: ApplicationConfigValue
 ) : ApplicationConfigValue {
 
     override fun getString(): String {
