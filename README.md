@@ -11,12 +11,22 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:2.1.3")
+implementation("com.blr19c.falowp:falowp-bot-system:2.2.0")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 2.2.0(有内容不向下兼容)
+
+* 更新一些依赖版本
+* 重构`ImageUrl`
+* 支持接收`Video`
+* 优化`Webdriver`、`Json`、`Scheduling`、`MinIO`
+* 延长`longTimeoutWebclient`时间
+* 支持`Telegram`(电报机器人)
+* 优化启动方式
 
 ### 2.1.3
 
@@ -34,12 +44,12 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.1.3")
 
 * 发送消息预处理hook不再返回默认message
 * 接受消息添加适配器信息
-* 支持NapCatQQ所有扩展api
+* 支持`NapCatQQ`所有扩展api
 
 ### 2.1.0
 
 * 更新一些依赖版本
-* 支持NapCatQQ
+* 支持`NapCatQQ`
 * 所有插件注册器都支持取消注册
 * 支持更多消息类型
 * 更新默认的useragent
@@ -60,12 +70,12 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.1.3")
 * 支持撤回消息事件
 * 优化了截图分辨率和字体渲染
 * 配置文件由conf类型改为yaml
-* 修复WebClient可能出现死锁的问题
-* 修改BotApiSupport注册逻辑
+* 修复`WebClient`可能出现死锁的问题
+* 修改`BotApiSupport`注册逻辑
 
 ### 1.4.3
 
-* 优化了ImageUrl中获取摘要的逻辑
+* 优化了`ImageUrl`中获取摘要的逻辑
 * 更新一些依赖版本
 
 ### 1.4.2
@@ -77,19 +87,19 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.1.3")
 
 * 更新一些依赖版本
 * 精简了utils中内容
-* 优化了ImageUrl中获取摘要的逻辑
-* 使用github-workflows发布
+* 优化了`ImageUrl`中获取摘要的逻辑
+* 使用`github-workflows`发布
 
 ### 1.4.0(有内容不向下兼容)
 
 * 修复message队列引起的不能重复获取消息问题
-* 修复Webdriver没有逐级关闭导致残留chrome进程的问题
+* 修复`Webdriver`没有逐级关闭导致残留chrome进程的问题
 * 新增了在`BotApi.sendGroup`和`BotApi.sendPrivate`方法中指定接受人的参数
 * 移除了对`SchedulingBotApi.addReceive`的支持（改为BotApi使用指定接受人的方式发送）
 
 ### 1.3.1
 
-* 优化HookJoinPoint中BotApi的获取逻辑
+* 优化`HookJoinPoint`中`BotApi`的获取逻辑
 
 ### 1.3.0(有内容不向下兼容)
 
@@ -103,7 +113,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.1.3")
 
 ### 1.2.6
 
-* 修复(go-cqhttp下)群昵称为空字符时无法获取昵称的问题
+* 修复(`go-cqhttp`下)群昵称为空字符时无法获取昵称的问题
 * 更新一些依赖的版本
 
 ### 1.2.5
@@ -122,7 +132,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.1.3")
 
 * 优化启动配置
 * 翻译和文本验证判断空字符
-* go-cqhttp发送失败时重试2次
+* `go-cqhttp`发送失败时重试2次
 * 更新一些依赖版本
 
 ### 1.2.1
@@ -140,4 +150,4 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.1.3")
 
 ### 1.0.1
 
-* 支持gq-cqhttp和qqBot
+* 支持`gq-cqhttp`和`qqBot`
