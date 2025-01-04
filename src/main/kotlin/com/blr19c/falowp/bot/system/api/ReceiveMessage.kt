@@ -95,6 +95,10 @@ data class ReceiveMessage(
          */
         val image: List<ImageUrl>,
         /**
+         * 视频
+         */
+        val video: Video?,
+        /**
          * 分享
          */
         val share: List<Share>,
@@ -105,10 +109,28 @@ data class ReceiveMessage(
     ) {
         companion object {
             fun empty(): Content {
-                return Content("", null, emptyList(), emptyList(), emptyList()) { null }
+                return Content("", null, emptyList(), emptyList(), null, emptyList()) { null }
             }
         }
     }
+
+    /**
+     * 视频
+     */
+    data class Video(
+        /**
+         * 缩略图
+         */
+        val thumbnail: ImageUrl,
+        /**
+         * 视频地址
+         */
+        val src: URI,
+        /**
+         * 视频大小
+         */
+        val size: Long,
+    )
 
     /**
      * 分享内容
