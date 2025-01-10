@@ -11,12 +11,18 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:2.2.0")
+implementation("com.blr19c.falowp:falowp-bot-system:2.2.1")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 2.2.1
+
+* 更新一些依赖版本
+* 支持多数据源配置
+* 优化一些配置
 
 ### 2.2.0(有内容不向下兼容)
 
