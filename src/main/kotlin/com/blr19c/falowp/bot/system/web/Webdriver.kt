@@ -54,7 +54,10 @@ fun defaultLaunchOptions(): LaunchOptions {
     )
 }
 
-fun <T> commonBrowserContext(block: BrowserContext.() -> T): T {
+fun <T> commonWebdriverContext(browserContext: BrowserContext? = null, block: BrowserContext.() -> T): T {
+    if (browserContext != null) {
+        return browserContext.use { block(it) }
+    }
     return Playwright.create().use { playwright ->
         playwright.chromium().launch(defaultLaunchOptions()).use { browser ->
             browser.newContext(defaultNewContextOptions()).use { browserContext ->
@@ -64,21 +67,20 @@ fun <T> commonBrowserContext(block: BrowserContext.() -> T): T {
     }
 }
 
-fun <T> commonWebdriverContext(browserContext: BrowserContext? = null, block: BrowserContext.() -> T): T {
-    if (browserContext != null) {
-        return browserContext.use { block(it) }
+fun <T> commonWebdriverContextPage(page: Page? = null, block: Page.() -> T): T {
+    if (page != null) {
+        return page.use { block(it) }
     }
-    return commonBrowserContext { block(this) }
+    return commonWebdriverContext { this.newPage().use { page -> block(page) } }
 }
+
 
 suspend fun htmlToImageBase64(html: String, querySelector: String = "body"): String {
     return withContext(Dispatchers.IO) {
-        commonWebdriverContext {
-            this.newPage().use { page ->
-                page.setContent(html)
-                page.waitForLoadState(LoadState.NETWORKIDLE)
-                page.querySelector(querySelector).screenshot().encodeToBase64String()
-            }
+        commonWebdriverContextPage {
+            this.setContent(html)
+            this.waitForLoadState(LoadState.NETWORKIDLE)
+            this.querySelector(querySelector).screenshot().encodeToBase64String()
         }
     }
 }
