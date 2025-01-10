@@ -114,8 +114,11 @@ internal class MergedApplicationConfigValue(
 fun configProperty(
     key: String,
     defaultValue: (String) -> String = configDefaultValue
-) = configPropertyMap.computeIfAbsent(key) {
-    applicationConfig.propertyOrNull(key)?.getString() ?: defaultValue.invoke(key)
+): String {
+    val finalKey = key.takeIf { !it.endsWith(".") } ?: key.dropLast(1)
+    return configPropertyMap.computeIfAbsent(finalKey) {
+        applicationConfig.propertyOrNull(finalKey)?.getString() ?: defaultValue.invoke(finalKey)
+    }
 }
 
 
@@ -125,8 +128,28 @@ fun configProperty(
 fun configListProperty(
     key: String,
     defaultValue: (String) -> List<String> = configDefaultListValue
-) = configListPropertyMap.computeIfAbsent(key) {
-    applicationConfig.propertyOrNull(key)?.getList() ?: defaultValue.invoke(key)
+): List<String> {
+    val finalKey = key.takeIf { !it.endsWith(".") } ?: key.dropLast(1)
+    return configListPropertyMap.computeIfAbsent(finalKey) {
+        applicationConfig.propertyOrNull(finalKey)?.getList() ?: defaultValue.invoke(finalKey)
+    }
+}
+
+
+/**
+ * 读取application.conf配置文件
+ */
+fun configList(key: String): List<ApplicationConfig> {
+    val finalKey = key.takeIf { !it.endsWith(".") } ?: key.dropLast(1)
+    return applicationConfig.configList(finalKey)
+}
+
+/**
+ * 读取application.conf配置文件
+ */
+fun config(key: String): ApplicationConfig {
+    val finalKey = key.takeIf { !it.endsWith(".") } ?: key.dropLast(1)
+    return applicationConfig.config(finalKey)
 }
 
 
@@ -152,6 +175,20 @@ fun systemConfigListProperty(
 }
 
 /**
+ * 读取application.conf配置文件-添加系统的前缀
+ */
+fun systemConfig(key: String): ApplicationConfig {
+    return config("bot.system.".plus(key))
+}
+
+/**
+ * 读取application.conf配置文件-添加系统的前缀
+ */
+fun systemConfigList(key: String): List<ApplicationConfig> {
+    return configList("bot.system.".plus(key))
+}
+
+/**
  * 读取application.conf配置文件-添加适配器前缀
  */
 fun adapterConfigProperty(
@@ -172,6 +209,20 @@ fun adapterConfigListProperty(
 }
 
 /**
+ * 读取application.conf配置文件-添加适配器前缀
+ */
+fun adapterConfigList(key: String): List<ApplicationConfig> {
+    return configList("bot.adapter.".plus(key))
+}
+
+/**
+ * 读取application.conf配置文件-添加适配器前缀
+ */
+fun adapterConfig(key: String): ApplicationConfig {
+    return config("bot.adapter.".plus(key))
+}
+
+/**
  * 读取application.conf配置文件-添加当前插件的前缀
  */
 fun pluginConfigProperty(
@@ -189,6 +240,20 @@ fun pluginConfigListProperty(
     defaultValue: (String) -> List<String> = configDefaultListValue
 ): List<String> {
     return configListProperty(configPath().plus(key), defaultValue)
+}
+
+/**
+ * 读取application.conf配置文件-添加当前插件的前缀
+ */
+fun pluginConfig(key: String): ApplicationConfig {
+    return config(configPath().plus(key))
+}
+
+/**
+ * 读取application.conf配置文件-添加当前插件的前缀
+ */
+fun pluginConfigList(key: String): List<ApplicationConfig> {
+    return configList(configPath().plus(key))
 }
 
 /**
