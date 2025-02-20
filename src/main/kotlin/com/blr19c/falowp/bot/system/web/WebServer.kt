@@ -18,8 +18,9 @@ object WebServer : Log {
 
     fun configure() {
         val port = systemConfigProperty("web.port").toInt()
-        val server = embeddedServer(Netty, port = port, module = Application::module).start(wait = true)
+        val server = embeddedServer(Netty, port = port, module = Application::module)
         server.application.registerDynamicRoute(routes)
+        server.start(wait = true)
     }
 
     fun registerRoute(route: Route.() -> Unit) {
