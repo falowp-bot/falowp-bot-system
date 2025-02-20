@@ -18,14 +18,10 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.2")
 
 ## 更新日志
 
-* 更新一些依赖版本
-* 修复WebServer无法动态注入route的问题
-
 ### 2.2.2
 
 * 更新一些依赖版本
-* 支持多数据源配置
-* 优化一些配置
+* 修复WebServer无法动态注入route的问题
 
 ### 2.2.1
 
