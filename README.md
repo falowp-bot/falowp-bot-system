@@ -11,12 +11,21 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:2.2.1")
+implementation("com.blr19c.falowp:falowp-bot-system:2.2.2")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+* 更新一些依赖版本
+* 修复WebServer无法动态注入route的问题
+
+### 2.2.2
+
+* 更新一些依赖版本
+* 支持多数据源配置
+* 优化一些配置
 
 ### 2.2.1
 
