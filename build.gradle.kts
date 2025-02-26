@@ -7,17 +7,17 @@ val guavaVersion: String by project
 val playwrightVersion: String by project
 val animatedGifVersion: String by project
 val jetbrainsAnnotationsVersion: String by project
-val jvmVersion: String = "2.1.20-Beta2"
+val jvmVersion: String = "2.1.20-RC"
 
 plugins {
-    kotlin("jvm") version "2.1.20-Beta2"
+    kotlin("jvm") version "2.1.20-RC"
     id("com.github.ben-manes.versions") version "0.52.0"
     id("maven-publish")
     id("signing")
 }
 
 group = "com.blr19c.falowp"
-version = "2.2.2"
+version = "2.2.2-fix1"
 
 kotlin {
     jvmToolchain(21)
