@@ -11,12 +11,18 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:2.2.2")
+implementation("com.blr19c.falowp:falowp-bot-system:2.2.3")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 2.2.3
+
+* 更新一些依赖版本
+* 优化WebServer启动流程
+* 更新扫描包逻辑支持空格
 
 ### 2.2.2
 
