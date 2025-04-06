@@ -1,5 +1,6 @@
 package com.blr19c.falowp.bot.system.utils
 
+import com.blr19c.falowp.bot.system.expand.urlDecoder
 import com.blr19c.falowp.bot.system.systemConfigListProperty
 import com.blr19c.falowp.bot.system.utils.ClassUtils.convertClassNameToResourcePath
 import com.blr19c.falowp.bot.system.utils.ClassUtils.convertResourcePathToClassName
@@ -58,9 +59,9 @@ object ScanUtils {
 
     private fun scanDirectoryOrJar(url: URL, packageName: String): List<Class<*>> {
         if (!ResourceUtils.isJarURL(url)) {
-            return scanDirectory(File(url.toURI()), packageName)
+            return scanDirectory(File(url.toURI().toASCIIString().urlDecoder()), packageName)
         }
-        return JarFile(ResourceUtils.extractArchiveURL(url).file).use { jarFile ->
+        return JarFile(ResourceUtils.extractArchiveURL(url).toURI().toASCIIString().urlDecoder()).use { jarFile ->
             jarFile.entries()
                 .asSequence()
                 .filter { it.name.endsWith(ClassUtils.CLASS_FILE_SUFFIX) }
@@ -87,7 +88,7 @@ object ScanUtils {
     private fun forName(className: String): Class<*>? {
         return try {
             Class.forName(className, false, this.javaClass.classLoader)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
