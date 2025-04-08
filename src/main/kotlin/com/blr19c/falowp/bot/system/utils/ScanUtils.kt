@@ -10,6 +10,7 @@ import java.util.jar.JarFile
 import kotlin.reflect.KClass
 import kotlin.streams.asSequence
 
+
 /**
  * 扫描包
  */
@@ -59,9 +60,9 @@ object ScanUtils {
 
     private fun scanDirectoryOrJar(url: URL, packageName: String): List<Class<*>> {
         if (!ResourceUtils.isJarURL(url)) {
-            return scanDirectory(File(url.toURI().toASCIIString().urlDecoder()), packageName)
+            return scanDirectory(File(ResourceUtils.extractArchiveURL(url).path.urlDecoder()), packageName)
         }
-        return JarFile(ResourceUtils.extractArchiveURL(url).toURI().toASCIIString().urlDecoder()).use { jarFile ->
+        return JarFile(File(ResourceUtils.extractArchiveURL(url).path.urlDecoder())).use { jarFile ->
             jarFile.entries()
                 .asSequence()
                 .filter { it.name.endsWith(ClassUtils.CLASS_FILE_SUFFIX) }
