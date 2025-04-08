@@ -24,10 +24,14 @@ object AdapterApplication : Log {
     suspend fun configure() = coroutineScope {
         log().info("初始化协议适配")
         val botAdapterRegister = BotAdapterRegister(loadAdapter)
-        systemConfigListProperty("adapterPackage")
-            .map(ScanUtils::scanPackage)
+        val list = systemConfigListProperty("adapterPackage") { emptyList() }
+        list.map(ScanUtils::scanPackage)
             .flatMap { it.stream().asSequence() }
             .forEach { launch { initAdapter(it, botAdapterRegister) } }
+        if (list.isEmpty()) {
+            log().info("初始化协议适配-没有加载任何协议适配")
+            load = true
+        }
         log().info("初始化协议适配完成")
     }
 
