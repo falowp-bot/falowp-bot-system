@@ -11,6 +11,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.net.URI
 import javax.imageio.ImageIO
 
@@ -40,6 +41,10 @@ data class ImageUrl(
         return info.matches(Regex("https?://.+"))
     }
 
+    fun isFile(): Boolean {
+        return info.matches(Regex("file://.+"))
+    }
+
     suspend fun toUrl(): String {
         if (isUrl()) return info
         if (!::toUrlFunction.isInitialized) {
@@ -52,6 +57,7 @@ data class ImageUrl(
         return cachedBytes ?: mutex.withLock {
             cachedBytes ?: run {
                 val data = if (isUrl()) webclient.get(toUrl()).readRawBytes()
+                else if (isFile()) File(URI(info)).readBytes()
                 else toBase64(webclient).decodeFromBase64String()
                 cachedBytes = data
                 data
@@ -67,8 +73,8 @@ data class ImageUrl(
 
     suspend fun toBase64(webclient: HttpClient = webclient()): String {
         return withContext(Dispatchers.IO) {
-            if (!isUrl()) info
-            else toBytes(webclient).encodeToBase64String()
+            if (isUrl() || isFile()) toBytes(webclient).encodeToBase64String()
+            else info
         }
     }
 
@@ -82,6 +88,11 @@ data class ImageUrl(
         }
     }
 
+    suspend fun toFile(file: File, webclient: HttpClient = webclient()): File {
+        file.writeBytes(toBytes(webclient))
+        return file
+    }
+
     companion object {
         fun empty(): ImageUrl {
             return ImageUrl("")
@@ -89,6 +100,6 @@ data class ImageUrl(
     }
 }
 
-
+fun File.toImageUrl(): ImageUrl = ImageUrl(this.toURI().toString())
 fun ByteArray.toImageUrl(): ImageUrl = ImageUrl(this.encodeToBase64String())
 fun URI.toImageUrl(): ImageUrl = ImageUrl(this.toString())
