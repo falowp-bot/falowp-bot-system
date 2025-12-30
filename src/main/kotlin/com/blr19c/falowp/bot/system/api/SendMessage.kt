@@ -7,6 +7,7 @@ import java.util.*
 /**
  * 可以作为发送的消息
  */
+@Suppress("UNUSED")
 interface SendMessage {
 
     companion object {

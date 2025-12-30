@@ -10,6 +10,7 @@ import kotlin.time.toJavaDuration
 /**
  * 缓存
  */
+@Suppress("UNUSED")
 class CacheReference<T>(
     duration: Duration,
     private val block: suspend () -> T,

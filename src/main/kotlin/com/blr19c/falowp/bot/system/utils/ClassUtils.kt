@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * util来源于spring
  */
-@Suppress("MemberVisibilityCanBePrivate", "UNUSED")
+@Suppress("UNUSED")
 object ClassUtils {
     /**
      * Suffix for array class names: `"[]"`.
@@ -187,13 +187,13 @@ object ClassUtils {
         get() {
             var cl: ClassLoader? = null
             try {
-                cl = Thread.currentThread().getContextClassLoader()
+                cl = Thread.currentThread().contextClassLoader
             } catch (ex: Throwable) {
                 // Cannot access thread context ClassLoader - falling back...
             }
             if (cl == null) {
                 // No thread context class loader -> use class loader of this class.
-                cl = ClassUtils::class.java.getClassLoader()
+                cl = ClassUtils::class.java.classLoader
                 if (cl == null) {
                     // getClassLoader() returning null indicates the bootstrap ClassLoader
                     try {
@@ -217,9 +217,9 @@ object ClassUtils {
 
     fun overrideThreadContextClassLoader(classLoaderToUse: ClassLoader?): ClassLoader? {
         val currentThread = Thread.currentThread()
-        val threadContextClassLoader = currentThread.getContextClassLoader()
+        val threadContextClassLoader = currentThread.contextClassLoader
         return if (classLoaderToUse != null && classLoaderToUse != threadContextClassLoader) {
-            currentThread.setContextClassLoader(classLoaderToUse)
+            currentThread.contextClassLoader = classLoaderToUse
             threadContextClassLoader
         } else {
             null
@@ -365,7 +365,7 @@ object ClassUtils {
             return true
         }
         try {
-            if (clazz.getClassLoader() === classLoader) {
+            if (clazz.classLoader === classLoader) {
                 return true
             }
         } catch (ex: SecurityException) {
@@ -386,7 +386,7 @@ object ClassUtils {
      */
     fun isCacheSafe(clazz: Class<*>, classLoader: ClassLoader?): Boolean {
         try {
-            var target = clazz.getClassLoader()
+            var target = clazz.classLoader
             // Common cases
             if (target === classLoader || target == null) {
                 return true
@@ -397,14 +397,14 @@ object ClassUtils {
             // Check for match in ancestors -> positive
             var current = classLoader
             while (current != null) {
-                current = current.getParent()
+                current = current.parent
                 if (current === target) {
                     return true
                 }
             }
             // Check for match in children -> negative
             while (target != null) {
-                target = target.getParent()
+                target = target.parent
                 if (target === classLoader) {
                     return false
                 }
@@ -783,7 +783,7 @@ object ClassUtils {
             if (ancestor == null || Any::class.java == ancestor) {
                 return null
             }
-        } while (!ancestor!!.isAssignableFrom(clazz2))
+        } while (!ancestor.isAssignableFrom(clazz2))
         return ancestor
     }
 
@@ -1107,7 +1107,7 @@ object ClassUtils {
      */
     fun getMethodCountForName(clazz: Class<*>, methodName: String): Int {
         var count = 0
-        val declaredMethods = clazz.getDeclaredMethods()
+        val declaredMethods = clazz.declaredMethods
         for (method in declaredMethods) {
             if (methodName == method.name) {
                 count++
@@ -1133,7 +1133,7 @@ object ClassUtils {
      * @return whether there is at least one method with the given name
      */
     fun hasAtLeastOneMethodWithName(clazz: Class<*>, methodName: String): Boolean {
-        val declaredMethods = clazz.getDeclaredMethods()
+        val declaredMethods = clazz.declaredMethods
         for (method in declaredMethods) {
             if (method.name == methodName) {
                 return true
@@ -1248,7 +1248,7 @@ object ClassUtils {
 
     private fun findMethodCandidatesByName(clazz: Class<*>, methodName: String): Set<Method> {
         val candidates: MutableSet<Method> = HashSet(1)
-        val methods = clazz.getMethods()
+        val methods = clazz.methods
         for (method in methods) {
             if (methodName == method.name) {
                 candidates.add(method)

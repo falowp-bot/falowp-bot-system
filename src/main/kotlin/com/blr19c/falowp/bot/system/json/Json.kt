@@ -1,14 +1,15 @@
 package com.blr19c.falowp.bot.system.json
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.TreeNode
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import io.ktor.http.*
+import tools.jackson.core.JsonParser
+import tools.jackson.core.TreeNode
+import tools.jackson.core.type.TypeReference
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.databind.module.SimpleModule
+import tools.jackson.module.kotlin.KotlinModule
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.time.LocalDateTime
@@ -18,14 +19,15 @@ import java.util.*
 /**
  * json序列化
  */
+@Suppress("UNUSED")
 object Json {
     private val json: ObjectMapper by lazy {
         val module = SimpleModule()
         module.addDeserializer(LocalDateTime::class.java, LocalDateTimeDeserializer)
-        ObjectMapper()
-            .registerModules(JavaTimeModule(), module)
-            .registerKotlinModule()
+        JsonMapper.builder()
+            .addModule(KotlinModule.Builder().build())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .build()
     }
 
     fun objectMapper(): ObjectMapper {
@@ -84,4 +86,28 @@ object Json {
     fun toJsonString(data: Any): String {
         return objectMapper().writeValueAsString(data)
     }
+}
+
+fun io.ktor.client.plugins.contentnegotiation.ContentNegotiationConfig.jackson3(
+    contentType: ContentType = ContentType.Application.Json,
+    block: ObjectMapper.() -> Unit = {}
+) {
+    val mapper = JsonMapper.builder()
+        .addModule(KotlinModule.Builder().build())
+        .build()
+        .apply(block)
+
+    register(contentType, Jackson3Converter(mapper))
+}
+
+fun io.ktor.server.plugins.contentnegotiation.ContentNegotiationConfig.jackson3(
+    contentType: ContentType = ContentType.Application.Json,
+    block: ObjectMapper.() -> Unit = {}
+) {
+    val mapper = JsonMapper.builder()
+        .addModule(KotlinModule.Builder().build())
+        .build()
+        .apply(block)
+
+    register(contentType, Jackson3Converter(mapper))
 }

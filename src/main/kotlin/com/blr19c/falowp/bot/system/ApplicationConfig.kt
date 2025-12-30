@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED")
+
 package com.blr19c.falowp.bot.system
 
 import com.blr19c.falowp.bot.system.utils.ResourceUtils
@@ -5,6 +7,7 @@ import com.blr19c.falowp.bot.system.utils.ScanUtils.configPath
 import com.blr19c.falowp.bot.system.utils.ScanUtils.pluginPath
 import io.ktor.server.config.*
 import io.ktor.server.config.yaml.*
+import io.ktor.util.reflect.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.mamoe.yamlkt.Yaml
@@ -35,7 +38,7 @@ private fun loadYaml(inputStream: InputStream): ApplicationConfig {
     val yaml = yamlElement as? YamlMap ?: throw IllegalArgumentException("配置应该是yaml字典")
     val constructor = YamlConfig::class.primaryConstructor!!
     constructor.isAccessible = true
-    return constructor.call(yaml).apply { checkEnvironmentVariables() }
+    return constructor.call(yaml)
 }
 
 private val applicationConfig by lazy {
@@ -69,7 +72,11 @@ internal class MergedApplicationConfig(
 
     override fun propertyOrNull(path: String): ApplicationConfigValue? {
         if (firstKeys.contains(path) && secondKeys.contains(path)) {
-            return MergedApplicationConfigValue(first.property(path), second.property(path))
+            return MergedApplicationConfigValue(
+                first.property(path),
+                second.property(path),
+                ApplicationConfigValue.Type.OBJECT
+            )
         }
         return when {
             firstKeys.contains(path) -> first.property(path)
@@ -96,7 +103,8 @@ internal class MergedApplicationConfig(
 
 internal class MergedApplicationConfigValue(
     private val first: ApplicationConfigValue,
-    private val second: ApplicationConfigValue
+    private val second: ApplicationConfigValue,
+    override val type: ApplicationConfigValue.Type
 ) : ApplicationConfigValue {
 
     override fun getString(): String {
@@ -105,6 +113,14 @@ internal class MergedApplicationConfigValue(
 
     override fun getList(): List<String> {
         return (first.getList() + second.getList()).distinct()
+    }
+
+    override fun getMap(): Map<String, Any?> {
+        return first.getMap() + second.getMap()
+    }
+
+    override fun getAs(type: TypeInfo): Any? {
+        throw IllegalStateException("It is not supported to parse according to TypeInfo")
     }
 }
 
@@ -268,7 +284,7 @@ suspend fun readResource(path: String): ByteArray {
  */
 suspend fun <R> readResource(path: String, block: (InputStream) -> R): R {
     return withContext(Dispatchers.IO) {
-        (Thread.currentThread().getContextClassLoader().getResourceAsStream(path)
+        (Thread.currentThread().contextClassLoader.getResourceAsStream(path)
             ?: throw IllegalStateException("资源${path}不存在"))
             .use { block.invoke(it) }
     }

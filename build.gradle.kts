@@ -7,20 +7,20 @@ val guavaVersion: String by project
 val playwrightVersion: String by project
 val animatedGifVersion: String by project
 val jetbrainsAnnotationsVersion: String by project
-val jvmVersion: String = "2.1.20"
+val jvmVersion: String = "2.3.0"
 
 plugins {
-    kotlin("jvm") version "2.1.20"
-    id("com.github.ben-manes.versions") version "0.52.0"
+    kotlin("jvm") version "2.3.0"
+    id("com.github.ben-manes.versions") version "0.53.0"
     id("maven-publish")
     id("signing")
 }
 
 group = "com.blr19c.falowp"
-version = "2.2.5-pre1"
+version = "2.3.0"
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(25)
 }
 
 repositories {
@@ -33,40 +33,31 @@ dependencies {
 
     // Ktor server
     api("io.ktor:ktor-server-core-jvm:$ktorVersion")
+    api("io.ktor:ktor-server-cio-jvm:${ktorVersion}")
+    api("io.ktor:ktor-server-websockets-jvm:${ktorVersion}")
     api("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
-    api("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
-    api("io.ktor:ktor-server-websockets-jvm:$ktorVersion")
-    api("io.ktor:ktor-server-netty-jvm:$ktorVersion")
     api("io.ktor:ktor-server-auth-jvm:$ktorVersion")
     api("io.ktor:ktor-server-config-yaml-jvm:$ktorVersion")
 
     // Ktor client
-    api("io.ktor:ktor-client-websockets-jvm:$ktorVersion")
     api("io.ktor:ktor-client-core-jvm:$ktorVersion")
-    api("io.ktor:ktor-client-cio-jvm:$ktorVersion")
+    api("io.ktor:ktor-client-cio-jvm:${ktorVersion}")
+    api("io.ktor:ktor-client-websockets-jvm:${ktorVersion}")
     api("io.ktor:ktor-client-encoding-jvm:$ktorVersion")
-    api("io.ktor:ktor-client-json-jvm:$ktorVersion")
     api("io.ktor:ktor-client-content-negotiation-jvm:$ktorVersion")
-    api("io.ktor:ktor-client-serialization-jvm:$ktorVersion")
     api("io.ktor:ktor-client-logging-jvm:$ktorVersion")
-    api("io.ktor:ktor-serialization-jackson:$ktorVersion")
-    api("ch.qos.logback:logback-classic:$logbackVersion")
 
+    api("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.7.1")
+    //logback
+    api("ch.qos.logback:logback-classic:$logbackVersion")
     //jackson
-    api("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+    api("tools.jackson.module:jackson-module-kotlin:$jacksonVersion")
     //guava
     api("com.google.guava:guava:$guavaVersion")
     //html处理
     api("org.jsoup:jsoup:$jsoupVersion")
-
     //浏览器
     api("com.microsoft.playwright:playwright:$playwrightVersion")
-    //gif处理
-    api("com.madgag:animated-gif-lib:$animatedGifVersion") {
-        exclude("junit", "junit")
-        exclude("org.easytesting", "fest-assert-core")
-    }
 }
 
 configurations.all {
@@ -74,10 +65,6 @@ configurations.all {
         force("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
         force("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinxCoroutinesVersion")
         force("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:$kotlinxCoroutinesVersion")
-        force("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
-        force("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
-        force("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-        force("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
         force("org.jetbrains:annotations:$jetbrainsAnnotationsVersion")
         force("com.google.guava:guava:$guavaVersion")
         force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$jvmVersion")

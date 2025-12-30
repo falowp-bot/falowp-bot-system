@@ -14,6 +14,7 @@ import kotlin.streams.asSequence
 /**
  * 对于不同的api适配
  */
+@Suppress("UNUSED")
 object AdapterApplication : Log {
 
     private lateinit var load: Any

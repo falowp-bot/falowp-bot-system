@@ -3,6 +3,7 @@ package com.blr19c.falowp.bot.system.api
 /**
  * 权限
  */
+@Suppress("UNUSED")
 enum class ApiAuth(val code: Int) {
 
     /**

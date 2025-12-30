@@ -3,9 +3,9 @@
 ![maven](https://img.shields.io/badge/go--cqhttp-1.2.0-red)
 ![maven](https://img.shields.io/badge/qq-bot-red)
 
-# 小花落Bot
+# 小花落 Bot
 
-> 此项目基于qqBot和go-cqhttp开发的机器人框架
+> 此项目基于QQBot和go-cqhttp开发的机器人框架
 
 ## 当前最新版本
 
@@ -18,23 +18,32 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 
 ## 更新日志
 
+### 2.3.0
+
+* 更新一些依赖版本
+* java21 -> java25
+* jackson2 -> jackson3
+* 移除了对图片的增强工具 `BufferedImage.kt`
+* 移除了`gson`全面使用`jackson3`
+* 移除了`netty`全面使用`CIO`
+
 ### 2.2.4
 
 * 更新一些依赖版本
-* 更新默认的useragent
+* 更新默认的`useragent`
 * 优化适配器加载流程
 * 优化扫描包
 
 ### 2.2.3
 
 * 更新一些依赖版本
-* 优化WebServer启动流程
+* 优化 WebServer 启动流程
 * 更新扫描包逻辑支持空格
 
 ### 2.2.2
 
 * 更新一些依赖版本
-* 修复WebServer无法动态注入route的问题
+* 修复 WebServer 无法动态注入`route`的问题
 
 ### 2.2.1
 
@@ -55,20 +64,20 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 ### 2.1.3
 
 * 优化帮助事件
-* cache委托新增追加方法
+* `cache`委托新增追加方法
 
 ### 2.1.2
 
 * 更新一些依赖版本
 * 优化事件
 * 优化插件注册器返回内容
-* 优化cache委托
+* 优化`cache`委托
 
 ### 2.1.1
 
-* 发送消息预处理hook不再返回默认message
+* 发送消息预处理`hook`不再返回默认`message`
 * 接受消息添加适配器信息
-* 支持`NapCatQQ`所有扩展api
+* 支持`NapCatQQ`所有扩展`api`
 
 ### 2.1.0
 
@@ -76,7 +85,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 * 支持`NapCatQQ`
 * 所有插件注册器都支持取消注册
 * 支持更多消息类型
-* 更新默认的useragent
+* 更新默认的`useragent`
 
 ### 2.0.0
 
@@ -93,7 +102,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 * 支持进退群事件
 * 支持撤回消息事件
 * 优化了截图分辨率和字体渲染
-* 配置文件由conf类型改为yaml
+* 配置文件由`conf`类型改为`yaml`
 * 修复`WebClient`可能出现死锁的问题
 * 修改`BotApiSupport`注册逻辑
 
@@ -110,14 +119,14 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 ### 1.4.1
 
 * 更新一些依赖版本
-* 精简了utils中内容
+* 精简了`utils`中内容
 * 优化了`ImageUrl`中获取摘要的逻辑
 * 使用`github-workflows`发布
 
 ### 1.4.0(有内容不向下兼容)
 
-* 修复message队列引起的不能重复获取消息问题
-* 修复`Webdriver`没有逐级关闭导致残留chrome进程的问题
+* 修复 message 队列引起的不能重复获取消息问题
+* 修复`Webdriver`没有逐级关闭导致残留 chrome 进程的问题
 * 新增了在`BotApi.sendGroup`和`BotApi.sendPrivate`方法中指定接受人的参数
 * 移除了对`SchedulingBotApi.addReceive`的支持（改为BotApi使用指定接受人的方式发送）
 
@@ -132,7 +141,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 * 发送消息使用链式处理(自定义消息顺序) 注意: 链式消息取代了之前的消息并且不向下兼容
 * 将之前的image扩展移动至了expand扩展,并新增了一些扩展(不兼容原路径)
 * 更新一些依赖
-* 更新默认的useragent
+* 更新默认的`useragent`
 * 更新一些描述
 
 ### 1.2.6
@@ -146,7 +155,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 
 ### 1.2.4
 
-* 修复`帮助功能`tag中没有需要展示的内容时会存在一个空tag的问题
+* 修复`帮助功能`的`tag`中没有需要展示的内容时会存在一个空`tag`的问题
 
 ### 1.2.3
 
@@ -165,8 +174,8 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 
 ### 1.2.0
 
-* hook增加等待消息
-* 新增一些系统内置hook
+* `hook`增加等待消息
+* 新增一些系统内置`hook`
 
 ### 1.1.0
 

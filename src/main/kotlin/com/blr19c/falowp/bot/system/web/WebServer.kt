@@ -1,12 +1,12 @@
 package com.blr19c.falowp.bot.system.web
 
 import com.blr19c.falowp.bot.system.Log
+import com.blr19c.falowp.bot.system.json.jackson3
 import com.blr19c.falowp.bot.system.systemConfigProperty
-import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.cio.*
 import io.ktor.server.engine.*
-import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -18,7 +18,7 @@ object WebServer : Log {
 
     fun configure() {
         val port = systemConfigProperty("web.port").toInt()
-        val server = embeddedServer(Netty, port = port) {
+        val server = embeddedServer(CIO, port = port) {
             module()
             registerDynamicRoute(routes)
         }
@@ -44,7 +44,7 @@ private fun Application.module() {
         }
     }
     install(ContentNegotiation) {
-        jackson { }
+        jackson3 {}
     }
     routing {
         get("/ping") {

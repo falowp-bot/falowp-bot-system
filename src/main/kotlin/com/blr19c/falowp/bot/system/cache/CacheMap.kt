@@ -10,6 +10,7 @@ import kotlin.time.toJavaDuration
 /**
  * 缓存
  */
+@Suppress("UNUSED")
 class CacheMap<K : Any, V : Any>(
     duration: Duration,
     private val block: suspend (K) -> V,

@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.LongAdder
  * Channel形式的Queue
  * 新增了计数(非精确)
  */
+@Suppress("UNUSED")
 class ChannelQueue<E>(capacity: Int = Channel.UNLIMITED) {
     private val channel = Channel<E>(capacity)
     private val count = LongAdder()

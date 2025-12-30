@@ -20,6 +20,7 @@ annotation class PluginUtils
 /**
  * 插件
  */
+@Suppress("UNUSED")
 annotation class Plugin(
     /**
      * 插件名称

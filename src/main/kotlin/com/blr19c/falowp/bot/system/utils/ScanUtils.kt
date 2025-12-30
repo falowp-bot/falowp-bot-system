@@ -69,8 +69,7 @@ object ScanUtils {
                 .map { convertResourcePathToClassName(it.name) }
                 .map { it.substring(0, it.indexOf(ClassUtils.CLASS_FILE_SUFFIX)) }
                 .filter { it.startsWith(packageName) }
-                .map { forName(it) }
-                .filterNotNull()
+                .mapNotNull { forName(it) }
                 .toList()
         }
     }

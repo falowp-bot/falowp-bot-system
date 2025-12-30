@@ -19,6 +19,7 @@ interface BotAdapterInterface {
 /**
  * 协议适配器注册
  */
+@Suppress("UNUSED")
 class BotAdapterRegister(private val registerList: MutableList<BotAdapterInterface>) {
 
     fun finish(botAdapterInterface: BotAdapterInterface) {

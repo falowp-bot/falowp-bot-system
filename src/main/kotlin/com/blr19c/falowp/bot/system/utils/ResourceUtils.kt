@@ -2,13 +2,15 @@ package com.blr19c.falowp.bot.system.utils
 
 import java.io.File
 import java.io.InputStream
-import java.net.*
+import java.net.MalformedURLException
+import java.net.URI
+import java.net.URL
 import java.util.jar.JarFile
 
 /**
  * util来源于spring
  */
-@Suppress("MemberVisibilityCanBePrivate", "UNUSED", "SpellCheckingInspection")
+@Suppress("UNUSED", "SpellCheckingInspection")
 object ResourceUtils {
     /**
      * Pseudo URL prefix for loading from the class path: "classpath:".

@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory
 /**
  * 启动
  */
+@Suppress("UNUSED")
 fun start() = runBlocking {
     try {
         Resources.configure()

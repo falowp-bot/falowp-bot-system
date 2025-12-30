@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED")
+
 package com.blr19c.falowp.bot.system.web
 
 import com.blr19c.falowp.bot.system.Log

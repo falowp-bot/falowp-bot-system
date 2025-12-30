@@ -1,10 +1,11 @@
+@file:Suppress("UNUSED")
+
 package com.blr19c.falowp.bot.system.web
 
 import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.json.Json
+import com.blr19c.falowp.bot.system.json.jackson3
 import com.blr19c.falowp.bot.system.readResource
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ArrayNode
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
@@ -14,8 +15,9 @@ import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.serialization.jackson.*
 import kotlinx.coroutines.runBlocking
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.ArrayNode
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets.UTF_8
@@ -38,7 +40,7 @@ private val client by lazy(LazyThreadSafetyMode.PUBLICATION) {
         }
         install(WebSockets)
         install(ContentNegotiation) {
-            jackson()
+            jackson3 {}
         }
         install(HttpTimeout) {
             requestTimeoutMillis = 5000

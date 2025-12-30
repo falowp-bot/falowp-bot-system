@@ -133,7 +133,7 @@ internal abstract class CronField protected constructor(private val type: Type) 
                 if (range.isValidIntValue(goal.toLong())) {
                     cast(temporal.with(field, goal.toLong()))
                 } else {
-                    // goal is invalid, eg. 29th Feb, so roll forward
+                    // goal is invalid, e.g. 29th Feb, so roll forward
                     val amount = range.maximum - current + 1
                     field.baseUnit.addTo(temporal, amount)
                 }
