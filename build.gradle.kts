@@ -152,6 +152,14 @@ publishing {
 signing {
     if (System.getenv("GPG_PRIVATE_KEY") != null) {
         useInMemoryPgpKeys(System.getenv("GPG_PRIVATE_KEY"), System.getenv("GPG_PASSPHRASE"))
+    } else {
+        //如果本地gpg采用homebrew安装 需要手动指定位置
+        //signing.gnupg.executable=/opt/homebrew/bin/gpg
+        //如果本地gpg出现无法输入密码问题 请尝试
+        //brew install pinentry-mac
+        //echo "pinentry-program /opt/homebrew/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+        //gpgconf --kill gpg-agent
+        useGpgCmd()
     }
     sign(publishing.publications)
 }
