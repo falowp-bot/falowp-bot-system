@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package com.blr19c.falowp.bot.system.plugin.event
 
 import com.blr19c.falowp.bot.system.api.*
