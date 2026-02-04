@@ -12,7 +12,7 @@ val jvmVersion: String = "2.3.0"
 plugins {
     kotlin("jvm") version "2.3.0"
     id("com.github.ben-manes.versions") version "0.53.0"
-    id("maven-publish")
+    id("com.vanniktech.maven.publish") version "0.36.0"
     id("signing")
 }
 
@@ -88,63 +88,40 @@ artifacts {
     add("archives", tasks.named<Jar>("sourcesJar"))
 }
 
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+    coordinates(
+        groupId = project.group.toString(),
+        artifactId = "falowp-bot-system",
+        version = project.version.toString()
+    )
+    pom {
+        name.set("${project.group}:falowp-bot-system")
+        description.set("FalowpBot system infrastructure")
+        url.set("https://github.com/falowp-bot")
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            groupId = project.group.toString()
-            artifactId = "falowp-bot-system"
-            version = project.version.toString()
+        scm {
+            url.set("https://github.com/falowp-bot")
+            connection.set("scm:git:https://github.com/falowp-bot.git")
+            developerConnection.set("scm:git:ssh://git@github.com/falowp-bot.git")
+        }
 
-            artifact(tasks.getByName<Jar>("javadocJar")) {
-                classifier = "javadoc"
-            }
-            artifact(tasks.getByName<Jar>("sourcesJar")) {
-                classifier = "sources"
-            }
-
-            pom {
-                name.set("${project.group}:falowp-bot-system")
-                description.set("FalowpBot system infrastructure")
-                packaging = "jar"
-                url.set("https://github.com/falowp-bot")
-
-                scm {
-                    url.set("https://github.com/falowp-bot")
-                    connection.set("https://github.com/falowp-bot")
-                    developerConnection.set("https://github.com/falowp-bot")
-                }
-
-                licenses {
-                    license {
-                        name.set("Apache-2.0 license")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-
-                developers {
-                    developer {
-                        id.set("falowp")
-                        name.set("falowp")
-                        organization {
-                            name = "falowp"
-                            url = "https://falowp.blr19c.com"
-                        }
-                        timezone.set("+8")
-                        roles.add("owner")
-                    }
-                }
+        licenses {
+            license {
+                name.set("Apache-2.0 license")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
-    }
 
-    repositories {
-        maven {
-            url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
-            credentials {
-                username = project.findProperty("CENTRAL_TOKEN_USERNAME")?.toString() ?: System.getenv("CENTRAL_TOKEN_USERNAME")
-                password = project.findProperty("CENTRAL_TOKEN_PASSWORD")?.toString() ?: System.getenv("CENTRAL_TOKEN_PASSWORD")
+        developers {
+            developer {
+                id.set("falowp")
+                name.set("falowp")
+                organization.set("falowp")
+                organizationUrl.set("https://falowp.blr19c.com")
+                timezone.set("+8")
+                roles.set(listOf("owner"))
             }
         }
     }
