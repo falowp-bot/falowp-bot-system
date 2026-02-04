@@ -128,8 +128,11 @@ mavenPublishing {
 }
 
 signing {
-    if (System.getenv("GPG_PRIVATE_KEY") != null) {
-        useInMemoryPgpKeys(System.getenv("GPG_PRIVATE_KEY"), System.getenv("GPG_PASSPHRASE"))
+    if (System.getenv("signingInMemoryKey") != null) {
+        useInMemoryPgpKeys(
+            System.getenv("signingInMemoryKey"),
+            System.getenv("signingInMemoryKeyPassword")
+        )
     } else {
         //如果本地gpg采用homebrew安装 需要手动指定位置
         //signing.gnupg.executable=/opt/homebrew/bin/gpg
