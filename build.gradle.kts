@@ -141,10 +141,10 @@ publishing {
 
     repositories {
         maven {
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
             credentials {
-                username = project.findProperty("s01SonatypeUserName")?.toString() ?: System.getenv("MAVEN_USERNAME")
-                password = project.findProperty("s01SonatypePassword")?.toString() ?: System.getenv("MAVEN_PASSWORD")
+                username = project.findProperty("CENTRAL_TOKEN_USERNAME")?.toString() ?: System.getenv("CENTRAL_TOKEN_USERNAME")
+                password = project.findProperty("CENTRAL_TOKEN_PASSWORD")?.toString() ?: System.getenv("CENTRAL_TOKEN_PASSWORD")
             }
         }
     }
