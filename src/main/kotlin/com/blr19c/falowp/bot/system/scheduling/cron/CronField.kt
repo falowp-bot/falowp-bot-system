@@ -73,7 +73,7 @@ internal abstract class CronField protected constructor(private val type: Type) 
             ChronoField.NANO_OF_SECOND
         );
 
-        private val lowerOrders: Array<ChronoField> = arrayOf(* lowerOrders)
+        private val lowerOrders: Array<ChronoField> = arrayOf(*lowerOrders)
 
         /**
          * Return the value of this type for the given temporal.

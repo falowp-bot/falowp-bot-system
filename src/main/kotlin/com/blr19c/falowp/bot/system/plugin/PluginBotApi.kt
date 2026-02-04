@@ -1,6 +1,7 @@
 package com.blr19c.falowp.bot.system.plugin
 
 import com.blr19c.falowp.bot.system.api.BotApi
+import com.blr19c.falowp.bot.system.api.BotSelf
 import com.blr19c.falowp.bot.system.api.SendMessage
 import com.blr19c.falowp.bot.system.api.SendMessageChain
 import com.blr19c.falowp.bot.system.listener.events.SendMessageEvent
@@ -69,7 +70,11 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
         }
     }
 
-    private fun publishSendMessageEvent(
+    override suspend fun self(): BotSelf {
+        return delegateBotApi.self()
+    }
+
+    private suspend fun publishSendMessageEvent(
         vararg sendMessageChain: SendMessageChain,
         reference: Boolean,
         forward: Boolean

@@ -1,8 +1,8 @@
 package com.blr19c.falowp.bot.system.plugin.hook
 
 import com.blr19c.falowp.bot.system.api.BotApi
+import com.blr19c.falowp.bot.system.api.BotSelf
 import com.blr19c.falowp.bot.system.api.SendMessageChain
-import com.blr19c.falowp.bot.system.plugin.HookPluginRegister
 import com.blr19c.falowp.bot.system.plugin.Plugin
 
 /**
@@ -41,5 +41,9 @@ class HookBotApi(
 
     override suspend fun sendReply(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         delegateBotApi.sendReply(*sendMessageChain, reference = reference, forward = forward)
+    }
+
+    override suspend fun self(): BotSelf {
+        return delegateBotApi.self()
     }
 }

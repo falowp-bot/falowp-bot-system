@@ -16,6 +16,11 @@ enum class SourceTypeEnum {
     PRIVATE,
 
     /**
+     * 系统内部消息
+     */
+    SYSTEM,
+
+    /**
      * 未知
      */
     UNKNOWN

@@ -1,7 +1,7 @@
 package com.blr19c.falowp.bot.system.listener.hooks
 
-import com.blr19c.falowp.bot.system.plugin.EventPluginRegister
 import com.blr19c.falowp.bot.system.plugin.Plugin
+import com.blr19c.falowp.bot.system.plugin.event.EventPluginRegister
 
 /**
  * 事件类插件执行时

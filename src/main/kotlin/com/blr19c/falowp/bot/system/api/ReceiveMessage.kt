@@ -6,6 +6,7 @@ import java.net.URI
 /**
  * 接收的消息
  */
+@Suppress("unused")
 data class ReceiveMessage(
     /**
      * 消息ID
@@ -30,7 +31,7 @@ data class ReceiveMessage(
     /**
      * 机器人信息
      */
-    val self: Self,
+    val self: BotSelf,
     /**
      * 消息来源适配器
      */
@@ -47,7 +48,7 @@ data class ReceiveMessage(
                 content,
                 sender,
                 source,
-                Self(""),
+                BotSelf.Default(),
                 Adapter.empty()
             )
         }
@@ -85,7 +86,7 @@ data class ReceiveMessage(
         /**
          * 语音
          */
-        val voice: URI?,
+        val voice: Voice?,
         /**
          * at谁
          */
@@ -95,6 +96,10 @@ data class ReceiveMessage(
          */
         val image: List<ImageUrl>,
         /**
+         * 表情
+         */
+        val emoji: List<Emoji>,
+        /**
          * 视频
          */
         val video: Video?,
@@ -103,21 +108,65 @@ data class ReceiveMessage(
          */
         val share: List<Share>,
         /**
+         * 文件
+         */
+        val file: List<File>,
+        /**
          * 引用消息
          */
         val reference: suspend () -> ReceiveMessage?
     ) {
         companion object {
             fun empty(): Content {
-                return Content("", null, emptyList(), emptyList(), null, emptyList()) { null }
+                return Content("", null, emptyList(), emptyList(), emptyList(), null, emptyList(), emptyList()) { null }
+            }
+        }
+
+        fun hasMessageContent(): Boolean =
+            message.isNotEmpty() || image.isNotEmpty() || at.isNotEmpty() || emoji.isNotEmpty()
+
+        fun toMessageType(): MessageTypeEnum {
+            return when {
+                this.video != null -> MessageTypeEnum.VIDEO
+                this.voice != null -> MessageTypeEnum.VOICE
+                this.share.isNotEmpty() -> MessageTypeEnum.SHARE
+                this.file.isNotEmpty() -> MessageTypeEnum.FILE
+                hasMessageContent() -> MessageTypeEnum.MESSAGE
+                else -> MessageTypeEnum.OTHER
             }
         }
     }
 
     /**
+     * 表情
+     */
+    @Suppress("UNUSED")
+    interface Emoji {
+        /**
+         * 表情ID
+         */
+        val id: String
+
+        /**
+         * 表情类型
+         */
+        val type: String
+
+        /**
+         * 展示/描述
+         */
+        val display: String
+    }
+
+
+    /**
      * 视频
      */
     data class Video(
+        /**
+         * 视频ID
+         */
+        val id: String,
         /**
          * 缩略图
          */
@@ -133,9 +182,27 @@ data class ReceiveMessage(
     )
 
     /**
+     * 语音
+     */
+    data class Voice(
+        /**
+         * 语音ID
+         */
+        val id: String,
+        /**
+         * 语音地址
+         */
+        val src: URI,
+    )
+
+    /**
      * 分享内容
      */
     data class Share(
+        /**
+         * appId
+         */
+        val appId: String,
         /**
          * app名称
          */
@@ -154,6 +221,35 @@ data class ReceiveMessage(
         val sourceUrl: String,
     )
 
+    /**
+     * 文件
+     */
+    data class File(
+        /**
+         * 文件ID
+         */
+        val id: String,
+        /**
+         * 文件类型
+         */
+        val type: String,
+        /**
+         * 文件名
+         */
+        val name: String,
+        /**
+         * 文件地址
+         */
+        val src: URI,
+        /**
+         * 文件大小
+         */
+        val size: Long,
+    )
+
+    /**
+     * 用户
+     */
     data class User(
         /**
          * id
@@ -181,6 +277,9 @@ data class ReceiveMessage(
         }
     }
 
+    /**
+     * 来源
+     */
     data class Source(
         /**
          * 消息来源id
@@ -195,16 +294,16 @@ data class ReceiveMessage(
             fun empty(): Source {
                 return Source("", SourceTypeEnum.UNKNOWN)
             }
+
+            fun system(): Source {
+                return Source("system", SourceTypeEnum.SYSTEM)
+            }
         }
     }
 
-    data class Self(
-        /**
-         * 机器人id
-         */
-        val id: String,
-    )
-
+    /**
+     * 适配器
+     */
     data class Adapter(
         /**
          * 适配器id

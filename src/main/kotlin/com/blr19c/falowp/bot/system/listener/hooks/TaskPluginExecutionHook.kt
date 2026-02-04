@@ -1,7 +1,7 @@
 package com.blr19c.falowp.bot.system.listener.hooks
 
 import com.blr19c.falowp.bot.system.plugin.Plugin
-import com.blr19c.falowp.bot.system.plugin.TaskPluginRegister
+import com.blr19c.falowp.bot.system.plugin.task.TaskPluginRegister
 
 /**
  * 任务类插件执行时

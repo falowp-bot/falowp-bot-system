@@ -2,7 +2,6 @@ package com.blr19c.falowp.bot.system.plugin.hook
 
 import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.api.BotApi
-import com.blr19c.falowp.bot.system.plugin.HookPluginRegister
 import com.blr19c.falowp.bot.system.plugin.Plugin
 import com.blr19c.falowp.bot.system.plugin.PluginInfo
 import com.blr19c.falowp.bot.system.plugin.hook.HookTypeEnum.*

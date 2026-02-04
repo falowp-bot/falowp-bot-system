@@ -2,20 +2,22 @@
 
 package com.blr19c.falowp.bot.system
 
+import com.blr19c.falowp.bot.system.json.Json
+import com.blr19c.falowp.bot.system.json.foldPath
+import com.blr19c.falowp.bot.system.json.safeString
+import com.blr19c.falowp.bot.system.json.safeStringOrNull
 import com.blr19c.falowp.bot.system.utils.ResourceUtils
 import com.blr19c.falowp.bot.system.utils.ScanUtils.configPath
 import com.blr19c.falowp.bot.system.utils.ScanUtils.pluginPath
-import io.ktor.server.config.*
-import io.ktor.server.config.yaml.*
-import io.ktor.util.reflect.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.mamoe.yamlkt.Yaml
-import net.mamoe.yamlkt.YamlMap
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.NullNode
+import tools.jackson.dataformat.yaml.YAMLFactory
+import tools.jackson.dataformat.yaml.YAMLMapper
+import tools.jackson.module.kotlin.convertValue
 import java.io.InputStream
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.reflect.full.primaryConstructor
-import kotlin.reflect.jvm.isAccessible
 
 /**
  * 资源&配置
@@ -32,24 +34,28 @@ object Resources : Log {
 /**
  * 加载YAML
  */
-private fun loadYaml(inputStream: InputStream): ApplicationConfig {
-    val content = inputStream.readBytes().toString(Charsets.UTF_8)
-    val yamlElement = Yaml.decodeYamlFromString(content)
-    val yaml = yamlElement as? YamlMap ?: throw IllegalArgumentException("配置应该是yaml字典")
-    val constructor = YamlConfig::class.primaryConstructor!!
-    constructor.isAccessible = true
-    return constructor.call(yaml)
+private fun loadYaml(inputStream: InputStream): JacksonYAMLValue {
+    val yamlMapper = YAMLMapper(YAMLFactory())
+    return JacksonYAMLValue(yamlMapper.readTree(inputStream))
+}
+
+/**
+ * 加载 application.yml
+ */
+private fun localApplicationYaml(): JacksonYAMLValue {
+    val resource = Thread.currentThread().contextClassLoader.getResource("application.yaml")
+    resource ?: throw IllegalArgumentException("未找到有效的application.yaml配置")
+    return resource.openStream().use { loadYaml(it) }
 }
 
 private val applicationConfig by lazy {
-    val yamlConfigLoader = YamlConfigLoader()
-    var config = yamlConfigLoader.load(null) ?: throw IllegalArgumentException("未找到有效的application.yaml配置")
+    var applicationYaml = localApplicationYaml()
     for (resource in Thread.currentThread().contextClassLoader.getResources("plugin-conf")) {
         val subConfig = ResourceUtils.resourceToInputStream(resource, ".yaml") { loadYaml(it) }
-            .reduce { a1, a2 -> MergedApplicationConfig(a1, a2) }
-        config = MergedApplicationConfig(config, subConfig)
+            .reduce { a1, a2 -> a1.merge(a2) }
+        applicationYaml = applicationYaml.merge(subConfig)
     }
-    config
+    applicationYaml
 }
 
 private val configPropertyMap by lazy { ConcurrentHashMap<String, String>() }
@@ -57,70 +63,78 @@ private val configListPropertyMap by lazy { ConcurrentHashMap<String, List<Strin
 private val configDefaultValue: (String) -> String = { throw IllegalArgumentException("未找到配置:$it") }
 private val configDefaultListValue: (String) -> List<String> = { throw IllegalArgumentException("未找到配置:$it") }
 
+open class JacksonYAMLValue(
+    val jsonNode: JsonNode,
+) {
 
-internal class MergedApplicationConfig(
-    private val first: ApplicationConfig,
-    private val second: ApplicationConfig
-) : ApplicationConfig {
+    constructor() : this(NullNode.instance)
 
-    private val firstKeys by lazy { first.keys() }
-    private val secondKeys by lazy { second.keys() }
-
-    override fun property(path: String): ApplicationConfigValue {
-        return propertyOrNull(path) ?: throw ApplicationConfigurationException("Property $path not found.")
+    open fun getConfig(path: String): JacksonYAMLValue {
+        return JacksonYAMLValue(jsonNode.foldPath(path))
     }
 
-    override fun propertyOrNull(path: String): ApplicationConfigValue? {
-        if (firstKeys.contains(path) && secondKeys.contains(path)) {
-            return MergedApplicationConfigValue(
-                first.property(path),
-                second.property(path),
-                ApplicationConfigValue.Type.OBJECT
-            )
+    open fun getListConfig(path: String): List<JacksonYAMLValue> {
+        val value = jsonNode.foldPath(path)
+        return value.map { JacksonYAMLValue(it) }.toList()
+    }
+
+    open fun getStringOrNull(path: String): String? {
+        return jsonNode.foldPath(path).safeStringOrNull()
+    }
+
+    open fun getListStringOrNull(path: String): List<String>? {
+        val firstValue = jsonNode.foldPath(path)
+        if (firstValue.isArray) {
+            return firstValue.map { it.safeString() }.toList()
         }
-        return when {
-            firstKeys.contains(path) -> first.property(path)
-            else -> second.propertyOrNull(path)
-        }
+        return null
     }
 
-    override fun config(path: String): ApplicationConfig {
-        if (firstKeys.none { it.startsWith("$path.") }) return second.config(path)
-        if (secondKeys.none { it.startsWith("$path.") }) return first.config(path)
-        return MergedApplicationConfig(first.config(path), second.config(path))
+    open fun toMap(): Map<String, Any?> {
+        return Json.objectMapper().convertValue(jsonNode)
     }
 
-    override fun configList(path: String): List<ApplicationConfig> {
-        val firstList = if (firstKeys.contains(path)) first.configList(path) else emptyList()
-        val secondList = if (secondKeys.contains(path)) second.configList(path) else emptyList()
-        return firstList + secondList
+    fun merge(value: JacksonYAMLValue?): JacksonYAMLValue {
+        return JacksonYAMLMergeValue(this, value ?: return this)
     }
-
-    override fun keys(): Set<String> = firstKeys + secondKeys
-
-    override fun toMap(): Map<String, Any?> = second.toMap() + first.toMap()
 }
 
-internal class MergedApplicationConfigValue(
-    private val first: ApplicationConfigValue,
-    private val second: ApplicationConfigValue,
-    override val type: ApplicationConfigValue.Type
-) : ApplicationConfigValue {
 
-    override fun getString(): String {
-        return first.getString()
+internal class JacksonYAMLMergeValue(
+    private val first: JacksonYAMLValue,
+    private val second: JacksonYAMLValue,
+) : JacksonYAMLValue() {
+
+    override fun getConfig(path: String): JacksonYAMLValue {
+        val firstValue = first.getConfig(path)
+        val secondValue = second.getConfig(path)
+        return firstValue.merge(secondValue)
     }
 
-    override fun getList(): List<String> {
-        return (first.getList() + second.getList()).distinct()
+    override fun getListConfig(path: String): List<JacksonYAMLValue> {
+        return (first.getListConfig(path) + second.getListConfig(path)).distinct()
     }
 
-    override fun getMap(): Map<String, Any?> {
-        return first.getMap() + second.getMap()
+    override fun getStringOrNull(path: String): String? {
+        val firstValue = first.getStringOrNull(path)
+        val secondValue = second.getStringOrNull(path)
+        return firstValue ?: secondValue
     }
 
-    override fun getAs(type: TypeInfo): Any? {
-        throw IllegalStateException("It is not supported to parse according to TypeInfo")
+    override fun getListStringOrNull(path: String): List<String>? {
+        val firstValue = first.getListStringOrNull(path)
+        val secondValue = second.getListStringOrNull(path)
+        if (firstValue == null && secondValue == null) {
+            return null
+        }
+        val list = mutableListOf<String>()
+        firstValue?.let { list.addAll(it) }
+        secondValue?.let { list.addAll(it) }
+        return list.distinct()
+    }
+
+    override fun toMap(): Map<String, Any?> {
+        return first.toMap() + second.toMap()
     }
 }
 
@@ -133,7 +147,7 @@ fun configProperty(
 ): String {
     val finalKey = key.takeIf { !it.endsWith(".") } ?: key.dropLast(1)
     return configPropertyMap.computeIfAbsent(finalKey) {
-        applicationConfig.propertyOrNull(finalKey)?.getString() ?: defaultValue.invoke(finalKey)
+        applicationConfig.getStringOrNull(finalKey) ?: defaultValue.invoke(finalKey)
     }
 }
 
@@ -147,7 +161,7 @@ fun configListProperty(
 ): List<String> {
     val finalKey = key.takeIf { !it.endsWith(".") } ?: key.dropLast(1)
     return configListPropertyMap.computeIfAbsent(finalKey) {
-        applicationConfig.propertyOrNull(finalKey)?.getList() ?: defaultValue.invoke(finalKey)
+        applicationConfig.getListStringOrNull(finalKey) ?: defaultValue.invoke(finalKey)
     }
 }
 
@@ -155,17 +169,17 @@ fun configListProperty(
 /**
  * 读取application.conf配置文件
  */
-fun configList(key: String): List<ApplicationConfig> {
+fun configList(key: String): List<JacksonYAMLValue> {
     val finalKey = key.takeIf { !it.endsWith(".") } ?: key.dropLast(1)
-    return applicationConfig.configList(finalKey)
+    return applicationConfig.getListConfig(finalKey)
 }
 
 /**
  * 读取application.conf配置文件
  */
-fun config(key: String): ApplicationConfig {
+fun config(key: String): JacksonYAMLValue {
     val finalKey = key.takeIf { !it.endsWith(".") } ?: key.dropLast(1)
-    return applicationConfig.config(finalKey)
+    return applicationConfig.getConfig(finalKey)
 }
 
 
@@ -193,14 +207,14 @@ fun systemConfigListProperty(
 /**
  * 读取application.conf配置文件-添加系统的前缀
  */
-fun systemConfig(key: String): ApplicationConfig {
+fun systemConfig(key: String): JacksonYAMLValue {
     return config("bot.system.".plus(key))
 }
 
 /**
  * 读取application.conf配置文件-添加系统的前缀
  */
-fun systemConfigList(key: String): List<ApplicationConfig> {
+fun systemConfigList(key: String): List<JacksonYAMLValue> {
     return configList("bot.system.".plus(key))
 }
 
@@ -227,14 +241,14 @@ fun adapterConfigListProperty(
 /**
  * 读取application.conf配置文件-添加适配器前缀
  */
-fun adapterConfigList(key: String): List<ApplicationConfig> {
+fun adapterConfigList(key: String): List<JacksonYAMLValue> {
     return configList("bot.adapter.".plus(key))
 }
 
 /**
  * 读取application.conf配置文件-添加适配器前缀
  */
-fun adapterConfig(key: String): ApplicationConfig {
+fun adapterConfig(key: String): JacksonYAMLValue {
     return config("bot.adapter.".plus(key))
 }
 
@@ -261,14 +275,14 @@ fun pluginConfigListProperty(
 /**
  * 读取application.conf配置文件-添加当前插件的前缀
  */
-fun pluginConfig(key: String): ApplicationConfig {
+fun pluginConfig(key: String): JacksonYAMLValue {
     return config(configPath().plus(key))
 }
 
 /**
  * 读取application.conf配置文件-添加当前插件的前缀
  */
-fun pluginConfigList(key: String): List<ApplicationConfig> {
+fun pluginConfigList(key: String): List<JacksonYAMLValue> {
     return configList(configPath().plus(key))
 }
 

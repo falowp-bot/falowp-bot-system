@@ -4,7 +4,7 @@ import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.adapter.AdapterApplication.botApiSupportList
 import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.plugin.PluginBotApi
-import com.blr19c.falowp.bot.system.plugin.TaskPluginRegister
+import com.blr19c.falowp.bot.system.plugin.task.TaskPluginRegister
 import com.blr19c.falowp.bot.system.scheduling.tasks.GreetingTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

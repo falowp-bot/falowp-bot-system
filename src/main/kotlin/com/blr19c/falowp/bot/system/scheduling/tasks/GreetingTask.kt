@@ -1,7 +1,7 @@
 package com.blr19c.falowp.bot.system.scheduling.tasks
 
 import com.blr19c.falowp.bot.system.listener.events.GreetingEvent
-import com.blr19c.falowp.bot.system.plugin.TaskPluginRegister
+import com.blr19c.falowp.bot.system.plugin.task.TaskPluginRegister
 import com.blr19c.falowp.bot.system.scheduling.cron.CronTrigger
 import com.blr19c.falowp.bot.system.scheduling.cron.TriggerContext
 import com.blr19c.falowp.bot.system.systemConfigProperty

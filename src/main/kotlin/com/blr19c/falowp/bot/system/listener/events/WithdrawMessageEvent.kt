@@ -3,31 +3,22 @@ package com.blr19c.falowp.bot.system.listener.events
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
 import com.blr19c.falowp.bot.system.plugin.Plugin
 
-
 /**
- * 发送帮助事件
+ * 撤回消息事件
  */
-data class HelpEvent(
+@Suppress("UNUSED")
+data class WithdrawMessageEvent(
     /**
      * 来源
      */
     override val source: ReceiveMessage.Source,
     /**
-     * 触发人
+     * 撤回人
      */
     override val actor: ReceiveMessage.User,
     /**
-     * 显示隐藏插件
+     * 消息内容
      */
-    val showHidden: Boolean = false,
-
-    /**
-     * 显示禁用插件
-     */
-    val showDisable: Boolean = true,
-
-    /**
-     * 获取功能的帮助
-     */
-    val pluginName: String? = null
+    val receiveMessage: ReceiveMessage,
 ) : Plugin.Listener.Event
+

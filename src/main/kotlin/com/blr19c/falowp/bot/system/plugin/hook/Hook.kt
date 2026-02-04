@@ -6,8 +6,10 @@ import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.api.SendMessage
 import com.blr19c.falowp.bot.system.listener.hooks.ReceiveMessageHook
 import com.blr19c.falowp.bot.system.listener.hooks.SendMessageHook
-import com.blr19c.falowp.bot.system.plugin.*
-import com.blr19c.falowp.bot.system.plugin.Plugin.Listener.Hook.Companion.beforeHook
+import com.blr19c.falowp.bot.system.plugin.Plugin
+import com.blr19c.falowp.bot.system.plugin.PluginRegister
+import com.blr19c.falowp.bot.system.plugin.UnRegister
+import com.blr19c.falowp.bot.system.plugin.message.MessageMatch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -47,7 +49,7 @@ inline fun <reified T : Plugin.Listener.Hook> BotApi.runtimeHook(
  * 监听下次匹配的消息
  */
 suspend fun <T : Any> BotApi.awaitReply(
-    match: MessagePluginRegisterMatch = MessagePluginRegisterMatch.allMatch(),
+    match: MessageMatch = MessageMatch.allMatch(),
     block: suspend BotApi.(args: Array<String>) -> T
 ): T {
     var data: T? = null

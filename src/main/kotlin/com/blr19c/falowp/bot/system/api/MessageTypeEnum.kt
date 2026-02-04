@@ -7,14 +7,9 @@ package com.blr19c.falowp.bot.system.api
 enum class MessageTypeEnum {
 
     /**
-     * 消息(图片和文本消息)
+     * 消息(图片/文本/表情消息)
      */
     MESSAGE,
-
-    /**
-     * 戳一戳(戳一戳消息)
-     */
-    POKE,
 
     /**
      * 语音消息(发送的语音)

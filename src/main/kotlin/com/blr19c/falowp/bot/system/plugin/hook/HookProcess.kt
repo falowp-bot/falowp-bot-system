@@ -1,6 +1,5 @@
 package com.blr19c.falowp.bot.system.plugin.hook
 
-import com.blr19c.falowp.bot.system.plugin.HookPluginRegister
 import com.blr19c.falowp.bot.system.plugin.Plugin
 
 /**

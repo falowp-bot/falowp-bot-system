@@ -18,14 +18,28 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 
 ## 更新日志
 
-### 2.3.0
+### 2.3.0(不向下兼容)
 
 * 更新一些依赖版本
-* java21 -> java25
-* jackson2 -> jackson3
+* 更新默认的`useragent`
+* `java21` -> `java25`
+* `jackson2` -> `jackson3`
+* `mamoe-yaml` -> `jackson3-yaml`
 * 移除了对图片的增强工具 `BufferedImage.kt`
 * 移除了`gson`全面使用`jackson3`
 * 移除了`netty`全面使用`CIO`
+* 将戳一戳/拍一拍由消息类型更改为事件类型`NudgeEvent`
+* `MessagePluginRegisterMatch`改为`MessageMatch`
+* `ReceiveMessage`中`Self`信息改为`BotSelf`,并支持在`BotApi`中直接获取
+* `Event`事件中增加来源和触发人
+* 重做了[`plugin`](https://github.com/falowp-bot/falowp-bot-system/blob/main/src/main/kotlin/com/blr19c/falowp/bot/system/plugin/Plugin.kt)
+    - 原`eventListener`移动到`com.blr19c.falowp.bot.system.plugin.event`
+    - 原`hook、beforeHook、...、aroundHook`移动到`com.blr19c.falowp.bot.system.plugin.hook`
+    - 原`message、queueMessage`移动到`com.blr19c.falowp.bot.system.plugin.message`
+    - 原`cronScheduling、periodicScheduling、applicationInitScheduling`移动到`com.blr19c.falowp.bot.system.plugin.task`
+    - 原`poke`移动到`com.blr19c.falowp.bot.system.plugin.event.nudgeMe`
+* 由于（`gocq-http`、`AstralGocq`）停止维护，终止了对[`-cq`](https://github.com/falowp-bot/falowp-bot-plugins/tree/main/falowp-bot-adapter-cq)的维护，后续版本中可能会删除此适配器
+* 重做了[`-nc`](https://github.com/falowp-bot/falowp-bot-plugins/tree/main/falowp-bot-adapter-nc)组件全面支持`napcat`
 
 ### 2.2.4
 
@@ -51,7 +65,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 * 支持多数据源配置
 * 优化一些配置
 
-### 2.2.0(有内容不向下兼容)
+### 2.2.0(不向下兼容)
 
 * 更新一些依赖版本
 * 重构`ImageUrl`
@@ -123,7 +137,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 * 优化了`ImageUrl`中获取摘要的逻辑
 * 使用`github-workflows`发布
 
-### 1.4.0(有内容不向下兼容)
+### 1.4.0(不向下兼容)
 
 * 修复 message 队列引起的不能重复获取消息问题
 * 修复`Webdriver`没有逐级关闭导致残留 chrome 进程的问题
@@ -134,7 +148,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.2.4")
 
 * 优化`HookJoinPoint`中`BotApi`的获取逻辑
 
-### 1.3.0(有内容不向下兼容)
+### 1.3.0(不向下兼容)
 
 * 支持队列消息
 * 支持获取引用消息内容

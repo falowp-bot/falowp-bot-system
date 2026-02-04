@@ -47,11 +47,12 @@ dependencies {
     api("io.ktor:ktor-client-content-negotiation-jvm:$ktorVersion")
     api("io.ktor:ktor-client-logging-jvm:$ktorVersion")
 
-    api("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.7.1")
     //logback
     api("ch.qos.logback:logback-classic:$logbackVersion")
     //jackson
     api("tools.jackson.module:jackson-module-kotlin:$jacksonVersion")
+    //yaml
+    api("tools.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}")
     //guava
     api("com.google.guava:guava:$guavaVersion")
     //html处理

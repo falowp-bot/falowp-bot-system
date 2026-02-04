@@ -3,7 +3,8 @@ package com.blr19c.falowp.bot.system.plugin.event
 import com.blr19c.falowp.bot.system.api.BotApi
 import com.blr19c.falowp.bot.system.api.SendMessage
 import com.blr19c.falowp.bot.system.api.SendMessageChain
-import com.blr19c.falowp.bot.system.api.SourceTypeEnum.*
+import com.blr19c.falowp.bot.system.api.SourceTypeEnum.GROUP
+import com.blr19c.falowp.bot.system.api.SourceTypeEnum.PRIVATE
 import com.blr19c.falowp.bot.system.listener.events.HelpEvent
 import com.blr19c.falowp.bot.system.listener.hooks.HelpEventHook
 import com.blr19c.falowp.bot.system.plugin.PluginInfo
@@ -15,6 +16,9 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jsoup.Jsoup
 
+/**
+ * 帮助程序
+ */
 class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, HelpEvent) -> Unit {
     private val pluginInfoRet = pluginList.map { it.plugin }.filter { !it.hidden }.map {
         mapOf(
@@ -90,10 +94,10 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
     }
 
     private suspend fun BotApi.send(event: HelpEvent, message: SendMessageChain) {
-        when (event.sourceType) {
-            GROUP -> this.sendGroup(message, sourceId = event.sourceId!!)
-            PRIVATE -> this.sendPrivate(message, sourceId = event.sourceId!!)
-            UNKNOWN, null -> this.sendReply(message)
+        when (event.source.type) {
+            GROUP -> this.sendGroup(message, sourceId = event.source.id)
+            PRIVATE -> this.sendPrivate(message, sourceId = event.source.id)
+            else -> {}
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.blr19c.falowp.bot.system.scheduling.api
 
 import com.blr19c.falowp.bot.system.api.BotApi
+import com.blr19c.falowp.bot.system.api.BotSelf
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
 import com.blr19c.falowp.bot.system.api.SendMessageChain
 import com.blr19c.falowp.bot.system.scheduling.Scheduling
@@ -49,6 +50,10 @@ class SchedulingBotApi(originalClass: KClass<*>) : BotApi(ReceiveMessage.empty()
     }
 
     override suspend fun sendReply(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
-        throw IllegalStateException("定时任务BotAPi无法回复消息")
+        throw IllegalStateException("定时任务BotApi无法回复消息")
+    }
+
+    override suspend fun self(): BotSelf {
+        throw IllegalStateException("定时任务BotApi无法获取自身信息")
     }
 }

@@ -1,5 +1,6 @@
 package com.blr19c.falowp.bot.system.json
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import io.ktor.http.*
 import tools.jackson.core.JsonParser
 import tools.jackson.core.TreeNode
@@ -7,9 +8,11 @@ import tools.jackson.core.type.TypeReference
 import tools.jackson.databind.DeserializationFeature
 import tools.jackson.databind.JsonNode
 import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.cfg.DateTimeFeature
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.databind.module.SimpleModule
 import tools.jackson.module.kotlin.KotlinModule
+import tools.jackson.module.kotlin.convertValue
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.time.LocalDateTime
@@ -27,6 +30,9 @@ object Json {
         JsonMapper.builder()
             .addModule(KotlinModule.Builder().build())
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .enable(DateTimeFeature.WRITE_DATES_WITH_ZONE_ID)
+            .changeDefaultPropertyInclusion { it.withValueInclusion(JsonInclude.Include.NON_NULL) }
+            .changeDefaultPropertyInclusion { it.withContentInclusion(JsonInclude.Include.NON_NULL) }
             .build()
     }
 
@@ -83,9 +89,39 @@ object Json {
         return objectMapper().readTree(jsonData)
     }
 
+    fun unwrapJsonNode(jsonNode: JsonNode): JsonNode {
+        return when {
+            jsonNode.isMissingNode || jsonNode.isNull -> json.createObjectNode()
+            jsonNode.isString -> runCatching { readJsonNode(jsonNode.safeString()) }.getOrElse { jsonNode }
+            else -> jsonNode
+        }
+    }
+
     fun toJsonString(data: Any): String {
         return objectMapper().writeValueAsString(data)
     }
+
+    inline fun <reified T> convertValue(data: Any): T {
+        return objectMapper().convertValue<T>(data)
+    }
+}
+
+fun JsonNode.safeString(): String {
+    return when {
+        this.isMissingNode || this.isNull -> ""
+        else -> this.asString()
+    }
+}
+
+fun JsonNode.safeStringOrNull(): String? {
+    return when {
+        this.isMissingNode || this.isNull -> null
+        else -> this.asString().ifBlank { null }
+    }
+}
+
+fun JsonNode.foldPath(path: String): JsonNode {
+    return path.split(".").fold(this) { node, segment -> node.path(segment) }
 }
 
 fun io.ktor.client.plugins.contentnegotiation.ContentNegotiationConfig.jackson3(

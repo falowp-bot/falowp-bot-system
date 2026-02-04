@@ -3,8 +3,8 @@ package com.blr19c.falowp.bot.system.scheduling
 import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.adapter.AdapterApplication
 import com.blr19c.falowp.bot.system.listener.hooks.TaskPluginExecutionHook
-import com.blr19c.falowp.bot.system.plugin.TaskPluginRegister
 import com.blr19c.falowp.bot.system.plugin.hook.withPluginHook
+import com.blr19c.falowp.bot.system.plugin.task.TaskPluginRegister
 import com.blr19c.falowp.bot.system.scheduling.api.SchedulingBotApi
 import com.blr19c.falowp.bot.system.scheduling.cron.Trigger
 import com.blr19c.falowp.bot.system.scheduling.cron.TriggerContext

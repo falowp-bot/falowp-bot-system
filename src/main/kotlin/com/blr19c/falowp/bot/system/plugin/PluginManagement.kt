@@ -9,6 +9,8 @@ import com.blr19c.falowp.bot.system.listener.hooks.ReceiveMessageHook
 import com.blr19c.falowp.bot.system.plugin.event.EventManager
 import com.blr19c.falowp.bot.system.plugin.hook.HookManager
 import com.blr19c.falowp.bot.system.plugin.hook.withPluginHook
+import com.blr19c.falowp.bot.system.plugin.message.MessagePluginRegister
+import com.blr19c.falowp.bot.system.plugin.message.QueueMessagePluginRegister
 import com.blr19c.falowp.bot.system.systemConfigListProperty
 import com.blr19c.falowp.bot.system.utils.ScanUtils
 import kotlinx.coroutines.*

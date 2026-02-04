@@ -1,8 +1,8 @@
 package com.blr19c.falowp.bot.system.listener.hooks
 
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
-import com.blr19c.falowp.bot.system.plugin.MessagePluginRegister
 import com.blr19c.falowp.bot.system.plugin.Plugin
+import com.blr19c.falowp.bot.system.plugin.message.MessagePluginRegister
 
 /**
  * 消息类插件执行时

@@ -3,31 +3,25 @@ package com.blr19c.falowp.bot.system.listener.events
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
 import com.blr19c.falowp.bot.system.plugin.Plugin
 
-
 /**
- * 发送帮助事件
+ * 轻推事件(戳一戳/拍一拍/无内容的强提醒)
  */
-data class HelpEvent(
+@Suppress("UNUSED")
+data class NudgeEvent(
     /**
      * 来源
      */
     override val source: ReceiveMessage.Source,
     /**
-     * 触发人
+     * 发起人
      */
     override val actor: ReceiveMessage.User,
     /**
-     * 显示隐藏插件
+     * 接收人
      */
-    val showHidden: Boolean = false,
-
+    val target: ReceiveMessage.User,
     /**
-     * 显示禁用插件
+     * 其他动作
      */
-    val showDisable: Boolean = true,
-
-    /**
-     * 获取功能的帮助
-     */
-    val pluginName: String? = null
+    val action: Any? = null
 ) : Plugin.Listener.Event

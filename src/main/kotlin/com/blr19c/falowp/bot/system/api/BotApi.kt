@@ -2,7 +2,9 @@ package com.blr19c.falowp.bot.system.api
 
 import com.blr19c.falowp.bot.system.Log
 import com.blr19c.falowp.bot.system.plugin.Plugin
+import com.blr19c.falowp.bot.system.plugin.event.EventBotApi
 import com.blr19c.falowp.bot.system.plugin.event.EventManager
+import com.blr19c.falowp.bot.system.plugin.event.eventBotApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.slf4j.Logger
@@ -25,9 +27,11 @@ abstract class BotApi(val receiveMessage: ReceiveMessage, val originalClass: KCl
     /**
      * 发布事件
      */
-    fun <T : Plugin.Listener.Event> publishEvent(event: T) {
+    suspend fun <T : Plugin.Listener.Event> publishEvent(event: T) {
+        var api = this
+        if (api !is EventBotApi) api = api.eventBotApi(event, receiveMessage.adapter)
         log().info("发布事件:{}", event)
-        EventManager.publishEvent(this, event)
+        EventManager.publishEvent(api, event)
     }
 
     /**
@@ -95,8 +99,13 @@ abstract class BotApi(val receiveMessage: ReceiveMessage, val originalClass: KCl
         reference: Boolean = false,
         forward: Boolean = false
     ) {
-        if (receiveMessage.group()) sendGroup(*sendMessageChain, reference = reference, forward = forward)
-        if (receiveMessage.private()) sendPrivate(*sendMessageChain, reference = reference, forward = forward)
+        if (receiveMessage.group()) return sendGroup(*sendMessageChain, reference = reference, forward = forward)
+        if (receiveMessage.private()) return sendPrivate(*sendMessageChain, reference = reference, forward = forward)
+        throw IllegalStateException("未知的消息类型")
     }
 
+    /**
+     * 获取机器人自身信息
+     */
+    abstract suspend fun self(): BotSelf
 }

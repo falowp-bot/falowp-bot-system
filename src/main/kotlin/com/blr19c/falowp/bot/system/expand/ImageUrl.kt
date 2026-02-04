@@ -97,11 +97,12 @@ data class ImageUrl(
 
     companion object {
         fun empty(): ImageUrl {
-            return ImageUrl("")
+            return "".toImageUrl()
         }
     }
 }
 
 fun File.toImageUrl(): ImageUrl = ImageUrl(this.toURI().toString())
+fun String.toImageUrl(): ImageUrl = ImageUrl(this)
 fun ByteArray.toImageUrl(): ImageUrl = ImageUrl(this.encodeToBase64String())
 fun URI.toImageUrl(): ImageUrl = ImageUrl(this.toString())

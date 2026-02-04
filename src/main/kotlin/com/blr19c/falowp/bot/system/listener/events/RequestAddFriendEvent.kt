@@ -3,31 +3,25 @@ package com.blr19c.falowp.bot.system.listener.events
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
 import com.blr19c.falowp.bot.system.plugin.Plugin
 
-
 /**
- * 发送帮助事件
+ * 申请添加好友事件
  */
-data class HelpEvent(
+@Suppress("UNUSED")
+data class RequestAddFriendEvent(
     /**
      * 来源
      */
     override val source: ReceiveMessage.Source,
     /**
-     * 触发人
+     * 申请人
      */
     override val actor: ReceiveMessage.User,
     /**
-     * 显示隐藏插件
+     * 验证信息
      */
-    val showHidden: Boolean = false,
-
+    val comment: String,
     /**
-     * 显示禁用插件
+     * 加好友标识
      */
-    val showDisable: Boolean = true,
-
-    /**
-     * 获取功能的帮助
-     */
-    val pluginName: String? = null
+    val flag: Any
 ) : Plugin.Listener.Event

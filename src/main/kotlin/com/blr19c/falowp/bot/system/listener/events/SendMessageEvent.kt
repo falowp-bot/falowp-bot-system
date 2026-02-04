@@ -1,21 +1,25 @@
 package com.blr19c.falowp.bot.system.listener.events
 
 import com.blr19c.falowp.bot.system.api.ReceiveMessage
+import com.blr19c.falowp.bot.system.api.SendMessageChain
 import com.blr19c.falowp.bot.system.plugin.Plugin
 
-
 /**
- * 早晚安事件(晚安之后系统进入闲时状态,直到第二天早安)
+ * 机器人发送了消息的事件
  */
-data class GreetingEvent(
+data class SendMessageEvent(
     /**
-     * 早安
+     * 发送的消息
      */
-    val goodMorning: Boolean,
+    val sendMessage: List<SendMessageChain>,
     /**
-     * 晚安
+     * 是否引用
      */
-    val goodNight: Boolean
+    val reference: Boolean,
+    /**
+     * 是否转发
+     */
+    val forward: Boolean
 ) : Plugin.Listener.Event {
     override val source = ReceiveMessage.Source.system()
     override val actor = ReceiveMessage.User.empty()
