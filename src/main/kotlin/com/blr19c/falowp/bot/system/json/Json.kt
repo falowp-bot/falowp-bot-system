@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED")
+
 package com.blr19c.falowp.bot.system.json
 
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -11,6 +13,7 @@ import tools.jackson.databind.ObjectMapper
 import tools.jackson.databind.cfg.DateTimeFeature
 import tools.jackson.databind.json.JsonMapper
 import tools.jackson.databind.module.SimpleModule
+import tools.jackson.databind.node.MissingNode
 import tools.jackson.module.kotlin.KotlinModule
 import tools.jackson.module.kotlin.convertValue
 import java.io.InputStream
@@ -22,7 +25,6 @@ import java.util.*
 /**
  * json序列化
  */
-@Suppress("UNUSED")
 object Json {
     private val json: ObjectMapper by lazy {
         val module = SimpleModule()
@@ -122,6 +124,13 @@ fun JsonNode.safeStringOrNull(): String? {
 
 fun JsonNode.foldPath(path: String): JsonNode {
     return path.split(".").fold(this) { node, segment -> node.path(segment) }
+}
+
+fun JsonNode.pathIgnoreCase(field: String): JsonNode {
+    return this.propertyNames()
+        .firstOrNull { it.equals(field, ignoreCase = true) }
+        ?.let { this.path(it) }
+        ?: MissingNode.getInstance()
 }
 
 fun io.ktor.client.plugins.contentnegotiation.ContentNegotiationConfig.jackson3(

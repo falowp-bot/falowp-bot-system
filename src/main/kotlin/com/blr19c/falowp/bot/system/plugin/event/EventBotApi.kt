@@ -48,7 +48,7 @@ suspend fun BotApi.eventBotApi(event: Plugin.Listener.Event, adapter: ReceiveMes
         this, receiveMessage.copy(
             messageType = MessageTypeEnum.OTHER,
             source = event.source,
-            self = self(),
+            self = runCatching { self() }.getOrDefault(BotSelf.Default()),
             adapter = adapter
         )
     )

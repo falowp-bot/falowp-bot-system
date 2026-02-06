@@ -11,7 +11,7 @@ import kotlin.time.toJavaDuration
  * 缓存
  */
 @Suppress("UNUSED")
-class CacheReference<T>(
+class CacheReference<T : Any>(
     duration: Duration,
     private val block: suspend () -> T,
 ) {

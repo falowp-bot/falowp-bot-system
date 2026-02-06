@@ -200,6 +200,10 @@ data class ReceiveMessage(
      */
     data class Share(
         /**
+         * 分享类型
+         */
+        val type: String,
+        /**
          * appId
          */
         val appId: String,
@@ -314,6 +318,11 @@ data class ReceiveMessage(
          */
         val data: Any
     ) {
+
+        override fun toString(): String {
+            return "Adapter(id=$id, data=适配器挂载:${data::class.simpleName})"
+        }
+
         companion object {
             fun empty(): Adapter {
                 return Adapter("", "")

@@ -11,12 +11,21 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:2.3.0")
+implementation("com.blr19c.falowp:falowp-bot-system:2.3.1")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 2.3.1
+* 更新一些依赖版本
+* 优化`EventBotApi`使用场景
+* 支持更多事件场景
+* 移除了[`-cq`](https://github.com/falowp-bot/falowp-bot-plugins/tree/main/falowp-bot-adapter-cq)适配器
+* 优化合并转发消息,支持任意层级的多层嵌套转发
+* 新增了一些`Json`工具的快捷操作
+* 分享消息新增分享类型
 
 ### 2.3.0(不向下兼容)
 
