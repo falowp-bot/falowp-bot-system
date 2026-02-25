@@ -5,7 +5,6 @@ package com.blr19c.falowp.bot.system.json
 import com.fasterxml.jackson.annotation.JsonInclude
 import io.ktor.http.*
 import tools.jackson.core.JsonParser
-import tools.jackson.core.TreeNode
 import tools.jackson.core.type.TypeReference
 import tools.jackson.databind.DeserializationFeature
 import tools.jackson.databind.JsonNode
@@ -50,7 +49,7 @@ object Json {
         return objectMapper().readValue(jsonData, object : TypeReference<T>() {})
     }
 
-    inline fun <reified T : Any> readObj(jsonData: TreeNode): T {
+    inline fun <reified T : Any> readObj(jsonData: JsonNode): T {
         return objectMapper().treeToValue(jsonData, object : TypeReference<T>() {})
     }
 

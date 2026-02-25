@@ -11,12 +11,21 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:2.3.1")
+implementation("com.blr19c.falowp:falowp-bot-system:2.3.2")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 2.3.2
+* 更新一些依赖版本
+* `CacheMap`支持设置缓存上限
+* `-nc`适配器的合并转发消息从`OTHER`类型改为`SHARE`类型
+* `-bili`插件优化了一些动态推送逻辑
+* `-repeat`插件优化了逻辑
+* 新版本的`Jackson`对`JsonNode`添加了`.map`方法,这会导致Kotlin的扩展函数不可用
+    use: `.elements().map or .mapNotNull`
 
 ### 2.3.1
 * 更新一些依赖版本

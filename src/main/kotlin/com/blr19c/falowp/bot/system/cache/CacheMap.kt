@@ -13,10 +13,12 @@ import kotlin.time.toJavaDuration
 @Suppress("UNUSED")
 class CacheMap<K : Any, V : Any>(
     duration: Duration,
+    maximumSize: Long? = null,
     private val block: suspend (K) -> V,
 ) {
     private val cache = CacheBuilder.newBuilder()
         .expireAfterWrite(duration.toJavaDuration())
+        .apply { maximumSize?.let { maximumSize(it) } }
         .build(CacheLoader.from<K, V> { key -> runBlocking { block.invoke(key) } })
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): suspend (K) -> V {

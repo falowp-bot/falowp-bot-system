@@ -75,7 +75,7 @@ open class JacksonYAMLValue(
 
     open fun getListConfig(path: String): List<JacksonYAMLValue> {
         val value = jsonNode.foldPath(path)
-        return value.map { JacksonYAMLValue(it) }.toList()
+        return value.mapNotNull { JacksonYAMLValue(it) }.toList()
     }
 
     open fun getStringOrNull(path: String): String? {
@@ -85,7 +85,7 @@ open class JacksonYAMLValue(
     open fun getListStringOrNull(path: String): List<String>? {
         val firstValue = jsonNode.foldPath(path)
         if (firstValue.isArray) {
-            return firstValue.map { it.safeString() }.toList()
+            return firstValue.mapNotNull { it.safeString() }.toList()
         }
         return null
     }
