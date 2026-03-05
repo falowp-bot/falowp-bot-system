@@ -52,8 +52,8 @@ private val applicationConfig by lazy {
     var applicationYaml = localApplicationYaml()
     for (resource in Thread.currentThread().contextClassLoader.getResources("plugin-conf")) {
         val subConfig = ResourceUtils.resourceToInputStream(resource, ".yaml") { loadYaml(it) }
-            .reduce { a1, a2 -> a1.merge(a2) }
-        applicationYaml = applicationYaml.merge(subConfig)
+            .reduceOrNull { a1, a2 -> a1.merge(a2) }
+        subConfig?.let { applicationYaml = applicationYaml.merge(it) }
     }
     applicationYaml
 }

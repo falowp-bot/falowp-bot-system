@@ -18,6 +18,11 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.3.2")
 
 ## 更新日志
 
+### 2.3.3
+* 更新一些依赖版本
+* 重构了 `ClassUtils` `ResourceUtils` `ScanUtils` 提升扫描包和资源文件的效率
+* 优化了资源文件读取
+
 ### 2.3.2
 * 更新一些依赖版本
 * `CacheMap`支持设置缓存上限
