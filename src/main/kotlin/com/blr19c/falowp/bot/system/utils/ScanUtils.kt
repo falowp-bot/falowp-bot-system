@@ -29,7 +29,14 @@ object ScanUtils {
     fun getCallerClass(packageNames: List<String> = systemConfigListProperty("pluginPackage")): KClass<*> {
         val caller = findCallerClass(packageNames)
         return caller?.kotlin
-            ?: throw IllegalStateException("未找到调用方类，packageNames=$packageNames")
+            ?: throw IllegalStateException("未找到调用方类,packageNames=$packageNames")
+    }
+
+    fun getLambdaCallerClass(lambda: Function<*>): KClass<*> {
+        val className = lambda::class.qualifiedName
+        val originalName = className?.substringBefore($$$"$$Lambda")
+        return runCatching { Class.forName(originalName).kotlin }
+            .getOrElse { throw IllegalStateException("未找到调用方类,className=$className") }
     }
 
     fun configPath(): String {

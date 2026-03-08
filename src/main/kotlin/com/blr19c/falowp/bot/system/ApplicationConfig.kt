@@ -17,7 +17,6 @@ import tools.jackson.dataformat.yaml.YAMLFactory
 import tools.jackson.dataformat.yaml.YAMLMapper
 import tools.jackson.module.kotlin.convertValue
 import java.io.InputStream
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * 资源&配置
@@ -58,8 +57,6 @@ private val applicationConfig by lazy {
     applicationYaml
 }
 
-private val configPropertyMap by lazy { ConcurrentHashMap<String, String>() }
-private val configListPropertyMap by lazy { ConcurrentHashMap<String, List<String>>() }
 private val configDefaultValue: (String) -> String = { throw IllegalArgumentException("未找到配置:$it") }
 private val configDefaultListValue: (String) -> List<String> = { throw IllegalArgumentException("未找到配置:$it") }
 
@@ -146,9 +143,7 @@ fun configProperty(
     defaultValue: (String) -> String = configDefaultValue
 ): String {
     val finalKey = key.takeIf { !it.endsWith(".") } ?: key.dropLast(1)
-    return configPropertyMap.computeIfAbsent(finalKey) {
-        applicationConfig.getStringOrNull(finalKey) ?: defaultValue.invoke(finalKey)
-    }
+    return applicationConfig.getStringOrNull(finalKey) ?: defaultValue.invoke(finalKey)
 }
 
 
@@ -160,9 +155,7 @@ fun configListProperty(
     defaultValue: (String) -> List<String> = configDefaultListValue
 ): List<String> {
     val finalKey = key.takeIf { !it.endsWith(".") } ?: key.dropLast(1)
-    return configListPropertyMap.computeIfAbsent(finalKey) {
-        applicationConfig.getListStringOrNull(finalKey) ?: defaultValue.invoke(finalKey)
-    }
+    return applicationConfig.getListStringOrNull(finalKey) ?: defaultValue.invoke(finalKey)
 }
 
 

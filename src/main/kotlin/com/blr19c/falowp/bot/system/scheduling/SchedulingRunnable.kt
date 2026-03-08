@@ -96,7 +96,7 @@ class SchedulingRunnable(
                 plugin.block.invoke(schedulingBotApi)
             }
         } catch (ex: Throwable) {
-            log().error("计划任务异常", ReflectionUtils.skipReflectionException(ex))
+            log().error("计划任务异常[${plugin.originalClass}]", ReflectionUtils.skipReflectionException(ex))
         }
     }
 

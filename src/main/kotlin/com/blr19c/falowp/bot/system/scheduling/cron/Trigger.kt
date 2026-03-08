@@ -30,7 +30,6 @@ interface Trigger {
         }
         return completion
     }
-
 }
 
 /**
@@ -50,7 +49,6 @@ data class CronTrigger(
         val date = scheduledDate(triggerContext).atZone(zoneOffset).toLocalDateTime()
         return cronExpression.next(date)?.toInstant(zoneOffset)
     }
-
 }
 
 /**

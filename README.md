@@ -11,28 +11,41 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:2.3.3")
+implementation("com.blr19c.falowp:falowp-bot-system:2.3.4")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
 
+### 2.3.4
+
+* 移除了`applicationConfig`的额外缓存
+* 优化了`-nc`适配器发送文件的使用方式
+* 新增了`-nc`适配器支持截断消息用于避免同类消息自动合并
+* 重构了`cron`定时任务组件提升执行效率
+* 新增了`WebServer`中使用`BotApi`的场景
+* 更新了默认的`useragent`
+* 优化了一些异常和日志的打印
+
 ### 2.3.3
+
 * 更新一些依赖版本
 * 重构了 `ClassUtils` `ResourceUtils` `ScanUtils` 提升扫描包和资源文件的效率
 * 优化了资源文件读取
 
 ### 2.3.2
+
 * 更新一些依赖版本
 * `CacheMap`支持设置缓存上限
 * `-nc`适配器的合并转发消息从`OTHER`类型改为`SHARE`类型
 * `-bili`插件优化了一些动态推送逻辑
 * `-repeat`插件优化了逻辑
 * 新版本的`Jackson`对`JsonNode`添加了`.map`方法,这会导致Kotlin的扩展函数不可用
-    use: `.elements().map or .mapNotNull`
+  use: `.elements().map or .mapNotNull`
 
 ### 2.3.1
+
 * 更新一些依赖版本
 * 优化`EventBotApi`使用场景
 * 支持更多事件场景
@@ -55,13 +68,15 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.3.3")
 * `MessagePluginRegisterMatch`改为`MessageMatch`
 * `ReceiveMessage`中`Self`信息改为`BotSelf`,并支持在`BotApi`中直接获取
 * `Event`事件中增加来源和触发人
-* 重做了[`plugin`](https://github.com/falowp-bot/falowp-bot-system/blob/main/src/main/kotlin/com/blr19c/falowp/bot/system/plugin/Plugin.kt)
+* 重做了[
+  `plugin`](https://github.com/falowp-bot/falowp-bot-system/blob/main/src/main/kotlin/com/blr19c/falowp/bot/system/plugin/Plugin.kt)
     - 原`eventListener`移动到`com.blr19c.falowp.bot.system.plugin.event`
     - 原`hook、beforeHook、...、aroundHook`移动到`com.blr19c.falowp.bot.system.plugin.hook`
     - 原`message、queueMessage`移动到`com.blr19c.falowp.bot.system.plugin.message`
     - 原`cronScheduling、periodicScheduling、applicationInitScheduling`移动到`com.blr19c.falowp.bot.system.plugin.task`
     - 原`poke`移动到`com.blr19c.falowp.bot.system.plugin.event.nudgeMe`
-* 由于（`gocq-http`、`AstralGocq`）停止维护，终止了对[`-cq`](https://github.com/falowp-bot/falowp-bot-plugins/tree/main/falowp-bot-adapter-cq)的维护，后续版本中可能会删除此适配器
+* 由于（`gocq-http`、`AstralGocq`）停止维护，终止了对[
+  `-cq`](https://github.com/falowp-bot/falowp-bot-plugins/tree/main/falowp-bot-adapter-cq)的维护，后续版本中可能会删除此适配器
 * 重做了[`-nc`](https://github.com/falowp-bot/falowp-bot-plugins/tree/main/falowp-bot-adapter-nc)组件全面支持`napcat`
 
 ### 2.2.4
