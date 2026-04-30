@@ -38,6 +38,9 @@ data class ReceiveMessage(
     val adapter: Adapter
 ) {
     companion object {
+        /**
+         * 创建空消息
+         */
         fun empty(): ReceiveMessage {
             val content = Content.empty()
             val sender = User.empty()
@@ -117,14 +120,23 @@ data class ReceiveMessage(
         val reference: suspend () -> ReceiveMessage?
     ) {
         companion object {
+            /**
+             * 创建空消息内容
+             */
             fun empty(): Content {
                 return Content("", null, emptyList(), emptyList(), emptyList(), null, emptyList(), emptyList()) { null }
             }
         }
 
+        /**
+         * 是否包含普通消息内容
+         */
         fun hasMessageContent(): Boolean =
             message.isNotEmpty() || image.isNotEmpty() || at.isNotEmpty() || emoji.isNotEmpty()
 
+        /**
+         * 根据内容推断消息类型
+         */
         fun toMessageType(): MessageTypeEnum {
             return when {
                 this.video != null -> MessageTypeEnum.VIDEO
@@ -274,6 +286,9 @@ data class ReceiveMessage(
     ) {
         companion object {
 
+            /**
+             * 创建空用户
+             */
             fun empty(): User {
                 return User("", "", ApiAuth.ORDINARY_MEMBER, ImageUrl.empty())
             }
@@ -295,10 +310,16 @@ data class ReceiveMessage(
         val type: SourceTypeEnum
     ) {
         companion object {
+            /**
+             * 创建空来源
+             */
             fun empty(): Source {
                 return Source("", SourceTypeEnum.UNKNOWN)
             }
 
+            /**
+             * 创建系统内部来源
+             */
             fun system(): Source {
                 return Source("system", SourceTypeEnum.SYSTEM)
             }
@@ -319,11 +340,17 @@ data class ReceiveMessage(
         val data: Any
     ) {
 
+        /**
+         * 隐藏适配器挂载数据的具体内容
+         */
         override fun toString(): String {
             return "Adapter(id=$id, data=适配器挂载:${data::class.simpleName})"
         }
 
         companion object {
+            /**
+             * 创建空适配器信息
+             */
             fun empty(): Adapter {
                 return Adapter("", "")
             }

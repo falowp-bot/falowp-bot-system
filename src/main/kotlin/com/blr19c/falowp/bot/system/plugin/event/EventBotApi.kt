@@ -9,6 +9,9 @@ import com.blr19c.falowp.bot.system.plugin.Plugin
 class EventBotApi(private val delegateBotApi: BotApi, receiveMessage: ReceiveMessage) :
     BotApi(receiveMessage, delegateBotApi.originalClass) {
 
+    /**
+     * 发送群聊消息
+     */
     override suspend fun sendGroup(
         vararg sendMessageChain: SendMessageChain,
         sourceId: String,
@@ -18,6 +21,9 @@ class EventBotApi(private val delegateBotApi: BotApi, receiveMessage: ReceiveMes
         delegateBotApi.sendGroup(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
     }
 
+    /**
+     * 发送所有群聊消息
+     */
     override suspend fun sendAllGroup(
         vararg sendMessageChain: SendMessageChain,
         reference: Boolean,
@@ -26,6 +32,9 @@ class EventBotApi(private val delegateBotApi: BotApi, receiveMessage: ReceiveMes
         delegateBotApi.sendAllGroup(*sendMessageChain, reference = reference, forward = forward)
     }
 
+    /**
+     * 发送私聊消息
+     */
     override suspend fun sendPrivate(
         vararg sendMessageChain: SendMessageChain,
         sourceId: String,
@@ -35,6 +44,9 @@ class EventBotApi(private val delegateBotApi: BotApi, receiveMessage: ReceiveMes
         delegateBotApi.sendPrivate(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
     }
 
+    /**
+     * 获取机器人自身信息
+     */
     override suspend fun self(): BotSelf {
         return delegateBotApi.self()
     }

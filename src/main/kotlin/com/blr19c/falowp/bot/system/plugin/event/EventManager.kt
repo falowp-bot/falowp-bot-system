@@ -24,6 +24,9 @@ object EventManager : Log {
             List<EventPluginRegister<out Plugin.Listener.Event>>>()
 
 
+    /**
+     * 初始化事件管理器
+     */
     fun configure(pluginList: List<PluginInfo>) {
         registerHelp(pluginList)
         log().info("加载的事件监听器数量:{}", eventPlugins.values.sumOf { it.size })

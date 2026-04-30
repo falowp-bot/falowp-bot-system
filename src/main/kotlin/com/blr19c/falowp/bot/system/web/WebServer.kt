@@ -17,9 +17,15 @@ import io.ktor.server.websocket.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.KClass
 
+/**
+ * WebServer管理器
+ */
 object WebServer : Log {
     private val routes = CopyOnWriteArrayList<RouteContext>()
 
+    /**
+     * 初始化WebServer
+     */
     fun configure() {
         val port = systemConfigProperty("web.port").toInt()
         val server = embeddedServer(CIO, port = port) {
@@ -29,11 +35,17 @@ object WebServer : Log {
         server.start(wait = true)
     }
 
+    /**
+     * 注册动态路由
+     */
     fun registerRoute(route: RouteDsl.() -> Unit) {
         routes.add(RouteContext(route, ScanUtils.getLambdaCallerClass(route)))
     }
 }
 
+/**
+ * 配置Ktor应用模块
+ */
 private fun Application.module() {
     install(WebSockets)
     install(Authentication) {
@@ -57,6 +69,9 @@ private fun Application.module() {
     }
 }
 
+/**
+ * 注册插件动态路由
+ */
 private fun Application.registerDynamicRoute(routes: List<RouteContext>) {
     routing {
         routes.forEach { route ->
@@ -66,5 +81,12 @@ private fun Application.registerDynamicRoute(routes: List<RouteContext>) {
     }
 }
 
+/**
+ * 路由上下文
+ */
 data class RouteContext(val route: RouteDsl.() -> Unit, val originalClass: KClass<*>)
+
+/**
+ * 路由DSL上下文
+ */
 data class RouteDsl(val route: Route, val botApi: BotApi) : Route by route

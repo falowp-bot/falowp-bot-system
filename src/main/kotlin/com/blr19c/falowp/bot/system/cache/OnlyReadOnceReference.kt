@@ -12,6 +12,9 @@ class OnlyReadOnceReference<T>(
     @Volatile
     private var firstCall = true
 
+    /**
+     * 首次读取返回真实数据，之后返回null
+     */
     @Synchronized
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T? {
         return if (firstCall) {

@@ -13,12 +13,17 @@ import kotlin.streams.asSequence
  */
 object ScanUtils {
 
+    const val CLASS_FILE_SUFFIX = ".class"
+
     private val callerStackWalker: StackWalker =
         StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
 
+    /**
+     * 扫描指定包下的类
+     */
     fun scanPackage(packageName: String): List<Class<*>> {
         val classLoader = Thread.currentThread().contextClassLoader
-        val packagePath = ClassUtils.convertClassNameToResourcePath(packageName)
+        val packagePath = convertClassNameToResourcePath(packageName)
         return classLoader.getResources(packagePath)
             .asSequence()
             .flatMap { scanDirectoryOrJar(it, packageName, packagePath, classLoader).asSequence() }
@@ -26,12 +31,18 @@ object ScanUtils {
             .toList()
     }
 
+    /**
+     * 获取调用方插件类
+     */
     fun getCallerClass(packageNames: List<String> = systemConfigListProperty("pluginPackage")): KClass<*> {
         val caller = findCallerClass(packageNames)
         return caller?.kotlin
             ?: throw IllegalStateException("未找到调用方类,packageNames=$packageNames")
     }
 
+    /**
+     * 获取Lambda所属类
+     */
     fun getLambdaCallerClass(lambda: Function<*>): KClass<*> {
         val className = lambda::class.qualifiedName
         val originalName = className?.substringBefore($$$"$$Lambda")
@@ -39,6 +50,9 @@ object ScanUtils {
             .getOrElse { throw IllegalStateException("未找到调用方类,className=$className") }
     }
 
+    /**
+     * 获取当前插件配置路径
+     */
     fun configPath(): String {
         val callerClass = getCallerClass()
         val qualifiedPath = callerClass.qualifiedName?.let {
@@ -49,6 +63,9 @@ object ScanUtils {
         return "bot.plugin".plus(packageName).plus(".")
     }
 
+    /**
+     * 获取当前插件资源路径
+     */
     fun pluginPath(): String {
         val callerClass = getCallerClass()
         val qualifiedPath = callerClass.qualifiedName?.let {
@@ -56,18 +73,26 @@ object ScanUtils {
             noClassNamePath.substringAfterLast("plugins")
         }
         val packageName = qualifiedPath ?: callerClass.java.packageName.substringAfterLast("plugins")
-        return ClassUtils.convertClassNameToResourcePath("plugins".plus(packageName))
+        return convertClassNameToResourcePath("plugins".plus(packageName))
     }
 
+    /**
+     * 在调用栈中查找插件类
+     */
     private fun findCallerClass(packageNames: List<String>): Class<*>? {
         return callerStackWalker.walk { frames ->
             frames.map { it.declaringClass }
                 .filter { clazz -> packageNames.any { clazz.name.contains(it) } }
                 .findFirst()
-                .orElse(null)
+                .let { optional ->
+                    if (optional.isPresent) optional.get() else null
+                }
         }
     }
 
+    /**
+     * 扫描目录或Jar资源
+     */
     private fun scanDirectoryOrJar(
         url: URL,
         packageName: String,
@@ -81,6 +106,9 @@ object ScanUtils {
         }
     }
 
+    /**
+     * 扫描文件目录中的类
+     */
     private fun scanDirectory(url: URL, packageName: String, classLoader: ClassLoader): List<Class<*>> {
         val root = url.toPathOrNull() ?: return emptyList()
         if (!Files.isDirectory(root)) {
@@ -91,15 +119,18 @@ object ScanUtils {
             pathStream
                 .asSequence()
                 .filter { Files.isRegularFile(it) }
-                .filter { it.fileName.toString().endsWith(ClassUtils.CLASS_FILE_SUFFIX) }
+                .filter { it.fileName.toString().endsWith(CLASS_FILE_SUFFIX) }
                 .map { root.relativize(it).toString() }
-                .map { it.replace('\\', '/').removeSuffix(ClassUtils.CLASS_FILE_SUFFIX) }
+                .map { it.replace('\\', '/').removeSuffix(CLASS_FILE_SUFFIX) }
                 .map { "$packageName.${it.replace('/', '.')}" }
                 .mapNotNull { loadClassOrNull(it, classLoader) }
                 .toList()
         }
     }
 
+    /**
+     * 扫描Jar中的类
+     */
     private fun scanJar(url: URL, packagePath: String, classLoader: ClassLoader): List<Class<*>> {
         val connection = runCatching { url.openConnection() }.getOrNull()
         if (connection !is JarURLConnection) {
@@ -110,14 +141,17 @@ object ScanUtils {
         return connection.jarFile.use { jar ->
             jar.entries().asSequence()
                 .filter { !it.isDirectory }
-                .filter { it.name.endsWith(ClassUtils.CLASS_FILE_SUFFIX) }
+                .filter { it.name.endsWith(CLASS_FILE_SUFFIX) }
                 .filter { it.name.startsWith("$packagePath/") }
-                .map { it.name.removeSuffix(ClassUtils.CLASS_FILE_SUFFIX).replace('/', '.') }
+                .map { it.name.removeSuffix(CLASS_FILE_SUFFIX).replace('/', '.') }
                 .mapNotNull { loadClassOrNull(it, classLoader) }
                 .toList()
         }
     }
 
+    /**
+     * 尝试加载类
+     */
     private fun loadClassOrNull(className: String, classLoader: ClassLoader): Class<*>? {
         return try {
             Class.forName(className, false, classLoader)
@@ -128,7 +162,17 @@ object ScanUtils {
         }
     }
 
+    /**
+     * URL转换为Path
+     */
     private fun URL.toPathOrNull(): Path? {
         return runCatching { Path.of(this.toURI()) }.getOrNull()
+    }
+
+    /**
+     * 类名转换为资源路径
+     */
+    private fun convertClassNameToResourcePath(className: String): String {
+        return className.replace('.', '/')
     }
 }

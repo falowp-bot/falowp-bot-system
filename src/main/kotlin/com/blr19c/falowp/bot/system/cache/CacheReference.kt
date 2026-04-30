@@ -19,10 +19,16 @@ class CacheReference<T : Any>(
         .expireAfterWrite(duration.toJavaDuration())
         .build(CacheLoader.from<String, T> { _ -> runBlocking { block.invoke() } })
 
+    /**
+     * 作为委托属性读取缓存值
+     */
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return cache.get("onlyKey")
     }
 
+    /**
+     * 刷新缓存值
+     */
     fun refresh() {
         return cache.refresh("onlyKey")
     }

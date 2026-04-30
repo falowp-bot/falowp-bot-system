@@ -23,8 +23,14 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets.UTF_8
 import kotlin.time.Duration.Companion.minutes
 
+/**
+ * WebClient管理器
+ */
 object WebClient : Log {
 
+    /**
+     * 初始化WebClient
+     */
     fun configure() {
         log().info("初始化WebClient")
         client

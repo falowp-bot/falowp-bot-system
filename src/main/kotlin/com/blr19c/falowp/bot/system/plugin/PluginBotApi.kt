@@ -16,6 +16,9 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
     BotApi(delegateBotApi.receiveMessage, delegateBotApi.originalClass) {
     private val messageIds = ConcurrentSet<String>()
 
+    /**
+     * 通过插件钩子发送群聊消息
+     */
     override suspend fun sendGroup(
         vararg sendMessageChain: SendMessageChain,
         sourceId: String,
@@ -30,6 +33,9 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
         }
     }
 
+    /**
+     * 通过插件钩子发送所有群聊消息
+     */
     override suspend fun sendAllGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         val sendMessageHook = SendMessageHook(sendMessageChain.toMutableList())
         withPluginHook(delegateBotApi, sendMessageHook) {
@@ -39,6 +45,9 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
         }
     }
 
+    /**
+     * 通过插件钩子发送私聊消息
+     */
     override suspend fun sendPrivate(
         vararg sendMessageChain: SendMessageChain,
         sourceId: String,
@@ -53,6 +62,9 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
         }
     }
 
+    /**
+     * 通过插件钩子发送文本回复
+     */
     override suspend fun sendReply(vararg sendMessage: String, reference: Boolean, forward: Boolean) {
         sendReply(
             *sendMessage.map { SendMessage.builder(it).build() }.toTypedArray(),
@@ -61,6 +73,9 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
         )
     }
 
+    /**
+     * 通过插件钩子发送消息链回复
+     */
     override suspend fun sendReply(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         val sendMessageHook = SendMessageHook(sendMessageChain.toMutableList())
         withPluginHook(delegateBotApi, sendMessageHook) {
@@ -70,10 +85,16 @@ class PluginBotApi(private val delegateBotApi: BotApi) :
         }
     }
 
+    /**
+     * 获取机器人自身信息
+     */
     override suspend fun self(): BotSelf {
         return delegateBotApi.self()
     }
 
+    /**
+     * 发布发送消息事件
+     */
     private suspend fun publishSendMessageEvent(
         vararg sendMessageChain: SendMessageChain,
         reference: Boolean,

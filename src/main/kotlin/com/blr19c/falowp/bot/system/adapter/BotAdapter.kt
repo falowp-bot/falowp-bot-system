@@ -12,6 +12,9 @@ annotation class BotAdapter(val name: String)
  */
 interface BotAdapterInterface {
 
+    /**
+     * 启动协议适配器
+     */
     suspend fun start(register: BotAdapterRegister)
 
 }
@@ -22,6 +25,9 @@ interface BotAdapterInterface {
 @Suppress("UNUSED")
 class BotAdapterRegister(private val registerList: MutableList<BotAdapterInterface>) {
 
+    /**
+     * 完成协议适配器注册
+     */
     fun finish(botAdapterInterface: BotAdapterInterface) {
         registerList.add(botAdapterInterface)
     }

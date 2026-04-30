@@ -61,6 +61,9 @@ class SchedulingRunnable(
      */
     suspend fun await() = mutex.withLock { obtainCurrentFuture() }.await()
 
+    /**
+     * 等待任务直至完成或超时
+     */
     suspend fun await(timeout: Duration) = withTimeout(timeout) {
         mutex.withLock { obtainCurrentFuture() }.await()
     }
@@ -76,6 +79,9 @@ class SchedulingRunnable(
     }
 
 
+    /**
+     * 执行当前任务并调度下一次
+     */
     private suspend fun run() {
         val actualExecutionTime = Instant.now()
         delegateRun()
@@ -89,6 +95,9 @@ class SchedulingRunnable(
         }
     }
 
+    /**
+     * 委托执行任务插件
+     */
     private suspend fun delegateRun() {
         try {
             val schedulingBotApi = SchedulingBotApi(plugin.originalClass)
@@ -100,6 +109,9 @@ class SchedulingRunnable(
         }
     }
 
+    /**
+     * 延迟到触发时间后执行任务
+     */
     private suspend fun asyncRun(initialDelay: Duration) {
         awaitInit()
         delay(initialDelay)
@@ -107,12 +119,18 @@ class SchedulingRunnable(
         this.run()
     }
 
+    /**
+     * 等待协议适配器初始化完成
+     */
     private suspend fun awaitInit() {
         while (!isInit()) {
-            delay(500)
+            delay(500.milliseconds)
         }
     }
 
+    /**
+     * 获取当前执行任务
+     */
     private fun obtainCurrentFuture(): Deferred<Unit> {
         return this.currentFuture!!
     }

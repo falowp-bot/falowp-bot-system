@@ -22,6 +22,9 @@ object AdapterApplication : Log {
     private val loadAdapter = CopyOnWriteArrayList<BotAdapterInterface>()
     private val botApiSupportList = CopyOnWriteArrayList<SchedulingBotApiSupport>()
 
+    /**
+     * 初始化协议适配器
+     */
     suspend fun configure() = coroutineScope {
         log().info("初始化协议适配")
         val botAdapterRegister = BotAdapterRegister(loadAdapter)
@@ -36,6 +39,9 @@ object AdapterApplication : Log {
         log().info("初始化协议适配完成")
     }
 
+    /**
+     * 初始化单个协议适配器
+     */
     private suspend fun initAdapter(adapter: Class<*>, botAdapterRegister: BotAdapterRegister): BotAdapterInfo? {
         val annotation = adapter.getAnnotation(BotAdapter::class.java) ?: return null
         @Suppress("UNCHECKED_CAST")
@@ -47,14 +53,23 @@ object AdapterApplication : Log {
         return BotAdapterInfo(annotation.name, adapter)
     }
 
+    /**
+     * 协议适配器是否加载完成
+     */
     fun isLoadingCompleted(): Boolean {
         return ::load.isInitialized && loadSize.toInt() == loadAdapter.size
     }
 
+    /**
+     * 获取定时任务BotApi支持列表
+     */
     fun botApiSupportList(): List<SchedulingBotApiSupport> {
         return Collections.unmodifiableList(botApiSupportList)
     }
 
+    /**
+     * 注册定时任务BotApi支持
+     */
     fun botApiSupportRegister(botApiSupport: SchedulingBotApiSupport) {
         botApiSupportList.add(botApiSupport)
         botApiSupportList.sortBy(SchedulingBotApiSupport::order)

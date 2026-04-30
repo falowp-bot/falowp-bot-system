@@ -1,22 +1,40 @@
-![maven](https://img.shields.io/badge/Kotlin-2.0.0-blue.svg)
-![maven](https://img.shields.io/badge/Ktor-3.0.0-a.svg)
-![maven](https://img.shields.io/badge/go--cqhttp-1.2.0-red)
-![maven](https://img.shields.io/badge/qq-bot-red)
+![maven](https://img.shields.io/badge/Kotlin-2.0+-blue.svg)
+![maven](https://img.shields.io/badge/Ktor-3.0+-a.svg)
+![maven](https://img.shields.io/badge/CQ1.2+-red)
+![maven](https://img.shields.io/badge/Napcat4.0+-red)
+![maven](https://img.shields.io/badge/QQ-red)
+![maven](https://img.shields.io/badge/TG-red)
+![maven](https://img.shields.io/badge/WX-red)
 
 # 小花落 Bot
 
-> 此项目基于QQBot和go-cqhttp开发的机器人框架
+> 一个通用的机器人框架
+
+> 组件参考 [Plugins](https://github.com/falowp-bot/falowp-bot-plugins)
+
+> Demo参考 [Demo](https://github.com/falowp-bot/falowp-bot-demo)
+
+* QQ
+* 微信
+* 电报
 
 ## 当前最新版本
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:2.3.4")
+implementation("com.blr19c.falowp:falowp-bot-system:2.3.5")
 ```
 
 ## [查看文档](https://falowp.blr19c.com)
 
 ## 更新日志
+
+### 2.3.5
+
+* 更新一些依赖版本
+* 移除了`ClassUtils`
+* 补充了一些注释
+* 优化了一些弱警告
 
 ### 2.3.4
 

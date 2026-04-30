@@ -9,10 +9,16 @@ import kotlinx.io.readByteArray
 import tools.jackson.databind.ObjectMapper
 import java.nio.charset.Charset
 
+/**
+ * Ktor使用的Jackson3内容转换器
+ */
 class Jackson3Converter(
     private val mapper: ObjectMapper
 ) : ContentConverter {
 
+    /**
+     * 序列化响应内容
+     */
     override suspend fun serialize(
         contentType: ContentType,
         charset: Charset,
@@ -24,6 +30,9 @@ class Jackson3Converter(
         return TextContent(text, contentType.withCharset(charset))
     }
 
+    /**
+     * 反序列化请求内容
+     */
     override suspend fun deserialize(
         charset: io.ktor.utils.io.charsets.Charset,
         typeInfo: TypeInfo,

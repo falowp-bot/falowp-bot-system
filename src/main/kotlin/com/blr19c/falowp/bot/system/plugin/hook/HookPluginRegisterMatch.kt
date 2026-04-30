@@ -12,6 +12,9 @@ data class HookPluginRegisterMatch(
     val customBlock: ((PluginInfo) -> Boolean)? = null,
 ) {
     companion object {
+        /**
+         * 匹配全部插件
+         */
         fun allMatch(): HookPluginRegisterMatch {
             return HookPluginRegisterMatch()
         }

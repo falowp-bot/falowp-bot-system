@@ -31,10 +31,16 @@ data class QueueMessagePluginRegister(
     override val originalClass: KClass<*> = messagePluginRegister.originalClass
 ) : PluginRegister() {
 
+    /**
+     * 注册队列消息插件
+     */
     override fun register() {
         PluginManagement.registerMessage(this)
     }
 
+    /**
+     * 取消注册队列消息插件
+     */
     override fun unregister() {
         PluginManagement.unregisterMessage(this)
     }

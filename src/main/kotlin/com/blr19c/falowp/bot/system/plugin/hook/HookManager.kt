@@ -14,16 +14,25 @@ object HookManager : Log {
     private val hookPlugins = ConcurrentHashMap<String, HookPluginRegister<out Plugin.Listener.Hook>>()
     private val pluginList = mutableListOf<PluginInfo>()
 
+    /**
+     * 初始化钩子管理器
+     */
     fun configure(pluginList: List<PluginInfo>) {
         this.pluginList.addAll(pluginList)
         log().info("加载的钩子监听器数量:{}", hookPlugins.size)
     }
 
+    /**
+     * 注册钩子插件
+     */
     fun <T : Plugin.Listener.Hook> registerHook(hookPluginRegister: HookPluginRegister<T>) {
         hookPlugins[hookPluginRegister.pluginId] = hookPluginRegister
     }
 
 
+    /**
+     * 取消注册钩子插件
+     */
     fun <T : Plugin.Listener.Hook> unregister(hookPluginRegister: HookPluginRegister<T>) {
         hookPlugins.remove(hookPluginRegister.pluginId)
     }

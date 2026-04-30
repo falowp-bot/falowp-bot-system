@@ -17,7 +17,7 @@ plugins {
 }
 
 group = "com.blr19c.falowp"
-version = "2.3.4"
+version = "2.3.5"
 
 kotlin {
     jvmToolchain(25)
@@ -74,11 +74,13 @@ configurations.all {
 }
 
 tasks.register<Jar>("javadocJar") {
+    description = "javadoc"
     archiveClassifier.set("javadoc")
     from(tasks.getByName("javadoc"))
 }
 
 tasks.register<Jar>("sourcesJar") {
+    description = "sources"
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
 }

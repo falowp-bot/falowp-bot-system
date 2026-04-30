@@ -7,6 +7,7 @@ import com.blr19c.falowp.bot.system.scheduling.cron.TriggerContext
 import com.blr19c.falowp.bot.system.systemConfigProperty
 import kotlinx.coroutines.delay
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * 早晚安事件
@@ -22,11 +23,17 @@ object GreetingTask {
         goodMorningCronTime!!.isBefore(goodNightCronTime)
     }.let { AtomicBoolean(it) }
 
+    /**
+     * 早安任务
+     */
     val goodMorning = TaskPluginRegister(goodMorningCron, {
         leisureTime.set(false)
         this.publishEvent(GreetingEvent(goodMorning = true, goodNight = false))
     }, GreetingTask::class)
 
+    /**
+     * 晚安任务
+     */
     val goodNight = TaskPluginRegister(goodNightCron, {
         leisureTime.set(true)
         this.publishEvent(GreetingEvent(goodMorning = false, goodNight = true))
@@ -40,7 +47,7 @@ object GreetingTask {
             val nextExecutionTime = goodMorningCron.nextExecutionTime(TriggerContext())
             val delay = nextExecutionTime!!.toEpochMilli() - System.currentTimeMillis()
             if (leisureTime.get()) {
-                delay(delay)
+                delay(delay.milliseconds)
             }
         }
     }

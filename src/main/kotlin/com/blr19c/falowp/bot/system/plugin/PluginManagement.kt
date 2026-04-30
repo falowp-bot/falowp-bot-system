@@ -68,6 +68,9 @@ object PluginManagement : Log {
         queueMessagePlugins.remove(pluginRegister.pluginId)?.close()
     }
 
+    /**
+     * 初始化插件管理器
+     */
     fun configure() {
         log().info("初始化插件")
         val pluginPackage = systemConfigListProperty("pluginPackage")
@@ -133,6 +136,9 @@ object PluginManagement : Log {
         allPluginJob.joinAll()
     }
 
+    /**
+     * 尝试执行队列消息插件
+     */
     private suspend fun executeQueueMessagePlugin(plugin: MessagePluginRegister, botApiJob: BotApiJob): Boolean {
         if (!queueMessageInfos.containsKey(plugin.pluginId)) {
             return false
@@ -149,6 +155,9 @@ object PluginManagement : Log {
     }
 
 
+    /**
+     * 构建消息插件执行任务
+     */
     private fun CoroutineScope.buildJob(
         message: ReceiveMessage,
         plugin: MessagePluginRegister,
@@ -167,17 +176,26 @@ object PluginManagement : Log {
         return BotApiJob(botApi, job)
     }
 
+    /**
+     * 初始化插件工具类
+     */
     private fun initPluginUtils(plugin: Class<*>) {
         if (plugin.isAnnotationPresent(PluginUtils::class.java)) {
             plugin.kotlin.objectInstance
         }
     }
 
+    /**
+     * 初始化普通插件
+     */
     private fun initPlugin(plugin: Class<*>): PluginInfo? {
         val annotation = plugin.getAnnotation(Plugin::class.java) ?: return null
         if (!annotation.enable) return null
         return PluginInfo(plugin.constructors.first().newInstance(), annotation)
     }
 
+    /**
+     * 消息插件执行任务
+     */
     data class BotApiJob(val botApi: BotApi, val job: Job)
 }

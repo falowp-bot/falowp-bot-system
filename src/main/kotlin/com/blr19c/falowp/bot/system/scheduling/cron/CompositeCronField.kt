@@ -11,6 +11,9 @@ internal class CompositeCronField private constructor(
     private val value: String,
 ) : CronField(type) {
 
+    /**
+     * 获取组合字段中最早匹配的时间
+     */
     override fun nextOrSame(temporal: Temporal): Temporal? {
         var best: Temporal? = null
         for (field in fields) {
@@ -34,6 +37,9 @@ internal class CompositeCronField private constructor(
     override fun toString(): String = "${type()} '$value'"
 
     companion object {
+        /**
+         * 创建组合字段
+         */
         fun compose(fields: Array<CronField>, type: Type, value: String): CronField {
             return if (fields.size == 1) fields[0] else CompositeCronField(type, fields, value)
         }

@@ -13,6 +13,9 @@ class HookBotApi(
     register: HookPluginRegister<out Plugin.Listener.Hook>
 ) : BotApi(delegateBotApi.receiveMessage, register.originalClass) {
 
+    /**
+     * 发送群聊消息
+     */
     override suspend fun sendGroup(
         vararg sendMessageChain: SendMessageChain,
         sourceId: String,
@@ -22,10 +25,16 @@ class HookBotApi(
         delegateBotApi.sendGroup(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
     }
 
+    /**
+     * 发送所有群聊消息
+     */
     override suspend fun sendAllGroup(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         delegateBotApi.sendAllGroup(*sendMessageChain, reference = reference, forward = forward)
     }
 
+    /**
+     * 发送私聊消息
+     */
     override suspend fun sendPrivate(
         vararg sendMessageChain: SendMessageChain,
         sourceId: String,
@@ -35,14 +44,23 @@ class HookBotApi(
         delegateBotApi.sendPrivate(*sendMessageChain, sourceId = sourceId, reference = reference, forward = forward)
     }
 
+    /**
+     * 发送文本回复
+     */
     override suspend fun sendReply(vararg sendMessage: String, reference: Boolean, forward: Boolean) {
         delegateBotApi.sendReply(*sendMessage, reference = reference, forward = forward)
     }
 
+    /**
+     * 发送消息链回复
+     */
     override suspend fun sendReply(vararg sendMessageChain: SendMessageChain, reference: Boolean, forward: Boolean) {
         delegateBotApi.sendReply(*sendMessageChain, reference = reference, forward = forward)
     }
 
+    /**
+     * 获取机器人自身信息
+     */
     override suspend fun self(): BotSelf {
         return delegateBotApi.self()
     }

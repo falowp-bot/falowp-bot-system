@@ -16,6 +16,9 @@ internal class QuartzCronField private constructor(
 
     private constructor(type: Type, adjuster: TemporalAdjuster, value: String) : this(type, type, adjuster, value)
 
+    /**
+     * 获取Quartz字段匹配的当前或下一个时间
+     */
     override fun nextOrSame(temporal: Temporal): Temporal? {
         var seed = temporal
         var result = adjust(seed) ?: return null
@@ -42,8 +45,14 @@ internal class QuartzCronField private constructor(
     override fun toString(): String = "${type()} '$value'"
 
     companion object {
+        /**
+         * 是否为Quartz日期字段
+         */
         fun isQuartzDaysOfMonthField(value: String): Boolean = value.contains('L') || value.contains('W')
 
+        /**
+         * 解析Quartz日期字段
+         */
         fun parseDaysOfMonth(value: String): QuartzCronField {
             val lIndex = value.lastIndexOf('L')
             if (lIndex != -1) {
@@ -76,8 +85,14 @@ internal class QuartzCronField private constructor(
             return QuartzCronField(Type.DAY_OF_MONTH, weekdayNearestTo(dayOfMonth), value)
         }
 
+        /**
+         * 是否为Quartz星期字段
+         */
         fun isQuartzDaysOfWeekField(value: String): Boolean = value.contains('L') || value.contains('#')
 
+        /**
+         * 解析Quartz星期字段
+         */
         fun parseDaysOfWeek(value: String): QuartzCronField {
             val lIndex = value.lastIndexOf('L')
             if (lIndex != -1) {

@@ -12,6 +12,7 @@ import com.blr19c.falowp.bot.system.plugin.UnRegister
 import com.blr19c.falowp.bot.system.plugin.message.MessageMatch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * 钩子函数
@@ -66,7 +67,7 @@ suspend fun <T : Any> BotApi.awaitReply(
         }
     }
     while (isActive && data == null) {
-        delay(100)
+        delay(100.milliseconds)
     }
     return data!!
 }

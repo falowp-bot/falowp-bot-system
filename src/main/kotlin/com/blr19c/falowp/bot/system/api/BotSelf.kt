@@ -9,5 +9,8 @@ interface BotSelf {
      */
     val id: String
 
+    /**
+     * 默认机器人自身信息
+     */
     data class Default(override val id: String = "") : BotSelf
 }

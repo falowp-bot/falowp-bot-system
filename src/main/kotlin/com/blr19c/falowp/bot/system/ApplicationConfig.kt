@@ -23,6 +23,9 @@ import java.io.InputStream
  */
 object Resources : Log {
 
+    /**
+     * 初始化资源和配置
+     */
     fun configure() {
         log().info("初始化资源文件")
         applicationConfig
@@ -60,25 +63,46 @@ private val applicationConfig by lazy {
 private val configDefaultValue: (String) -> String = { throw IllegalArgumentException("未找到配置:$it") }
 private val configDefaultListValue: (String) -> List<String> = { throw IllegalArgumentException("未找到配置:$it") }
 
+/**
+ * YAML配置值
+ */
 open class JacksonYAMLValue(
+    /**
+     * 当前配置节点
+     */
     val jsonNode: JsonNode,
 ) {
 
+    /**
+     * 空配置值
+     */
     constructor() : this(NullNode.instance)
 
+    /**
+     * 读取子配置
+     */
     open fun getConfig(path: String): JacksonYAMLValue {
         return JacksonYAMLValue(jsonNode.foldPath(path))
     }
 
+    /**
+     * 读取子配置列表
+     */
     open fun getListConfig(path: String): List<JacksonYAMLValue> {
         val value = jsonNode.foldPath(path)
         return value.mapNotNull { JacksonYAMLValue(it) }.toList()
     }
 
+    /**
+     * 读取字符串配置
+     */
     open fun getStringOrNull(path: String): String? {
         return jsonNode.foldPath(path).safeStringOrNull()
     }
 
+    /**
+     * 读取字符串列表配置
+     */
     open fun getListStringOrNull(path: String): List<String>? {
         val firstValue = jsonNode.foldPath(path)
         if (firstValue.isArray) {
@@ -87,37 +111,57 @@ open class JacksonYAMLValue(
         return null
     }
 
+    /**
+     * 转为Map
+     */
     open fun toMap(): Map<String, Any?> {
         return Json.objectMapper().convertValue(jsonNode)
     }
 
+    /**
+     * 合并配置值
+     */
     fun merge(value: JacksonYAMLValue?): JacksonYAMLValue {
         return JacksonYAMLMergeValue(this, value ?: return this)
     }
 }
 
-
+/**
+ * 合并后的YAML配置值
+ */
 internal class JacksonYAMLMergeValue(
     private val first: JacksonYAMLValue,
     private val second: JacksonYAMLValue,
 ) : JacksonYAMLValue() {
 
+    /**
+     * 合并并读取子配置
+     */
     override fun getConfig(path: String): JacksonYAMLValue {
         val firstValue = first.getConfig(path)
         val secondValue = second.getConfig(path)
         return firstValue.merge(secondValue)
     }
 
+    /**
+     * 合并并读取子配置列表
+     */
     override fun getListConfig(path: String): List<JacksonYAMLValue> {
         return (first.getListConfig(path) + second.getListConfig(path)).distinct()
     }
 
+    /**
+     * 按优先级读取字符串配置
+     */
     override fun getStringOrNull(path: String): String? {
         val firstValue = first.getStringOrNull(path)
         val secondValue = second.getStringOrNull(path)
         return firstValue ?: secondValue
     }
 
+    /**
+     * 合并并读取字符串列表配置
+     */
     override fun getListStringOrNull(path: String): List<String>? {
         val firstValue = first.getListStringOrNull(path)
         val secondValue = second.getListStringOrNull(path)
@@ -130,6 +174,9 @@ internal class JacksonYAMLMergeValue(
         return list.distinct()
     }
 
+    /**
+     * 合并为Map
+     */
     override fun toMap(): Map<String, Any?> {
         return first.toMap() + second.toMap()
     }

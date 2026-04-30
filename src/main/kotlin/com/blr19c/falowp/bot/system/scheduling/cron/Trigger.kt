@@ -7,6 +7,9 @@ import java.time.ZoneOffset
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * 任务触发器
+ */
 interface Trigger {
     /**
      * 跟随系统的闲时状态执行定时
@@ -40,10 +43,16 @@ data class CronTrigger(
      * cron
      */
     val cron: String,
+    /**
+     * 跟随系统的闲时状态执行定时
+     */
     override val useGreeting: Boolean
 ) : Trigger {
     private val cronExpression: CronExpression = CronExpression.parse(cron)
 
+    /**
+     * 获取Cron下一次执行时间
+     */
     override fun nextExecutionTime(triggerContext: TriggerContext): Instant? {
         val zoneOffset = ZoneOffset.of(systemConfigProperty("zoneOffset") { "+8" })
         val date = scheduledDate(triggerContext).atZone(zoneOffset).toLocalDateTime()
@@ -67,9 +76,15 @@ data class PeriodicTrigger(
      * 首次执行间隔
      */
     val initialDelay: Duration = 0.seconds,
+    /**
+     * 跟随系统的闲时状态执行定时
+     */
     override val useGreeting: Boolean,
 ) : Trigger {
 
+    /**
+     * 获取周期任务下一次执行时间
+     */
     override fun nextExecutionTime(triggerContext: TriggerContext): Instant? {
         val lastExecution = triggerContext.lastScheduledExecutionTime()
             ?: return Instant.ofEpochMilli(System.currentTimeMillis() + initialDelay.inWholeMilliseconds)
@@ -88,6 +103,9 @@ class ApplicationInitTrigger(override val useGreeting: Boolean) : Trigger {
         Instant.ofEpochMilli(System.currentTimeMillis())
     }
 
+    /**
+     * 获取应用初始化后的首次执行时间
+     */
     override fun nextExecutionTime(triggerContext: TriggerContext): Instant? {
         return onlyReadOnceReference
     }

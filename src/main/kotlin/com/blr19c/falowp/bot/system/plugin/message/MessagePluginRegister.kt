@@ -29,10 +29,16 @@ data class MessagePluginRegister(
     override val originalClass: KClass<*> = getCallerClass()
 ) : PluginRegister() {
 
+    /**
+     * 注册消息插件
+     */
     override fun register() {
         PluginManagement.registerMessage(this)
     }
 
+    /**
+     * 取消注册消息插件
+     */
     override fun unregister() {
         PluginManagement.unregisterMessage(this)
     }

@@ -14,10 +14,19 @@ import java.util.*
  */
 internal abstract class CronField protected constructor(private val type: Type) {
 
+    /**
+     * 获取当前字段匹配的当前或下一个时间
+     */
     abstract fun nextOrSame(temporal: Temporal): Temporal?
 
+    /**
+     * 获取字段类型
+     */
     protected fun type(): Type = type
 
+    /**
+     * Cron字段类型
+     */
     enum class Type(
         private val field: ChronoField,
         private val higherOrder: ChronoUnit,
@@ -61,10 +70,19 @@ internal abstract class CronField protected constructor(private val type: Type) 
 
         private val lowerOrders: Array<ChronoField> = arrayOf(*lowerOrders)
 
+        /**
+         * 获取时间字段值
+         */
         operator fun get(date: Temporal): Int = date[field]
 
+        /**
+         * 获取字段取值范围
+         */
         fun range(): ValueRange = field.range()
 
+        /**
+         * 校验字段值
+         */
         fun checkValidValue(value: Int): Int {
             if (this == DAY_OF_WEEK && value == 0) {
                 return 0
@@ -76,6 +94,9 @@ internal abstract class CronField protected constructor(private val type: Type) 
             }
         }
 
+        /**
+         * 推进时间直到达到目标字段值
+         */
         fun elapseUntil(temporal: Temporal, goal: Int): Temporal {
             val current = get(temporal)
             val range = temporal.range(field)
@@ -93,12 +114,18 @@ internal abstract class CronField protected constructor(private val type: Type) 
             }
         }
 
+        /**
+         * 推进到更高一级时间单位
+         */
         fun rollForward(temporal: Temporal): Temporal {
             val result = higherOrder.addTo(temporal, 1)
             val range = result.range(field)
             return field.adjustInto(result, range.minimum)
         }
 
+        /**
+         * 重置低阶字段
+         */
         fun reset(temporal: Temporal): Temporal {
             var candidate = temporal
             for (lowerOrder in lowerOrders) {
@@ -118,14 +145,29 @@ internal abstract class CronField protected constructor(private val type: Type) 
         )
         private val DAYS = arrayOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
 
+        /**
+         * 创建纳秒归零字段
+         */
         fun zeroNanos(): CronField = BitsCronField.zeroNanos()
 
+        /**
+         * 解析秒字段
+         */
         fun parseSeconds(value: String): CronField = BitsCronField.parseSeconds(value)
 
+        /**
+         * 解析分钟字段
+         */
         fun parseMinutes(value: String): CronField = BitsCronField.parseMinutes(value)
 
+        /**
+         * 解析小时字段
+         */
         fun parseHours(value: String): CronField = BitsCronField.parseHours(value)
 
+        /**
+         * 解析日期字段
+         */
         fun parseDaysOfMonth(value: String): CronField {
             if (!isQuartzDaysOfMonthField(value)) {
                 return BitsCronField.parseDaysOfMonth(value)
@@ -139,8 +181,14 @@ internal abstract class CronField protected constructor(private val type: Type) 
             }
         }
 
+        /**
+         * 解析月份字段
+         */
         fun parseMonth(value: String): CronField = BitsCronField.parseMonth(replaceOrdinals(value, MONTHS))
 
+        /**
+         * 解析星期字段
+         */
         fun parseDaysOfWeek(value: String): CronField {
             val normalized = replaceOrdinals(value, DAYS)
             if (!isQuartzDaysOfWeekField(normalized)) {
@@ -178,6 +226,9 @@ internal abstract class CronField protected constructor(private val type: Type) 
             return result
         }
 
+        /**
+         * 比较两个时间先后
+         */
         @Suppress("UNCHECKED_CAST")
         fun isBefore(left: Temporal, right: Temporal): Boolean {
             return (left as Comparable<Any>) < (right as Any)

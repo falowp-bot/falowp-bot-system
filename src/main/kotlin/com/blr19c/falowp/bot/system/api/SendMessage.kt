@@ -12,76 +12,130 @@ import java.util.*
 interface SendMessage {
 
     companion object {
+        /**
+         * 创建包含文本内容的消息链构建器
+         */
         fun builder(content: String): Builder {
             return Builder().text(content)
         }
 
+        /**
+         * 创建消息链构建器
+         */
         fun builder(): Builder {
             return Builder()
         }
     }
 
+    /**
+     * 消息链构建器
+     */
     @Suppress("unused")
     class Builder(val messageList: MutableList<SendMessage> = arrayListOf()) {
 
+        /**
+         * 添加文本消息
+         */
         fun text(content: String) = apply {
             messageList.addLast(TextSendMessage(content))
         }
 
+        /**
+         * 添加单个at消息
+         */
         fun at(at: String) = apply {
             messageList.addLast(AtSendMessage(at))
         }
 
+        /**
+         * 添加多个at消息
+         */
         fun at(at: List<String>) = apply {
             at.forEach { messageList.addLast(AtSendMessage(it)) }
         }
 
+        /**
+         * at消息发送人
+         */
         fun at(receiveMessage: ReceiveMessage) = apply {
             messageList.addLast(AtSendMessage(receiveMessage.sender.id))
         }
 
+        /**
+         * 添加图片消息
+         */
         fun image(image: String) = apply {
             messageList.addLast(ImageSendMessage(image.toImageUrl()))
         }
 
+        /**
+         * 添加多张图片消息
+         */
         fun image(images: List<String>) = apply {
             images.forEach {
                 messageList.addLast(ImageSendMessage(it.toImageUrl()))
             }
         }
 
+        /**
+         * 添加语音消息
+         */
         fun voice(video: URI) = apply {
             messageList.addLast(VoiceSendMessage(video))
         }
 
+        /**
+         * 添加视频消息
+         */
         fun video(video: URI) = apply {
             messageList.addLast(VideoSendMessage(video))
         }
 
+        /**
+         * 添加多个视频消息
+         */
         fun video(videos: List<URI>) = apply {
             videos.forEach { messageList.addLast(VideoSendMessage(it)) }
         }
 
+        /**
+         * 添加轻推消息
+         */
         fun nudge(id: String) = apply {
             messageList.addLast(NudgeSendMessage(id))
         }
 
+        /**
+         * 回复轻推事件
+         */
         fun nudge(nudgeEvent: NudgeEvent) = apply {
             messageList.addLast(NudgeSendMessage(nudgeEvent.actor.id))
         }
 
+        /**
+         * 添加表情消息
+         */
         fun emoji(id: String, type: String, display: String) = apply {
             messageList.addLast(EmojiSendMessage(id, type, display))
         }
 
+        /**
+         * 添加表情消息
+         */
         fun emoji(emojiSendMessage: EmojiSendMessage) = apply {
             messageList.addLast(emojiSendMessage)
         }
 
+        /**
+         * 添加多个表情消息
+         */
         fun emoji(emojiSendMessages: List<EmojiSendMessage>) = apply {
             emojiSendMessages.forEach { messageList.addLast(it) }
         }
 
+        /**
+         * 构建消息链
+         */
         fun build(): SendMessageChain {
             return SendMessageChain(UUID.randomUUID().toString(), messageList)
         }

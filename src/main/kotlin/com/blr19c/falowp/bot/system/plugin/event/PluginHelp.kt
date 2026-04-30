@@ -37,6 +37,9 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
         }
     }
 
+    /**
+     * 通过帮助事件钩子获取可展示插件列表
+     */
     private suspend fun withPlugin(botApi: BotApi): List<PluginInfo> {
         val helpEventHook = HelpEventHook(pluginList)
         withPluginHook(botApi, helpEventHook) {}
@@ -44,11 +47,17 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
     }
 
 
+    /**
+     * 处理帮助事件
+     */
     override suspend fun invoke(botApi: BotApi, helpEvent: HelpEvent) {
         helpEvent.pluginName ?: return allHelp(botApi, helpEvent)
         return pluginHelp(botApi, helpEvent)
     }
 
+    /**
+     * 发送单个插件帮助
+     */
     private suspend fun pluginHelp(botApi: BotApi, helpEvent: HelpEvent) {
         val plugin = withPlugin(botApi)
             .filter { it.plugin.name == helpEvent.pluginName }
@@ -66,6 +75,9 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
         botApi.send(helpEvent, SendMessage.builder().image(base64Help).build())
     }
 
+    /**
+     * 发送全部插件帮助
+     */
     private suspend fun allHelp(botApi: BotApi, helpEvent: HelpEvent) {
         val htmlString = readResource("system/help/help.html") { inputStream ->
             inputStream.bufferedReader().use { it.readText() }
@@ -93,6 +105,9 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
         botApi.send(helpEvent, SendMessage.builder().image(base64Help).build())
     }
 
+    /**
+     * 根据帮助事件来源发送消息
+     */
     private suspend fun BotApi.send(event: HelpEvent, message: SendMessageChain) {
         when (event.source.type) {
             GROUP -> this.sendGroup(message, sourceId = event.source.id)

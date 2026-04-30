@@ -3,6 +3,9 @@ package com.blr19c.falowp.bot.system.plugin
 import java.util.*
 import kotlin.reflect.KClass
 
+/**
+ * 可注册对象
+ */
 interface Register {
 
     /**
@@ -11,6 +14,9 @@ interface Register {
     fun register()
 }
 
+/**
+ * 可取消注册对象
+ */
 interface UnRegister {
 
     /**

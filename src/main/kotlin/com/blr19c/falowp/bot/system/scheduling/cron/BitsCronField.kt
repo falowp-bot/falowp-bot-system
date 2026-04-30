@@ -4,11 +4,17 @@ import java.time.DateTimeException
 import java.time.temporal.Temporal
 import java.time.temporal.ValueRange
 
+/**
+ * 使用bit集合表示可取值的Cron字段
+ */
 internal class BitsCronField private constructor(
     type: Type,
     private val bits: Long,
 ) : CronField(type) {
 
+    /**
+     * 获取当前字段匹配的当前或下一个时间
+     */
     override fun nextOrSame(temporal: Temporal): Temporal? {
         var candidate = temporal
         var current = type()[candidate]
@@ -37,8 +43,14 @@ internal class BitsCronField private constructor(
         return type().reset(candidate)
     }
 
+    /**
+     * 判断指定位置是否已设置
+     */
     private fun getBit(index: Int): Boolean = bits and (1L shl index) != 0L
 
+    /**
+     * 查找下一个已设置的位置
+     */
     private fun nextSetBit(fromIndex: Int): Int {
         val result = bits and (MASK shl fromIndex)
         return if (result != 0L) java.lang.Long.numberOfTrailingZeros(result) else -1
@@ -76,18 +88,39 @@ internal class BitsCronField private constructor(
             BitsCronField(Type.NANO, BIT_0)
         }
 
+        /**
+         * 创建纳秒归零字段
+         */
         fun zeroNanos(): BitsCronField = ZERO_NANOS
 
+        /**
+         * 解析秒字段
+         */
         fun parseSeconds(value: String): BitsCronField = parseField(value, Type.SECOND)
 
+        /**
+         * 解析分钟字段
+         */
         fun parseMinutes(value: String): BitsCronField = parseField(value, Type.MINUTE)
 
+        /**
+         * 解析小时字段
+         */
         fun parseHours(value: String): BitsCronField = parseField(value, Type.HOUR)
 
+        /**
+         * 解析日期字段
+         */
         fun parseDaysOfMonth(value: String): BitsCronField = parseDate(value, Type.DAY_OF_MONTH)
 
+        /**
+         * 解析月份字段
+         */
         fun parseMonth(value: String): BitsCronField = parseField(value, Type.MONTH)
 
+        /**
+         * 解析星期字段
+         */
         fun parseDaysOfWeek(value: String): BitsCronField {
             var result = parseDate(value, Type.DAY_OF_WEEK)
             if (result.getBit(0)) {
@@ -181,7 +214,13 @@ internal class BitsCronField private constructor(
         }
     }
 
+    /**
+     * 返回设置指定位置的新字段
+     */
     private fun copySetting(index: Int): BitsCronField = BitsCronField(type(), bits or (BIT_0 shl index))
 
+    /**
+     * 返回清除指定位置的新字段
+     */
     private fun copyClearing(index: Int): BitsCronField = BitsCronField(type(), bits and (BIT_0 shl index).inv())
 }

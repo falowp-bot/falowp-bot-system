@@ -14,6 +14,9 @@ data class PluginInfo(
     val plugin: Plugin
 ) {
     companion object {
+        /**
+         * 创建空插件信息
+         */
         fun empty(): PluginInfo {
             return PluginInfo(Any(), Plugin(name = ""))
         }

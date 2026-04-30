@@ -21,15 +21,24 @@ data class EventPluginRegister<T : Plugin.Listener.Event>(
     override val originalClass: KClass<*> = getCallerClass()
 ) : PluginRegister() {
 
+    /**
+     * 发布事件到当前插件
+     */
     suspend fun publish(botApi: BotApi, event: Any) {
         @Suppress("UNCHECKED_CAST")//因为data class无法使用reified，导致T被擦出无法正确识别T
         block.invoke(botApi, event as T)
     }
 
+    /**
+     * 注册事件插件
+     */
     override fun register() {
         EventManager.registerEvent(this)
     }
 
+    /**
+     * 取消注册事件插件
+     */
     override fun unregister() {
         EventManager.unregisterEvent(this)
     }

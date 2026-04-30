@@ -15,6 +15,9 @@ import kotlinx.coroutines.withContext
  */
 object Webdriver : Log {
 
+    /**
+     * 初始化Webdriver
+     */
     internal fun configure() {
         log().info("初始化Webdriver")
         Playwright.create().close()
@@ -36,6 +39,9 @@ fun <T> Page.existsToExecute(
     return allElementHandle.map { block.invoke(it) }.toList()
 }
 
+/**
+ * 默认浏览器上下文配置
+ */
 fun defaultNewContextOptions(): Browser.NewContextOptions {
     return Browser.NewContextOptions()
         .setViewportSize(3024, 1964)
@@ -44,6 +50,9 @@ fun defaultNewContextOptions(): Browser.NewContextOptions {
         .setIsMobile(false)
 }
 
+/**
+ * 默认浏览器启动配置
+ */
 fun defaultLaunchOptions(): LaunchOptions {
     return LaunchOptions().setArgs(
         listOf(
@@ -56,6 +65,9 @@ fun defaultLaunchOptions(): LaunchOptions {
     )
 }
 
+/**
+ * 使用通用浏览器上下文执行
+ */
 fun <T> commonWebdriverContext(browserContext: BrowserContext? = null, block: BrowserContext.() -> T): T {
     if (browserContext != null) {
         return browserContext.use { block(it) }
@@ -69,6 +81,9 @@ fun <T> commonWebdriverContext(browserContext: BrowserContext? = null, block: Br
     }
 }
 
+/**
+ * 使用通用页面执行
+ */
 fun <T> commonWebdriverContextPage(page: Page? = null, block: Page.() -> T): T {
     if (page != null) {
         return page.use { block(it) }
@@ -77,6 +92,9 @@ fun <T> commonWebdriverContextPage(page: Page? = null, block: Page.() -> T): T {
 }
 
 
+/**
+ * HTML截图并转为Base64图片
+ */
 suspend fun htmlToImageBase64(html: String, querySelector: String = "body"): String {
     return withContext(Dispatchers.IO) {
         commonWebdriverContextPage {

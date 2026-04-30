@@ -21,6 +21,9 @@ object Scheduling : Log {
     private val executor = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val executorTaskList = CopyOnWriteArrayList<SchedulingRunnable>()
 
+    /**
+     * 根据接收人选择可用BotApi
+     */
     suspend fun selectBot(receive: String, originalClass: KClass<*>): BotApi? {
         return botApiSupportList()
             .firstOrNull { it.supportReceive(receive) }
@@ -28,14 +31,23 @@ object Scheduling : Log {
             ?.let { PluginBotApi(it) }
     }
 
+    /**
+     * 获取所有可用BotApi
+     */
     suspend fun allBot(originalClass: KClass<*>): List<BotApi> {
         return botApiSupportList().map { PluginBotApi(it.bot("", originalClass)) }.toList()
     }
 
+    /**
+     * 注册任务
+     */
     fun registerTask(pluginRegister: TaskPluginRegister) {
         executorTaskList.add(schedulingRunnable(pluginRegister))
     }
 
+    /**
+     * 取消注册任务
+     */
     fun unregisterTask(pluginRegister: TaskPluginRegister) {
         executor.launch {
             executorTaskList.singleOrNull { it.plugin.pluginId == pluginRegister.pluginId }?.let {
@@ -45,6 +57,9 @@ object Scheduling : Log {
         }
     }
 
+    /**
+     * 初始化定时任务
+     */
     fun configure() {
         log().info("初始化(周期/cron)任务")
         val systemTasks = initSystemTasks()
@@ -53,6 +68,9 @@ object Scheduling : Log {
         log().info("初始化(周期/cron)任务完成")
     }
 
+    /**
+     * 初始化系统内置任务
+     */
     private fun initSystemTasks(): List<SchedulingRunnable> {
         return listOf(
             schedulingRunnable(GreetingTask.goodMorning),
@@ -60,6 +78,9 @@ object Scheduling : Log {
         )
     }
 
+    /**
+     * 创建并调度任务
+     */
     private fun schedulingRunnable(plugin: TaskPluginRegister): SchedulingRunnable {
         val runnable = SchedulingRunnable(plugin, executor)
         runnable.schedule()

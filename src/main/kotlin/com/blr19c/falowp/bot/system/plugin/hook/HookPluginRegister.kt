@@ -34,14 +34,23 @@ data class HookPluginRegister<T : Plugin.Listener.Hook>(
     override val originalClass: KClass<*> = getCallerClass()
 ) : PluginRegister() {
 
+    /**
+     * 注册钩子插件
+     */
     override fun register() {
         HookManager.registerHook(this)
     }
 
+    /**
+     * 取消注册钩子插件
+     */
     override fun unregister() {
         HookManager.unregister(this)
     }
 
+    /**
+     * 执行钩子
+     */
     suspend fun hook(hookJoinPoint: HookJoinPoint, event: Any) {
         @Suppress("UNCHECKED_CAST")//因为data class无法使用reified，导致T被擦出无法正确识别T
         block.invoke(hookJoinPoint, event as T)

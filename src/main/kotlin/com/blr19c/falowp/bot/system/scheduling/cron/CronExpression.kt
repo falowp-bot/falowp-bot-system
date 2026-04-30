@@ -3,6 +3,9 @@ package com.blr19c.falowp.bot.system.scheduling.cron
 import java.time.temporal.ChronoUnit
 import java.time.temporal.Temporal
 
+/**
+ * Cron表达式解析与下次执行时间计算
+ */
 class CronExpression private constructor(
     seconds: CronField,
     minutes: CronField,
@@ -17,6 +20,9 @@ class CronExpression private constructor(
     private val fields: Array<CronField> =
         arrayOf(daysOfWeek, months, daysOfMonth, hours, minutes, seconds, CronField.zeroNanos())
 
+    /**
+     * 获取给定时间之后的下一次匹配时间
+     */
     fun <T> next(temporal: T): T? where T : Temporal? {
         if (temporal == null) {
             return null
@@ -62,6 +68,9 @@ class CronExpression private constructor(
     override fun toString(): String = expression
 
     companion object {
+        /**
+         * 最大向前尝试次数
+         */
         const val MAX_ATTEMPTS = 366
 
         private val MACROS: Map<String, String> = mapOf(
@@ -74,6 +83,9 @@ class CronExpression private constructor(
             "@hourly" to "0 0 * * * *",
         )
 
+        /**
+         * 解析Cron表达式
+         */
         fun parse(exp: String): CronExpression {
             val expression = resolveMacros(exp)
             val fields = tokenizeFields(expression)

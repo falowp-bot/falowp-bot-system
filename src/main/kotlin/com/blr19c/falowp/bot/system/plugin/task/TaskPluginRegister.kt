@@ -22,10 +22,16 @@ data class TaskPluginRegister(
     override val originalClass: KClass<*> = getCallerClass()
 ) : PluginRegister() {
 
+    /**
+     * 注册任务插件
+     */
     override fun register() {
         Scheduling.registerTask(this)
     }
 
+    /**
+     * 取消注册任务插件
+     */
     override fun unregister() {
         Scheduling.unregisterTask(this)
     }

@@ -31,6 +31,9 @@ interface HookJoinPoint {
     fun pluginInfo(): PluginInfo?
 }
 
+/**
+ * 原生hook接入点
+ */
 class NativeHookJoinPoint(
     private val pluginInfo: PluginInfo?,
     private val hook: Plugin.Listener.Hook,
@@ -62,11 +65,19 @@ class NativeHookJoinPoint(
      */
     override fun botApi(): BotApi = currentHookProcess.get().botApi()
 
+    /**
+     * 插件信息
+     */
     override fun pluginInfo() = pluginInfo
 }
 
+/**
+ * 指定BotApi的hook接入点
+ */
 class SpecifiedBotApiNativeHookJoinPoint(private val botApi: BotApi, hookJoinPoint: HookJoinPoint) :
     HookJoinPoint by hookJoinPoint {
+    /**
+     * 获取指定的BotApi
+     */
     override fun botApi() = botApi
 }
-
