@@ -10,9 +10,8 @@ import com.blr19c.falowp.bot.system.plugin.Plugin
 import com.blr19c.falowp.bot.system.plugin.PluginRegister
 import com.blr19c.falowp.bot.system.plugin.UnRegister
 import com.blr19c.falowp.bot.system.plugin.message.MessageMatch
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.CompletableDeferred
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * 钩子函数
@@ -53,23 +52,32 @@ suspend fun <T : Any> BotApi.awaitReply(
     match: MessageMatch = MessageMatch.allMatch(),
     block: suspend BotApi.(args: Array<String>) -> T
 ): T {
-    var data: T? = null
-    this.runtimeHook<ReceiveMessageHook>(HookTypeEnum.BEFORE) { (receiveMessage), unRegister ->
-        val botApi = this.botApi()
-        if (match.checkMath(receiveMessage)) {
-            val args = match.regex?.find(receiveMessage.content.message)?.destructured?.toList() ?: listOf()
-            try {
-                data = block.invoke(botApi, args.toTypedArray())
-            } finally {
-                unRegister.unregister()
-            }
+    val deferred = CompletableDeferred<T>()
+    val consumed = AtomicBoolean(false)
+    val hook = this.runtimeHook<ReceiveMessageHook>(HookTypeEnum.BEFORE) { (receiveMessage), unRegister ->
+        if (!deferred.isActive) {
+            unRegister.unregister()
             return@runtimeHook
         }
+        if (!match.checkMath(receiveMessage) || !consumed.compareAndSet(false, true)) {
+            return@runtimeHook
+        }
+
+        val botApi = this.botApi()
+        val args = match.regex?.find(receiveMessage.content.message)?.destructured?.toList() ?: listOf()
+        try {
+            deferred.complete(block.invoke(botApi, args.toTypedArray()))
+        } catch (e: Throwable) {
+            deferred.completeExceptionally(e)
+        } finally {
+            unRegister.unregister()
+        }
     }
-    while (isActive && data == null) {
-        delay(100.milliseconds)
+    try {
+        return deferred.await()
+    } finally {
+        hook.unregister()
     }
-    return data!!
 }
 
 
