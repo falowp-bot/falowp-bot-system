@@ -113,10 +113,32 @@ class SchedulingRunnable(
      * 延迟到触发时间后执行任务
      */
     private suspend fun asyncRun(initialDelay: Duration) {
-        awaitInit()
-        delay(initialDelay)
-        GreetingTask.delayNextGoodMorning(this.trigger.useGreeting)
-        this.run()
+        try {
+            awaitInit()
+            delay(initialDelay)
+            GreetingTask.delayNextGoodMorning(this.trigger.useGreeting)
+            this.run()
+        } catch (ex: CancellationException) {
+            throw ex
+        } catch (ex: Throwable) {
+            log().error("定时任务调度异常[${plugin.originalClass}], 将尝试调度下一次执行", ReflectionUtils.skipReflectionException(ex))
+            rescheduleAfterFailure()
+        }
+    }
+
+    /**
+     * 调度协程自身异常时，跳过当前触发点并尝试恢复后续调度
+     */
+    private suspend fun rescheduleAfterFailure() {
+        val now = Instant.now()
+        mutex.withLock {
+            if (obtainCurrentFuture().isCancelled) {
+                return
+            }
+            val scheduled = scheduledExecutionTime ?: now
+            triggerContext.update(scheduled, now, now)
+            schedule()
+        }
     }
 
     /**
