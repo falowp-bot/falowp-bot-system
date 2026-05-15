@@ -1,5 +1,6 @@
 package com.blr19c.falowp.bot.system.utils
 
+import com.blr19c.falowp.bot.system.plugin.Plugin
 import com.blr19c.falowp.bot.system.systemConfigListProperty
 import java.net.JarURLConnection
 import java.net.URL
@@ -35,7 +36,7 @@ object ScanUtils {
      * 获取调用方插件类
      */
     fun getCallerClass(packageNames: List<String> = systemConfigListProperty("pluginPackage")): KClass<*> {
-        val caller = findCallerClass(packageNames)
+        val caller = findPluginCallerClass(packageNames) ?: findCallerClass(packageNames)
         return caller?.kotlin
             ?: throw IllegalStateException("未找到调用方类,packageNames=$packageNames")
     }
@@ -83,6 +84,21 @@ object ScanUtils {
         return callerStackWalker.walk { frames ->
             frames.map { it.declaringClass }
                 .filter { clazz -> packageNames.any { clazz.name.contains(it) } }
+                .findFirst()
+                .let { optional ->
+                    if (optional.isPresent) optional.get() else null
+                }
+        }
+    }
+
+    /**
+     * 在调用栈中查找声明了插件注解的插件类
+     */
+    private fun findPluginCallerClass(packageNames: List<String>): Class<*>? {
+        return callerStackWalker.walk { frames ->
+            frames.map { it.declaringClass }
+                .filter { clazz -> packageNames.any { clazz.name.contains(it) } }
+                .filter { clazz -> clazz.isAnnotationPresent(Plugin::class.java) }
                 .findFirst()
                 .let { optional ->
                     if (optional.isPresent) optional.get() else null

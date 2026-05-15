@@ -9,6 +9,7 @@ import com.blr19c.falowp.bot.system.listener.hooks.ReceiveMessageHook
 import com.blr19c.falowp.bot.system.plugin.event.EventManager
 import com.blr19c.falowp.bot.system.plugin.hook.HookManager
 import com.blr19c.falowp.bot.system.plugin.hook.withPluginHook
+import com.blr19c.falowp.bot.system.plugin.message.MessagePluginInfo
 import com.blr19c.falowp.bot.system.plugin.message.MessagePluginRegister
 import com.blr19c.falowp.bot.system.plugin.message.QueueMessagePluginRegister
 import com.blr19c.falowp.bot.system.systemConfigListProperty
@@ -66,6 +67,32 @@ object PluginManagement : Log {
         messagePlugins.remove(pluginRegister.messagePluginRegister)
         queueMessageInfos.remove(pluginRegister.pluginId)
         queueMessagePlugins.remove(pluginRegister.pluginId)?.close()
+    }
+
+    /**
+     * 获取消息类插件信息
+     */
+    fun messagePluginInfos(): List<MessagePluginInfo> {
+        return messagePlugins.map(::MessagePluginInfo)
+    }
+
+    /**
+     * 直接执行消息类插件
+     *
+     * @param pluginId 消息类插件注册器ID
+     * @param args 传递给消息类插件的参数
+     */
+    suspend fun BotApi.invokeMessagePlugin(pluginId: String, args: Array<String> = emptyArray()) {
+        val plugin = messagePlugins.find { it.pluginId == pluginId }
+            ?: throw IllegalArgumentException("未找到消息类插件:$pluginId")
+        try {
+            withPluginHook(this, MessagePluginExecutionHook(this.receiveMessage, plugin)) {
+                plugin.block(this, args)
+            }
+        } catch (exception: Throwable) {
+            log().error("插件:${plugin.originalClass}处理失败", exception)
+            throw exception
+        }
     }
 
     /**
