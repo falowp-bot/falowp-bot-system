@@ -36,10 +36,7 @@ internal class QuartzCronField private constructor(
     override fun hashCode(): Int = value.hashCode()
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        return other is QuartzCronField && type() == other.type() && value == other.value
+        return this === other || other is QuartzCronField && type() == other.type() && value == other.value
     }
 
     override fun toString(): String = "${type()} '$value'"

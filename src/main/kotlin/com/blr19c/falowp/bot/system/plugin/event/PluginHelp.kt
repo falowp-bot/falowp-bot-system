@@ -86,11 +86,11 @@ class PluginHelp(private val pluginList: List<PluginInfo>) : suspend (BotApi, He
         val tagList = mutableListOf<String>()
         for ((tag, pluginInfoList) in withPlugin(botApi).groupBy { it.plugin.tag }) {
             val cardList = mutableListOf<String>()
-            for (pluginInfo in pluginInfoList) {
-                if (pluginInfo.plugin.hidden && !helpEvent.showHidden) continue
-                if (!pluginInfo.plugin.enable && !helpEvent.showDisable) continue
-                val enablePart = if (pluginInfo.plugin.enable) "" else " disable"
-                val plugin = """<div class="plugin-info$enablePart">${pluginInfo.plugin.name}</div>"""
+            for ((_, plugin1) in pluginInfoList) {
+                if (plugin1.hidden && !helpEvent.showHidden) continue
+                if (!plugin1.enable && !helpEvent.showDisable) continue
+                val enablePart = if (plugin1.enable) "" else " disable"
+                val plugin = """<div class="plugin-info$enablePart">${plugin1.name}</div>"""
                 val content = """<div class="card-content">$plugin</div>"""
                 val card = """<div class="card-item">$content</div>"""
                 cardList.add(card)

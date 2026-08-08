@@ -59,10 +59,7 @@ internal class BitsCronField private constructor(
     override fun hashCode(): Int = java.lang.Long.hashCode(bits)
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        return other is BitsCronField && type() == other.type() && bits == other.bits
+        return this === other || other is BitsCronField && type() == other.type() && bits == other.bits
     }
 
     override fun toString(): String {

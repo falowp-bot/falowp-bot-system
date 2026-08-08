@@ -59,10 +59,7 @@ class CronExpression private constructor(
     override fun hashCode(): Int = fields.contentHashCode()
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        return other is CronExpression && fields.contentEquals(other.fields)
+        return this === other || other is CronExpression && fields.contentEquals(other.fields)
     }
 
     override fun toString(): String = expression

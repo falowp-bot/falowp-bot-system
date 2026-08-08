@@ -28,10 +28,7 @@ internal class CompositeCronField private constructor(
     override fun hashCode(): Int = value.hashCode()
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        return other is CompositeCronField && type() == other.type() && value == other.value
+        return this === other || other is CompositeCronField && type() == other.type() && value == other.value
     }
 
     override fun toString(): String = "${type()} '$value'"

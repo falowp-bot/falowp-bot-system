@@ -1,23 +1,23 @@
-val kotlinxCoroutinesVersion: String by project
-val ktorVersion: String by project
-val logbackVersion: String by project
-val jacksonVersion: String by project
-val jsoupVersion: String by project
-val guavaVersion: String by project
-val playwrightVersion: String by project
-val animatedGifVersion: String by project
-val jetbrainsAnnotationsVersion: String by project
-val jvmVersion: String = "2.3.10"
+val kotlinxCoroutinesVersion: String = project.property("kotlinxCoroutinesVersion").toString()
+val ktorVersion: String = project.property("ktorVersion").toString()
+val logbackVersion: String = project.property("logbackVersion").toString()
+val jacksonVersion: String = project.property("jacksonVersion").toString()
+val jsoupVersion: String = project.property("jsoupVersion").toString()
+val guavaVersion: String = project.property("guavaVersion").toString()
+val playwrightVersion: String = project.property("playwrightVersion").toString()
+val animatedGifVersion: String = project.property("animatedGifVersion").toString()
+val jetbrainsAnnotationsVersion: String = project.property("jetbrainsAnnotationsVersion").toString()
+val jvmVersion: String = "2.4.0"
 
 plugins {
-    kotlin("jvm") version "2.3.10"
-    id("com.github.ben-manes.versions") version "0.53.0"
-    id("com.vanniktech.maven.publish") version "0.36.0"
+    kotlin("jvm") version "2.4.0"
+    id("com.github.ben-manes.versions") version "0.60.0"
+    id("com.vanniktech.maven.publish") version "0.37.0"
     id("signing")
 }
 
 group = "com.blr19c.falowp"
-version = "2.3.6-FX3"
+version = "2.3.6-FX4"
 
 kotlin {
     jvmToolchain(25)
