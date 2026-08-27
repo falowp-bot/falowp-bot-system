@@ -1,6 +1,5 @@
 ![maven](https://img.shields.io/badge/Kotlin-2.0+-blue.svg)
 ![maven](https://img.shields.io/badge/Ktor-3.0+-a.svg)
-![maven](https://img.shields.io/badge/CQ1.2+-red)
 ![maven](https://img.shields.io/badge/Napcat4.0+-red)
 ![maven](https://img.shields.io/badge/QQ-red)
 ![maven](https://img.shields.io/badge/TG-red)
@@ -25,9 +24,19 @@
 implementation("com.blr19c.falowp:falowp-bot-system:2.3.5")
 ```
 
-## [查看文档](https://falowp.blr19c.com)
+## [查看文档](https://falowp-bot.github.io)
 
 ## 更新日志
+
+### 2.3.6
+
+* 更新一些依赖版本
+* 优化了`hook`等待消息的逻辑
+* 机器人自身信息添加了昵称和头像
+* 添加了插件信息获取方法
+* 优化了`cron`代码结构
+* 新增了`-ai`插件，支持ai交互和调用已加载插件
+* 优化了一些插件代码结构
 
 ### 2.3.5
 
@@ -59,8 +68,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.3.5")
 * `-nc`适配器的合并转发消息从`OTHER`类型改为`SHARE`类型
 * `-bili`插件优化了一些动态推送逻辑
 * `-repeat`插件优化了逻辑
-* 新版本的`Jackson`对`JsonNode`添加了`.map`方法,这会导致Kotlin的扩展函数不可用
-  use: `.elements().map or .mapNotNull`
+* 新版本的`Jackson`对`JsonNode`添加了`.map`方法,这会导致Kotlin的扩展函数不可用 use: `.elements().map or .mapNotNull`
 
 ### 2.3.1
 
@@ -72,7 +80,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.3.5")
 * 新增了一些`Json`工具的快捷操作
 * 分享消息新增分享类型
 
-### 2.3.0(不向下兼容)
+### 2.3.0 (不向下兼容)
 
 * 更新一些依赖版本
 * 更新默认的`useragent`
@@ -121,7 +129,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.3.5")
 * 支持多数据源配置
 * 优化一些配置
 
-### 2.2.0(不向下兼容)
+### 2.2.0 (不向下兼容)
 
 * 更新一些依赖版本
 * 重构`ImageUrl`
@@ -162,7 +170,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.3.5")
 * 2.0.0-RC?的正式版本
 * 修复了一些问题
 
-### 2.0.0-RC1/2/3/4/5/6/7/8(不向下兼容)
+### 2.0.0-RC1/2/3/4/5/6/7/8 (不向下兼容)
 
 * 更新一些依赖版本
 * 重做了协议适配器、文本检测、翻译、数据源、MinIO
@@ -193,7 +201,7 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.3.5")
 * 优化了`ImageUrl`中获取摘要的逻辑
 * 使用`github-workflows`发布
 
-### 1.4.0(不向下兼容)
+### 1.4.0 (不向下兼容)
 
 * 修复 message 队列引起的不能重复获取消息问题
 * 修复`Webdriver`没有逐级关闭导致残留 chrome 进程的问题
@@ -204,19 +212,19 @@ implementation("com.blr19c.falowp:falowp-bot-system:2.3.5")
 
 * 优化`HookJoinPoint`中`BotApi`的获取逻辑
 
-### 1.3.0(不向下兼容)
+### 1.3.0 (不向下兼容)
 
 * 支持队列消息
 * 支持获取引用消息内容
-* 发送消息使用链式处理(自定义消息顺序) 注意: 链式消息取代了之前的消息并且不向下兼容
-* 将之前的image扩展移动至了expand扩展,并新增了一些扩展(不兼容原路径)
+* 发送消息使用链式处理 (自定义消息顺序) 注意: 链式消息取代了之前的消息并且不向下兼容
+* 将之前的image扩展移动至了expand扩展,并新增了一些扩展 (不兼容原路径)
 * 更新一些依赖
 * 更新默认的`useragent`
 * 更新一些描述
 
 ### 1.2.6
 
-* 修复(`go-cqhttp`下)群昵称为空字符时无法获取昵称的问题
+* 修复 (`go-cqhttp`下)群昵称为空字符时无法获取昵称的问题
 * 更新一些依赖的版本
 
 ### 1.2.5

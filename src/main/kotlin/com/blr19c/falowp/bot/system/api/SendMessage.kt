@@ -41,6 +41,11 @@ interface SendMessage {
         }
 
         /**
+         * 添加文本消息并且换行
+         */
+        fun textLine(content: String) = text("${content.trimEnd('\n')}\n")
+
+        /**
          * 添加单个at消息
          */
         fun at(at: String) = apply {
