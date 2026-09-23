@@ -21,12 +21,16 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:2.3.5")
+implementation("com.blr19c.falowp:falowp-bot-system:2.3.7")
 ```
 
 ## [查看文档](https://falowp-bot.github.io)
 
 ## 更新日志
+
+### 2.3.7
+* 更新一些依赖版本
+* 修复了`-nc`适配器私聊变群聊的问题
 
 ### 2.3.6
 

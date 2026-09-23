@@ -11,13 +11,13 @@ val jvmVersion: String = "2.4.0"
 
 plugins {
     kotlin("jvm") version "2.4.0"
-    id("com.github.ben-manes.versions") version "0.61.0"
+    id("com.github.ben-manes.versions") version "0.64.0"
     id("com.vanniktech.maven.publish") version "0.37.0"
     id("signing")
 }
 
 group = "com.blr19c.falowp"
-version = "2.3.6"
+version = "2.3.7"
 
 kotlin {
     jvmToolchain(25)

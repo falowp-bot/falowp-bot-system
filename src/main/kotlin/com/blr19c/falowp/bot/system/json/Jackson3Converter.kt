@@ -38,7 +38,7 @@ class Jackson3Converter(
         typeInfo: TypeInfo,
         content: ByteReadChannel
     ): Any? {
-        val bytes = content.readRemaining().readByteArray()
+        val bytes = content.readBuffer().readByteArray()
         val valueType = mapper.typeFactory.constructType(typeInfo.reifiedType)
         return mapper.readValue(bytes, valueType)
     }

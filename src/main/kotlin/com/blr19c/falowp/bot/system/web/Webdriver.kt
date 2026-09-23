@@ -34,7 +34,7 @@ fun <T> Page.existsToExecute(
     block: ElementHandle.() -> T
 ): List<T> {
     val allElementHandle = this.querySelectorAll(selector)
-    if (allElementHandle.isNullOrEmpty()) return emptyList()
+    if (allElementHandle.isEmpty()) return emptyList()
     if (onlyOne) return listOf(block.invoke(allElementHandle.first()))
     return allElementHandle.map { block.invoke(it) }.toList()
 }
@@ -100,7 +100,10 @@ suspend fun htmlToImageBase64(html: String, querySelector: String = "body"): Str
         commonWebdriverContextPage {
             this.setContent(html)
             this.waitForLoadState(LoadState.NETWORKIDLE)
-            this.querySelector(querySelector).screenshot().encodeToBase64String()
+            val element = checkNotNull(this.querySelector(querySelector)) {
+                "未找到匹配的页面元素: $querySelector"
+            }
+            element.screenshot().encodeToBase64String()
         }
     }
 }
