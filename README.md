@@ -21,14 +21,21 @@
 
 ```
 // https://mvnrepository.com/artifact/com.blr19c.falowp/falowp-bot-system
-implementation("com.blr19c.falowp:falowp-bot-system:2.3.7")
+implementation("com.blr19c.falowp:falowp-bot-system:2.3.8")
 ```
 
 ## [查看文档](https://falowp-bot.github.io)
 
 ## 更新日志
 
+### 2.3.8
+
+* 更新一些依赖版本
+* 增加了`-ai`插件支持文件配置预设
+* 修改了一些配置为升级`gradle-10`做准备
+
 ### 2.3.7
+
 * 更新一些依赖版本
 * 修复了`-nc`适配器私聊变群聊的问题
 

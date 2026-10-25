@@ -5,19 +5,18 @@ val jacksonVersion: String = project.property("jacksonVersion").toString()
 val jsoupVersion: String = project.property("jsoupVersion").toString()
 val guavaVersion: String = project.property("guavaVersion").toString()
 val playwrightVersion: String = project.property("playwrightVersion").toString()
-val animatedGifVersion: String = project.property("animatedGifVersion").toString()
 val jetbrainsAnnotationsVersion: String = project.property("jetbrainsAnnotationsVersion").toString()
-val jvmVersion: String = "2.4.0"
+val kotlinVersion: String = "2.4.21"
 
 plugins {
-    kotlin("jvm") version "2.4.0"
-    id("com.github.ben-manes.versions") version "0.64.0"
+    kotlin("jvm") version "2.4.21"
+    id("io.github.ben-manes.versions") version "0.66.0"
     id("com.vanniktech.maven.publish") version "0.37.0"
     id("signing")
 }
 
 group = "com.blr19c.falowp"
-version = "2.3.7"
+version = "2.3.8"
 
 kotlin {
     jvmToolchain(25)
@@ -28,6 +27,8 @@ repositories {
 }
 
 dependencies {
+    implementation(kotlin("reflect"))
+
     //kotlinx-coroutines
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:$kotlinxCoroutinesVersion")
 
@@ -68,26 +69,25 @@ configurations.all {
         force("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:$kotlinxCoroutinesVersion")
         force("org.jetbrains:annotations:$jetbrainsAnnotationsVersion")
         force("com.google.guava:guava:$guavaVersion")
-        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$jvmVersion")
-        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$jvmVersion")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
     }
 }
 
-tasks.register<Jar>("javadocJar") {
+val javadocJar = tasks.register<Jar>("javadocJar") {
     description = "javadoc"
     archiveClassifier.set("javadoc")
     from(tasks.getByName("javadoc"))
 }
 
-tasks.register<Jar>("sourcesJar") {
+val sourcesJar = tasks.register<Jar>("sourcesJar") {
     description = "sources"
     archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
 }
 
-artifacts {
-    add("archives", tasks.named<Jar>("javadocJar"))
-    add("archives", tasks.named<Jar>("sourcesJar"))
+tasks.named("assemble") {
+    dependsOn(javadocJar, sourcesJar)
 }
 
 mavenPublishing {
